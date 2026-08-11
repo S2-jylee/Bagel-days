@@ -49,7 +49,7 @@ export default function About() {
 
         <div className="wrap">
           <div className="mascot-panel">
-            <img src={asset("/assets/images/candy-mascot.jpg")} alt="Candy the Bagel Days mascot" />
+            <img src={asset("/assets/images/candy-mascot.png")} alt="Candy the Bagel Days mascot" />
             <div>
               <span className="eyebrow">Meet Candy</span>
               <h3 style={{ fontSize: "1.6rem", marginBottom: 12 }}>Our Beloved Mascot</h3>
