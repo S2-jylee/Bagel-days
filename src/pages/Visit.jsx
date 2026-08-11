@@ -7,19 +7,13 @@ const MAPS_EMBED = "https://www.google.com/maps?q=Shop+1,+29+Robertson+Street,+F
 export default function Visit() {
   return (
     <>
-      <section className="hero" style={{ paddingBottom: 0 }}>
+      <section className="hero hero-photo" style={{ paddingBottom: 0, "--hero-img": "url(/assets/images/storefront.jpg)", "--hero-aspect": "2.29" }}>
         <div className="wrap">
-          <div>
-            <span className="eyebrow">Visit Us</span>
+          <div className="hero-content">
             <h1>We Can't Wait to Welcome You!</h1>
             <p className="lede">We look forward to welcoming you to Bagel Days. Stop by for freshly baked bagels, house-made cream cheese, and Campos Specialty Coffee.</p>
+            <span className="sr-only">Bagel Days storefront in Fortitude Valley</span>
           </div>
-          <div
-            className="hero-img"
-            style={{ backgroundImage: "url(/assets/images/storefront.jpg)" }}
-            role="img"
-            aria-label="Bagel Days storefront in Fortitude Valley"
-          />
         </div>
       </section>
 
@@ -58,8 +52,6 @@ export default function Visit() {
               </ul>
             </div>
           </div>
-
-          <iframe className="map-embed" loading="lazy" allowFullScreen title="Bagel Days location" src={MAPS_EMBED}></iframe>
 
           <div className="closing-note">
             <div className="ic" style={{ width: 44, height: 44, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--maroon)", margin: "0 auto 14px" }}>

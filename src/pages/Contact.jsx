@@ -42,22 +42,17 @@ export default function Contact() {
 
   return (
     <>
-      <section className="hero" style={{ paddingBottom: 0 }}>
+      <section className="hero hero-photo" style={{ paddingBottom: 0, "--hero-img": "url(/assets/images/sandwich-set.jpg)", "--hero-aspect": "1.43" }}>
         <div className="wrap">
-          <div>
+          <div className="hero-content">
             <h1>Contact Us</h1>
             <div className="divider" style={{ margin: "14px 0" }}></div>
             <p className="script" style={{ fontSize: "1.2rem" }}>We'd love to hear from you.</p>
             <p className="lede" style={{ marginTop: 14 }}>
               Have a question, catering enquiry, or collaboration idea? Send us a message and we'll get back to you as soon as possible.
             </p>
+            <span className="sr-only">Bagel Days coffee and bagel to go</span>
           </div>
-          <div
-            className="hero-img"
-            style={{ backgroundImage: "url(/assets/images/sandwich-set.jpg)" }}
-            role="img"
-            aria-label="Bagel Days coffee and bagel to go"
-          />
         </div>
       </section>
 
@@ -74,7 +69,7 @@ export default function Contact() {
 
             <div className="contact-card">
               <h4>Send Us a Message</h4>
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} className="contact-form">
                 <div className="form-grid">
                   <div className="field"><label>First Name</label><input type="text" name="first_name" required /></div>
                   <div className="field"><label>Last Name</label><input type="text" name="last_name" required /></div>

@@ -16,29 +16,22 @@ const HIGHLIGHTS = [
 export default function Pickup() {
   return (
     <>
-      <section className="hero home-hero">
+      <section className="hero home-hero hero-photo" style={{ "--hero-img": "url(/assets/images/hero-main.jpg)", "--hero-aspect": "2.09" }}>
         <div className="wrap">
-          <div>
-            <span className="eyebrow">Pickup &amp; Delivery</span>
+          <div className="hero-content">
             <h1>Order Online</h1>
             <p className="script" style={{ fontSize: "1.15rem", marginTop: 8 }}>Fresh bagels, ready when you are.</p>
             <p className="lede">
               Order your favourite bagels and drinks for pickup or delivery. Freshly made, carefully packed, ready for you.
             </p>
+            <span className="sr-only">Bagel and coffee ready for order</span>
           </div>
-          <div
-            className="hero-img"
-            style={{ backgroundImage: "url(/assets/images/hero-main.jpg)" }}
-            role="img"
-            aria-label="Bagel and coffee ready for order"
-          />
         </div>
       </section>
 
-      <section>
+      <section className="pickup-order-section">
         <div className="wrap">
           <div className="section-head center">
-            <span className="eyebrow">Order With</span>
             <h2>Choose Your Way to Order</h2>
           </div>
           <div className="delivery-buttons">

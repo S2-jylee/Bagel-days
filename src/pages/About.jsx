@@ -14,14 +14,13 @@ export default function About() {
       <section className="hero" style={{ paddingBottom: 0 }}>
         <div className="wrap" style={{ gridTemplateColumns: "1fr", textAlign: "center" }}>
           <div>
-            <span className="eyebrow">About Bagel Days</span>
             <h1>Our Story</h1>
             <p className="script" style={{ fontSize: "1.2rem", marginTop: 10 }}>Freshly Crafted Every Morning.</p>
           </div>
         </div>
       </section>
 
-      <section>
+      <section className="split-section">
         <div className="wrap split">
           <div className="img-duo">
             <img src="/assets/images/dough-rolling.jpg" alt="Hand-rolled bagel dough" />
@@ -64,7 +63,6 @@ export default function About() {
       <section style={{ background: "var(--cream-alt)", borderTop: "1px solid var(--line)" }}>
         <div className="wrap">
           <div className="section-head center">
-            <span className="eyebrow">Why We're Different</span>
             <h2>What Makes Bagel Days Special</h2>
           </div>
           <div className="special-grid">

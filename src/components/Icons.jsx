@@ -25,6 +25,9 @@ export const IcCar = () => (
 export const IcCheck = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
 );
+export const IcPlus = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+);
 export const IcMail = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m3 6 9 7 9-7"/></svg>
 );
@@ -60,4 +63,16 @@ export const IcExternal = () => (
 );
 export const IcWheat = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20"/><path d="M12 6 8 4M12 6l4-2M12 10 8 8m4 2 4-2M12 14 8 12m4 2 4-2"/></svg>
+);
+export const IcPhone = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .6 2.9a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.5 2.9.6a2 2 0 0 1 1.8 2.1Z"/></svg>
+);
+export const IcDonut = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.3"/><circle cx="8" cy="8.5" r=".6" fill="currentColor" stroke="none"/><circle cx="15.5" cy="7.5" r=".6" fill="currentColor" stroke="none"/><circle cx="17" cy="13" r=".6" fill="currentColor" stroke="none"/><circle cx="7" cy="15.5" r=".6" fill="currentColor" stroke="none"/><circle cx="12.5" cy="17.5" r=".6" fill="currentColor" stroke="none"/></svg>
+);
+export const IcBread = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12c0-4.4 3.6-8 8-8s8 3.6 8 8v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6Z"/><path d="M8 9l2 2M12 8l2 2M16 9l2 2"/></svg>
+);
+export const IcCakeSlice = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20h16M4 20V12l8-6 8 6v8"/><path d="M4 15h16M12 6v3"/></svg>
 );

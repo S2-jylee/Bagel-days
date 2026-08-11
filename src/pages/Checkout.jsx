@@ -101,7 +101,6 @@ export default function Checkout() {
     <section style={{ paddingBottom: 100 }}>
       <div className="wrap">
         <div className="section-head">
-          <span className="eyebrow">Checkout</span>
           <h1 style={{ fontSize: "clamp(2rem,3.6vw,2.8rem)" }}>Complete Your Order</h1>
           <p style={{ color: "var(--body)", maxWidth: "56ch", marginTop: 8 }}>
             Review your order, add your details, and pay securely by card.

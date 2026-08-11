@@ -3,17 +3,40 @@ import { CATEGORIES } from "../data/products";
 import FoodCard from "../components/FoodCard";
 import CartList from "../components/CartList";
 import { useCart } from "../context/CartContext";
+import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup } from "../components/Icons";
+
+const CATEGORY_ICONS = {
+  bagels: IcDonut,
+  "cream-cheese": IcTub,
+  "salt-bread": IcBread,
+  dessert: IcCakeSlice,
+  coffee: IcCup,
+};
+
+const ADDONS = [
+  { name: "Extra Cream Cheese", price: 1.5 },
+  { name: "Flavoured Cream Cheese", price: 2.0 },
+  { name: "Extra Butter", price: 0.5 },
+];
 
 export default function Menu() {
-  const [active, setActive] = useState(CATEGORIES[0].id);
+  const [activeCat, setActiveCat] = useState(CATEGORIES[0].id);
+  const [activeSubcat, setActiveSubcat] = useState(CATEGORIES[0].subcategories?.[0]?.id ?? null);
   const { addToCart } = useCart();
-  const activeCategory = CATEGORIES.find((c) => c.id === active);
+
+  const activeCategory = CATEGORIES.find((c) => c.id === activeCat);
+  const activeSubcategory = activeCategory.subcategories?.find((s) => s.id === activeSubcat) ?? null;
+  const visibleItems = activeSubcategory ? activeSubcategory.items : activeCategory.items;
+
+  function selectCategory(cat) {
+    setActiveCat(cat.id);
+    setActiveSubcat(cat.subcategories?.[0]?.id ?? null);
+  }
 
   return (
     <section className="menu-page-section">
       <div className="wrap">
         <div className="section-head center">
-          <span className="eyebrow">Menu &amp; Order</span>
           <h1 style={{ fontSize: "clamp(2.2rem,4vw,3.2rem)" }}>Menu &amp; Order</h1>
           <p style={{ maxWidth: "56ch", color: "var(--body)", margin: "8px auto 0" }}>
             Freshly baked every morning using quality ingredients and our signature slow fermentation process.
@@ -21,39 +44,75 @@ export default function Menu() {
           </p>
         </div>
 
-        <div className="menu-tabs" role="tablist">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              className={active === cat.id ? "active" : ""}
-              onClick={() => setActive(cat.id)}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-
         <div className="menu-order-layout">
-          <div>
+          <nav className="menu-maincats" aria-label="Menu categories">
+            <h3 className="menu-maincats-label">Menu</h3>
+            {CATEGORIES.map((cat) => {
+              const Ic = CATEGORY_ICONS[cat.id];
+              return (
+                <button
+                  key={cat.id}
+                  className={activeCat === cat.id ? "active" : ""}
+                  onClick={() => selectCategory(cat)}
+                >
+                  {Ic && <Ic />}
+                  <span>{cat.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          <div className="menu-products">
             <div className="menu-category active">
               <h2>{activeCategory.label}</h2>
+
+              {activeCategory.subcategories && (
+                <div className="menu-subcat-pills">
+                  {activeCategory.subcategories.map((sub) => (
+                    <button
+                      key={sub.id}
+                      className={activeSubcat === sub.id ? "active" : ""}
+                      onClick={() => setActiveSubcat(sub.id)}
+                    >
+                      {sub.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <div className="card-grid">
-                {activeCategory.items.map((id) => (
+                {visibleItems.map((id) => (
                   <FoodCard key={id} id={id} />
                 ))}
               </div>
 
-              {active === "bagels" && (
-                <div className="set-banner">
-                  <img src="/assets/images/sandwich-set.jpg" alt="Bagel set" />
-                  <div>
-                    <h3 style={{ fontSize: "1.2rem" }}>Make It A Set</h3>
-                    <p style={{ color: "var(--body)", fontSize: ".9rem" }}>Any Bagel + Cream Cheese + Coffee</p>
-                    <div className="price">From $12.50</div>
+              {activeCat === "bagels" && (
+                <div className="set-row">
+                  <div className="set-banner">
+                    <img src="/assets/images/sandwich-set.jpg" alt="Bagel set" />
+                    <div className="set-banner-info">
+                      <h3 style={{ fontSize: "1.2rem" }}>Make It A Set</h3>
+                      <p style={{ color: "var(--body)", fontSize: ".9rem" }}>Any Bagel + Cream Cheese + Coffee</p>
+                      <div className="set-banner-row">
+                        <div className="price">From $12.50</div>
+                        <button className="btn btn-primary" onClick={() => addToCart("set-classic", 1)}>
+                          Add Set to Cart
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <button className="btn btn-primary" onClick={() => addToCart("set-classic", 1)}>
-                    Add Set to Cart
-                  </button>
+
+                  <div className="addons-panel">
+                    <h4>Add-ons</h4>
+                    <ul>
+                      {ADDONS.map((a) => (
+                        <li key={a.name}>
+                          <span>{a.name}</span>
+                          <span className="p">${a.price.toFixed(2)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               )}
             </div>
