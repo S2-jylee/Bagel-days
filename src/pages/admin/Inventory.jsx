@@ -19,6 +19,8 @@ export default function Inventory() {
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [bulkQty, setBulkQty] = useState("");
   const [applying, setApplying] = useState(false);
+  const [fillAllQty, setFillAllQty] = useState("");
+  const [fillingAll, setFillingAll] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -86,6 +88,21 @@ export default function Inventory() {
     setBulkQty("");
   }
 
+  async function fillAllStock() {
+    if (fillAllQty === "") return;
+    const qty = Math.max(0, parseInt(fillAllQty, 10) || 0);
+    const ids = Object.keys(PRODUCTS);
+    setFillingAll(true);
+    setStockMap((prev) => {
+      const next = { ...prev };
+      ids.forEach((id) => (next[id] = qty));
+      return next;
+    });
+    await supabase.from("product_stock").update({ stock_qty: qty }).in("product_id", ids);
+    setFillingAll(false);
+    setFillAllQty("");
+  }
+
   return (
     <div>
       <div className="admin-section-header">
@@ -93,6 +110,30 @@ export default function Inventory() {
       </div>
 
       <p className="inventory-hint">Enter today's available quantity for each item &mdash; anything left blank shows as Sold Out on the menu.</p>
+
+      <div className="inventory-fillall-bar">
+        <div className="inventory-fillall-text">
+          <strong>Fill every product</strong>
+          <span>Sets stock for all {Object.keys(PRODUCTS).length} products at once, across every category &mdash; no need to select items first.</span>
+        </div>
+        <div className="inventory-bulk-apply">
+          <input
+            type="number"
+            min="0"
+            placeholder="Qty"
+            value={fillAllQty}
+            onChange={(e) => setFillAllQty(e.target.value)}
+          />
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            onClick={fillAllStock}
+            disabled={fillAllQty === "" || fillingAll}
+          >
+            {fillingAll ? "Filling…" : "Fill All Products"}
+          </button>
+        </div>
+      </div>
 
       <div className="inventory-layout">
         <nav className="menu-maincats" aria-label="Inventory categories">

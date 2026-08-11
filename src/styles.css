@@ -795,6 +795,13 @@ footer ul li a:hover{color:#F0D9C9;}
 @media (max-width:980px){
   .inventory-hint{margin-left:0;}
 }
+.inventory-fillall-bar{
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;
+  background:var(--tan); border:1px solid var(--tan-dark); border-radius:var(--radius); padding:16px 18px; margin-bottom:24px;
+}
+.inventory-fillall-text{display:flex; flex-direction:column; gap:2px; max-width:52ch;}
+.inventory-fillall-text strong{font-family:'Pretendard', sans-serif; font-weight:700; font-size:.92rem; color:var(--ink);}
+.inventory-fillall-text span{font-family:'Pretendard', sans-serif; font-size:.78rem; color:var(--body);}
 .inventory-bulk-bar{
   display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;
   background:var(--cream-alt); border-radius:var(--radius); padding:14px 16px; margin-top:18px;

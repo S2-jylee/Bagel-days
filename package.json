@@ -10,7 +10,7 @@
     "check:align": "node -e \"const { chromium } = require('playwright'); (async () => { const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 1440, height: 900 } }); await page.goto('http://localhost:5174/menu', { waitUntil: 'networkidle' }); const label = await page.locator('.menu-subcats-label').boundingBox(); const h2 = await page.locator('.menu-category h2').boundingBox(); const cartHead = await page.locator('.menu-cart-panel .cart-head h3').boundingBox(); console.log('label y:', label.y, 'h2 y:', h2.y, 'cartHead y:', cartHead.y); await browser.close(); })();\""
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.112.2",
+    "@supabase/supabase-js": "^2.112.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.0"
