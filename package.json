@@ -1,22 +1,29 @@
 {
-  "name": "bagel-days-site",
+  "name": "bagel-days",
   "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "check:align": "node -e \"const { chromium } = require('playwright'); (async () => { const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 1440, height: 900 } }); await page.goto('http://localhost:5174/menu', { waitUntil: 'networkidle' }); const label = await page.locator('.menu-subcats-label').boundingBox(); const h2 = await page.locator('.menu-category h2').boundingBox(); const cartHead = await page.locator('.menu-cart-panel .cart-head h3').boundingBox(); console.log('label y:', label.y, 'h2 y:', h2.y, 'cartHead y:', cartHead.y); await browser.close(); })();\""
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.112.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.0"
+    "@supabase/supabase-js": "^2.43.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.1",
-    "vite": "^5.4.0"
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "gh-pages": "^6.1.1",
+    "vite": "^5.2.0"
   }
 }
