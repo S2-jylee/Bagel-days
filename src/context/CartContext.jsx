@@ -15,7 +15,7 @@ function lineId(id, addons) {
 
 function loadCart() {
   try {
-    const raw = JSON.parse(localStorage.getItem(CART_KEY)) || {};
+    const raw = JSON.parse(sessionStorage.getItem(CART_KEY)) || {};
     const normalized = {};
     for (const key of Object.keys(raw)) {
       const val = raw[key];
@@ -35,7 +35,7 @@ export function CartProvider({ children }) {
   const [cart, setCart] = useState(loadCart);
 
   useEffect(() => {
-    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    sessionStorage.setItem(CART_KEY, JSON.stringify(cart));
   }, [cart]);
 
   const addToCart = useCallback((id, qty = 1, addons = []) => {
