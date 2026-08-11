@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CATEGORIES } from "../data/products";
+import { CATEGORIES, ADDONS } from "../data/products";
 import FoodCard from "../components/FoodCard";
 import CartList from "../components/CartList";
 import { useCart } from "../context/CartContext";
@@ -12,12 +12,6 @@ const CATEGORY_ICONS = {
   dessert: IcCakeSlice,
   coffee: IcCup,
 };
-
-const ADDONS = [
-  { name: "Extra Cream Cheese", price: 1.5 },
-  { name: "Flavoured Cream Cheese", price: 2.0 },
-  { name: "Extra Butter", price: 0.5 },
-];
 
 export default function Menu() {
   const [activeCat, setActiveCat] = useState(CATEGORIES[0].id);
@@ -86,35 +80,33 @@ export default function Menu() {
                 ))}
               </div>
 
-              {activeCat === "bagels" && (
-                <div className="set-row">
-                  <div className="set-banner">
-                    <img src="/assets/images/sandwich-set.jpg" alt="Bagel set" />
-                    <div className="set-banner-info">
-                      <h3 style={{ fontSize: "1.2rem" }}>Make It A Set</h3>
-                      <p style={{ color: "var(--body)", fontSize: ".9rem" }}>Any Bagel + Cream Cheese + Coffee</p>
-                      <div className="set-banner-row">
-                        <div className="price">From $12.50</div>
-                        <button className="btn btn-primary" onClick={() => addToCart("set-classic", 1)}>
-                          Add Set to Cart
-                        </button>
-                      </div>
+              <div className="set-row">
+                <div className="set-banner">
+                  <img src="/assets/images/sandwich-set.jpg" alt="Bagel set" />
+                  <div className="set-banner-info">
+                    <h3 style={{ fontSize: "1.2rem" }}>Make It A Set</h3>
+                    <p style={{ color: "var(--body)", fontSize: ".9rem" }}>Any Bagel + Cream Cheese + Coffee</p>
+                    <div className="set-banner-row">
+                      <div className="price">From $12.50</div>
+                      <button className="btn btn-primary" onClick={() => addToCart("set-classic", 1)}>
+                        Add Set to Cart
+                      </button>
                     </div>
                   </div>
-
-                  <div className="addons-panel">
-                    <h4>Add-ons</h4>
-                    <ul>
-                      {ADDONS.map((a) => (
-                        <li key={a.name}>
-                          <span>{a.name}</span>
-                          <span className="p">${a.price.toFixed(2)}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
                 </div>
-              )}
+
+                <div className="addons-panel">
+                  <h4>Add-ons</h4>
+                  <ul>
+                    {ADDONS.map((a) => (
+                      <li key={a.name}>
+                        <span>{a.name}</span>
+                        <span className="p">${a.price.toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
 

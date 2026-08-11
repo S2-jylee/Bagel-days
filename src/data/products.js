@@ -65,6 +65,12 @@ export const PRODUCTS = {
   "set-classic":        { name:"Bagel + Cream Cheese + Coffee Set", price:12.5, img:"/assets/images/sandwich-set.jpg", desc:"Any Bagel + Cream Cheese + Coffee" }
 };
 
+export const ADDONS = [
+  { name: "Extra Cream Cheese", price: 1.5 },
+  { name: "Flavoured Cream Cheese", price: 2.0 },
+  { name: "Extra Butter", price: 0.5 },
+];
+
 export const CATEGORIES = [
   {
     id: "bagels", label: "Bagels", img: "/assets/images/bagel-plain.jpg",

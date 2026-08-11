@@ -12,11 +12,16 @@ import Pickup from "./pages/Pickup";
 import Visit from "./pages/Visit";
 import Contact from "./pages/Contact";
 import Checkout from "./pages/Checkout";
+import OrderDisplay from "./pages/OrderDisplay";
+import Admin from "./pages/Admin";
+
+const STANDALONE_ROUTES = ["/order-display", "/admin"];
 
 export default function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
   const location = useLocation();
+  const isStandalone = STANDALONE_ROUTES.includes(location.pathname);
 
   // scroll to top + close overlays on route change; toggle body class for menu page
   useEffect(() => {
@@ -25,6 +30,15 @@ export default function App() {
     setNavOpen(false);
     document.body.classList.toggle("menu-page", location.pathname === "/menu");
   }, [location.pathname]);
+
+  if (isStandalone) {
+    return (
+      <Routes>
+        <Route path="/order-display" element={<OrderDisplay />} />
+        <Route path="/admin" element={<Admin />} />
+      </Routes>
+    );
+  }
 
   return (
     <>

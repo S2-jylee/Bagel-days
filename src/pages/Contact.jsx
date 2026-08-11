@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IcTruck, IcMail, IcInsta, IcTikTok, IcFacebook, IcSend, IcExternal } from "../components/Icons";
+import { IcBag, IcChat, IcMail, IcInsta, IcTikTok, IcFacebook, IcPhone, IcExternal } from "../components/Icons";
 
 const SOCIAL_LINKS = [
   { ic: IcInsta, label: "Instagram", value: "@bageldays.au", href: "https://www.instagram.com/bageldays.au/" },
@@ -42,8 +42,9 @@ export default function Contact() {
 
   return (
     <>
-      <section className="hero hero-photo" style={{ paddingBottom: 0, "--hero-img": "url(/assets/images/sandwich-set.jpg)", "--hero-aspect": "1.43" }}>
-        <div className="wrap">
+      <section className="hero hero-photo-fit" style={{ paddingBottom: 0 }}>
+        <div className="wrap hero-fit-wrap">
+          <img className="hero-fit-img" src="/assets/images/hero-main-contact.png" alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1000px)" }} />
           <div className="hero-content">
             <h1>Contact Us</h1>
             <div className="divider" style={{ margin: "14px 0" }}></div>
@@ -60,15 +61,15 @@ export default function Contact() {
         <div className="wrap">
           <div className="contact-layout">
             <div className="contact-card">
-              <div className="ic" style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--tan)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--maroon)", marginBottom: 14 }}>
-                <IcTruck />
-              </div>
-              <h4>Catering &amp; Bulk Orders</h4>
+              <h4><IcBag /> Catering &amp; Bulk Orders</h4>
+              <div className="divider left"></div>
               <p>Planning an event or placing a bulk order? Please fill out the contact form, and we'll get back to you as soon as possible.</p>
+              <img src="/assets/images/catering-box.png" alt="Catering box with sandwiches and a drink, ready for pickup" className="contact-card-img" />
             </div>
 
             <div className="contact-card">
-              <h4>Send Us a Message</h4>
+              <h4><IcChat /> Send Us a Message</h4>
+              <div className="divider left"></div>
               <form onSubmit={handleSubmit} className="contact-form">
                 <div className="form-grid">
                   <div className="field"><label>First Name</label><input type="text" name="first_name" required /></div>
@@ -89,7 +90,7 @@ export default function Contact() {
             </div>
 
             <div className="contact-card">
-              <h4><IcSend /> Get in Touch</h4>
+              <h4><IcPhone /> Get in Touch</h4>
               <div className="divider left"></div>
               <ul className="get-in-touch">
                 <li>
@@ -114,7 +115,7 @@ export default function Contact() {
           </div>
 
           <div className="thank-note">
-            <img src="/assets/images/candy-mascot.jpg" alt="Candy the mascot" />
+            <img src="/assets/images/candy-mascot.png" alt="Candy the mascot" />
             <div>
               <h3 className="script" style={{ fontSize: "1.2rem" }}>Thank you for supporting Bagel Days.</h3>
               <p style={{ marginTop: 6 }}>From our family to yours, thank you for being part of our journey. We can't wait to welcome you soon!</p>

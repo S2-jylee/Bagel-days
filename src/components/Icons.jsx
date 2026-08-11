@@ -1,3 +1,14 @@
+export const IcScooter = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="5.5" cy="18" r="2.2" /><circle cx="17" cy="18" r="2.2" />
+    <path d="M7.5 18h6.3l1.8-5.5h3.4" /><path d="M12.5 12 10 5.5H7" /><path d="M17 18v-2.5a2 2 0 0 1 2-2h1" />
+  </svg>
+);
+export const IcChat = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 4h16v12H8l-4 4V4Z" /><line x1="8" y1="9" x2="16" y2="9" /><line x1="8" y1="13" x2="13" y2="13" />
+  </svg>
+);
 export const IcLeaf = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 20A7 7 0 0 1 4 13V6a1 1 0 0 1 1-1h6a7 7 0 0 1 7 7v1a7 7 0 0 1-7 7Z"/><path d="M4 6c0 8 4 12 8 14"/></svg>
 );

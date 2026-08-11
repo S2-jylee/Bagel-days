@@ -15,7 +15,7 @@ const SQUARE_SDK_URL = "https://sandbox.web.squarecdn.com/v1/square.js"; // swit
 // ---------------------------------------------------------------
 
 export default function Checkout() {
-  const { ids, cart, subtotal, clearCart } = useCart();
+  const { ids, cart, subtotal, lineUnitPrice, clearCart } = useCart();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [note, setNote] = useState("");
@@ -73,12 +73,17 @@ export default function Checkout() {
         setStatus({ text: "Card details couldn't be verified. Please check and try again.", type: "err" });
         return;
       }
+      const items = ids.map((lid) => {
+        const entry = cart[lid];
+        const p = PRODUCTS[entry.id];
+        return { id: entry.id, name: p.name, qty: entry.qty, unitPrice: lineUnitPrice(lid), addons: entry.addons || [] };
+      });
       const payload = {
         sourceId: result.token,
         amount: subtotal,
         currency: "AUD",
         customer: { name, phone, note },
-        items: cart,
+        items,
       };
       const res = await fetch(PAYMENT_ENDPOINT, {
         method: "POST",
@@ -147,17 +152,24 @@ export default function Checkout() {
               {ids.length === 0 ? (
                 <div className="cart-empty">Your cart is empty. <Link to="/menu">Browse the menu &rarr;</Link></div>
               ) : (
-                ids.map((id) => {
-                  const p = PRODUCTS[id];
-                  const qty = cart[id];
+                ids.map((lid) => {
+                  const entry = cart[lid];
+                  const p = PRODUCTS[entry.id];
+                  const qty = entry.qty;
+                  const unitPrice = lineUnitPrice(lid);
                   return (
-                    <div className="cart-item" key={id}>
+                    <div className="cart-item" key={lid}>
                       <img src={p.img} alt={p.name} />
                       <div className="info">
                         <h5>{p.name}</h5>
-                        <div className="unit mono">{qty} &times; {fmt(p.price)}</div>
+                        <div className="unit mono">{qty} &times; {fmt(unitPrice)}</div>
+                        {entry.addons?.length > 0 && (
+                          <div className="unit mono" style={{ fontSize: ".72rem" }}>
+                            {entry.addons.map((a) => a.name).join(", ")}
+                          </div>
+                        )}
                       </div>
-                      <div className="mono" style={{ alignSelf: "center" }}>{fmt(p.price * qty)}</div>
+                      <div className="mono" style={{ alignSelf: "center" }}>{fmt(unitPrice * qty)}</div>
                     </div>
                   );
                 })

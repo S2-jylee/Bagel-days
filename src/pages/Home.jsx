@@ -9,8 +9,9 @@ const BEST_SELLERS = ["bagel-plain", "bagel-blueberry", "salt-bread", "dessert-s
 export default function Home() {
   return (
     <>
-      <section className="hero home-hero hero-photo" style={{ "--hero-img": "url(/assets/images/hero-main.jpg)", "--hero-aspect": "2.09" }}>
-        <div className="wrap">
+      <section className="hero home-hero hero-photo-fit">
+        <div className="wrap hero-fit-wrap">
+          <img className="hero-fit-img" src="/assets/images/hero-main.jpg" alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1470px)" }} />
           <div className="hero-content">
             <h1>Bagel Days</h1>
             <p className="script" style={{ fontSize: "1.2rem", display: "block", marginTop: 6 }}>
@@ -54,9 +55,11 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="widget-card">
-            <h3>Order Online</h3>
-            <p>Order your favourites and enjoy Bagel Days wherever you are.</p>
+          <div className="widget-card widget-order">
+            <div className="widget-order-text">
+              <h3>Order Online</h3>
+              <p>Order your favourites and enjoy Bagel Days wherever you are.</p>
+            </div>
             <div className="widget-btn-col">
               <UberEatsButton full />
               <DoorDashButton full />

@@ -16,8 +16,9 @@ const HIGHLIGHTS = [
 export default function Pickup() {
   return (
     <>
-      <section className="hero home-hero hero-photo" style={{ "--hero-img": "url(/assets/images/hero-main.jpg)", "--hero-aspect": "2.09" }}>
-        <div className="wrap">
+      <section className="hero home-hero hero-photo-fit">
+        <div className="wrap hero-fit-wrap">
+          <img className="hero-fit-img" src="/assets/images/hero-main.jpg" alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1470px)" }} />
           <div className="hero-content">
             <h1>Order Online</h1>
             <p className="script" style={{ fontSize: "1.15rem", marginTop: 8 }}>Fresh bagels, ready when you are.</p>

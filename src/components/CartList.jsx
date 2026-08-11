@@ -3,7 +3,7 @@ import { useCart, fmt } from "../context/CartContext";
 import { PRODUCTS } from "../data/products";
 
 export default function CartList({ showCheckoutButton = true }) {
-  const { ids, cart, subtotal, setQty, removeFromCart } = useCart();
+  const { ids, cart, subtotal, lineUnitPrice, setQty, removeFromCart } = useCart();
 
   return (
     <>
@@ -15,20 +15,29 @@ export default function CartList({ showCheckoutButton = true }) {
             Add something delicious from the menu!
           </div>
         ) : (
-          ids.map((id) => {
-            const p = PRODUCTS[id];
-            const qty = cart[id];
+          ids.map((lid) => {
+            const entry = cart[lid];
+            const p = PRODUCTS[entry.id];
+            const qty = entry.qty;
+            const addons = entry.addons || [];
             return (
-              <div className="cart-item" key={id}>
+              <div className="cart-item" key={lid}>
                 <img src={p.img} alt={p.name} />
                 <div className="info">
                   <h5>{p.name}</h5>
-                  <div className="unit mono">{fmt(p.price)} each</div>
+                  <div className="unit mono">{fmt(lineUnitPrice(lid))}</div>
+                  {addons.length > 0 && (
+                    <ul className="cart-item-addons">
+                      {addons.map((a) => (
+                        <li key={a.name}>+ {a.name} ({fmt(a.price)})</li>
+                      ))}
+                    </ul>
+                  )}
                   <div className="qty-row">
-                    <button className="qty-btn" onClick={() => setQty(id, qty - 1)}>&#8722;</button>
+                    <button className="qty-btn" onClick={() => setQty(lid, qty - 1)}>&#8722;</button>
                     <span className="qty-val">{qty}</span>
-                    <button className="qty-btn" onClick={() => setQty(id, qty + 1)}>+</button>
-                    <span className="remove-link" onClick={() => removeFromCart(id)}>Remove</span>
+                    <button className="qty-btn" onClick={() => setQty(lid, qty + 1)}>+</button>
+                    <span className="remove-link" onClick={() => removeFromCart(lid)}>Remove</span>
                   </div>
                 </div>
               </div>

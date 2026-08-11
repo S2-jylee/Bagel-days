@@ -4,9 +4,28 @@ import { PRODUCTS } from "../data/products";
 const CART_KEY = "bageldays_cart";
 const CartContext = createContext(null);
 
+function addonKey(addons) {
+  return (addons || []).map((a) => a.name).sort().join("|");
+}
+
+function lineId(id, addons) {
+  const key = addonKey(addons);
+  return key ? `${id}::${key}` : id;
+}
+
 function loadCart() {
   try {
-    return JSON.parse(localStorage.getItem(CART_KEY)) || {};
+    const raw = JSON.parse(localStorage.getItem(CART_KEY)) || {};
+    const normalized = {};
+    for (const key of Object.keys(raw)) {
+      const val = raw[key];
+      if (typeof val === "number") {
+        normalized[key] = { id: key, qty: val, addons: [] };
+      } else if (val && typeof val === "object") {
+        normalized[key] = { id: val.id ?? key, qty: val.qty ?? 0, addons: val.addons ?? [] };
+      }
+    }
+    return normalized;
   } catch {
     return {};
   }
@@ -19,34 +38,43 @@ export function CartProvider({ children }) {
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = useCallback((id, qty = 1) => {
-    setCart((prev) => ({ ...prev, [id]: (prev[id] || 0) + qty }));
+  const addToCart = useCallback((id, qty = 1, addons = []) => {
+    setCart((prev) => {
+      const lid = lineId(id, addons);
+      const existingQty = prev[lid]?.qty || 0;
+      return { ...prev, [lid]: { id, qty: existingQty + qty, addons } };
+    });
   }, []);
 
-  const setQty = useCallback((id, qty) => {
+  const setQty = useCallback((lid, qty) => {
     setCart((prev) => {
       const next = { ...prev };
-      if (qty <= 0) delete next[id];
-      else next[id] = qty;
+      if (qty <= 0) delete next[lid];
+      else next[lid] = { ...next[lid], qty };
       return next;
     });
   }, []);
 
-  const removeFromCart = useCallback((id) => {
+  const removeFromCart = useCallback((lid) => {
     setCart((prev) => {
       const next = { ...prev };
-      delete next[id];
+      delete next[lid];
       return next;
     });
   }, []);
 
   const clearCart = useCallback(() => setCart({}), []);
 
-  const ids = Object.keys(cart).filter((id) => PRODUCTS[id]);
-  const count = ids.reduce((sum, id) => sum + cart[id], 0);
-  const subtotal = ids.reduce((sum, id) => sum + PRODUCTS[id].price * cart[id], 0);
+  const ids = Object.keys(cart).filter((lid) => PRODUCTS[cart[lid].id]);
+  const count = ids.reduce((sum, lid) => sum + cart[lid].qty, 0);
+  const lineUnitPrice = (lid) => {
+    const entry = cart[lid];
+    const addonsTotal = (entry.addons || []).reduce((s, a) => s + a.price, 0);
+    return PRODUCTS[entry.id].price + addonsTotal;
+  };
+  const subtotal = ids.reduce((sum, lid) => sum + lineUnitPrice(lid) * cart[lid].qty, 0);
 
-  const value = { cart, ids, count, subtotal, addToCart, setQty, removeFromCart, clearCart };
+  const value = { cart, ids, count, subtotal, lineUnitPrice, addToCart, setQty, removeFromCart, clearCart };
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
