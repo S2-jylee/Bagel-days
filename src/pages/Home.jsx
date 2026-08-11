@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import FoodCard from "../components/FoodCard";
 import { UberEatsButton, DoorDashButton } from "../components/DeliveryButtons";
 import { IcLeaf, IcWhisk, IcBean, IcHeart, IcPin, IcClock, IcPhone } from "../components/Icons";
+import { asset } from "../lib/assetUrl";
 
 // TODO: keep this ordered by actual order/sales volume, highest first — placeholder order for now.
 const BEST_SELLERS = ["bagel-plain", "bagel-blueberry", "salt-bread", "dessert-signature", "bagel-sesame", "bagel-everything"];
@@ -11,7 +12,7 @@ export default function Home() {
     <>
       <section className="hero home-hero hero-photo-fit">
         <div className="wrap hero-fit-wrap">
-          <img className="hero-fit-img" src="/assets/images/hero-main.jpg" alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1470px)" }} />
+          <img className="hero-fit-img" src={asset("/assets/images/hero-main.jpg")} alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1470px)" }} />
           <div className="hero-content">
             <h1>Bagel Days</h1>
             <p className="script" style={{ fontSize: "1.2rem", display: "block", marginTop: 6 }}>
@@ -45,7 +46,7 @@ export default function Home() {
 
           <div className="widget-card widget-about">
             <div className="widget-about-badge">
-              <img src="/assets/images/mascot-dog.png" alt="Bagel Days mascot" />
+              <img src={asset("/assets/images/mascot-dog.png")} alt="Bagel Days mascot" />
             </div>
             <div className="widget-about-text">
               <h3>About Bagel Days</h3>

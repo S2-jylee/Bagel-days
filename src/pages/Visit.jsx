@@ -1,4 +1,5 @@
 import { IcPin, IcClock, IcMap, IcCar, IcCheck } from "../components/Icons";
+import { asset } from "../lib/assetUrl";
 
 const MAPS_DIRECTIONS = "https://www.google.com/maps/dir/?api=1&destination=Shop+1%2C+29+Robertson+Street%2C+Fortitude+Valley+QLD+4006";
 const MAPS_VIEW = "https://www.google.com/maps/search/?api=1&query=Shop+1%2C+29+Robertson+Street%2C+Fortitude+Valley+QLD+4006";
@@ -9,7 +10,7 @@ export default function Visit() {
     <>
       <section className="hero hero-photo-fit" style={{ paddingBottom: 0 }}>
         <div className="wrap hero-fit-wrap">
-          <img className="hero-fit-img" src="/assets/images/storefront.jpg" alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1600px)" }} />
+          <img className="hero-fit-img" src={asset("/assets/images/storefront.jpg")} alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1600px)" }} />
           <div className="hero-content">
             <h1>We Can't Wait to Welcome You!</h1>
             <p className="lede">We look forward to welcoming you to Bagel Days. Stop by for freshly baked bagels, house-made cream cheese, and Campos Specialty Coffee.</p>
@@ -69,7 +70,7 @@ export default function Visit() {
 
           <div className="closing-note">
             <div className="ic" style={{ width: 60, height: 60, borderRadius: "50%", background: "#fff", overflow: "hidden", margin: "0 auto 14px" }}>
-              <img src="/assets/images/ic-heart.png" alt="" width="60" height="60" />
+              <img src={asset("/assets/images/ic-heart.png")} alt="" width="60" height="60" />
             </div>
             <h3 className="script" style={{ fontSize: "1.4rem" }}>We look forward to seeing you soon!</h3>
             <p style={{ marginTop: 10 }}>Thank you for choosing Bagel Days. We can't wait to welcome you with freshly baked bagels and great coffee.</p>

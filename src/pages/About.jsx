@@ -1,11 +1,12 @@
 import { IcWheat, IcPot, IcCup } from "../components/Icons";
+import { asset } from "../lib/assetUrl";
 
 const SPECIALS = [
-  { num: "1. FRESH DOUGH DAILY", title: "Made from scratch", desc: "Every morning using quality ingredients.", img: "/assets/images/dough-rolling.jpg" },
-  { num: "2. SLOW COLD FERMENTATION", title: "Deeper flavour", desc: "Fermented overnight for the perfect chewy texture.", img: "/assets/images/dough-baking.jpg" },
-  { num: "3. HAND-BOILED & OVEN-BAKED", title: "NY-style texture", desc: "Every bagel is hand-boiled before baking.", img: "/assets/images/bagel-everything.jpg" },
-  { num: "4. HOUSE-MADE CREAM CHEESE", title: "Prepared daily", desc: "In a variety of delicious flavours.", img: "/assets/images/cream-plain.jpg" },
-  { num: "5. CAMPOS SPECIALTY COFFEE", title: "Perfectly paired", desc: "Proudly serving Campos Specialty Coffee.", img: "/assets/images/coffee-flatwhite.jpg" },
+  { num: "1. FRESH DOUGH DAILY", title: "Made from scratch", desc: "Every morning using quality ingredients.", img: asset("/assets/images/dough-rolling.jpg") },
+  { num: "2. SLOW COLD FERMENTATION", title: "Deeper flavour", desc: "Fermented overnight for the perfect chewy texture.", img: asset("/assets/images/dough-baking.jpg") },
+  { num: "3. HAND-BOILED & OVEN-BAKED", title: "NY-style texture", desc: "Every bagel is hand-boiled before baking.", img: asset("/assets/images/bagel-everything.jpg") },
+  { num: "4. HOUSE-MADE CREAM CHEESE", title: "Prepared daily", desc: "In a variety of delicious flavours.", img: asset("/assets/images/cream-plain.jpg") },
+  { num: "5. CAMPOS SPECIALTY COFFEE", title: "Perfectly paired", desc: "Proudly serving Campos Specialty Coffee.", img: asset("/assets/images/coffee-flatwhite.jpg") },
 ];
 
 export default function About() {
@@ -23,8 +24,8 @@ export default function About() {
       <section className="split-section">
         <div className="wrap split">
           <div className="img-duo">
-            <img src="/assets/images/dough-rolling.jpg" alt="Hand-rolled bagel dough" />
-            <img src="/assets/images/dough-baking.jpg" alt="Bagels baking in the oven" />
+            <img src={asset("/assets/images/dough-rolling.jpg")} alt="Hand-rolled bagel dough" />
+            <img src={asset("/assets/images/dough-baking.jpg")} alt="Bagels baking in the oven" />
           </div>
           <div>
             <h2>Freshly Crafted Every Morning</h2>
@@ -48,7 +49,7 @@ export default function About() {
 
         <div className="wrap">
           <div className="mascot-panel">
-            <img src="/assets/images/candy-mascot.jpg" alt="Candy the Bagel Days mascot" />
+            <img src={asset("/assets/images/candy-mascot.jpg")} alt="Candy the Bagel Days mascot" />
             <div>
               <span className="eyebrow">Meet Candy</span>
               <h3 style={{ fontSize: "1.6rem", marginBottom: 12 }}>Our Beloved Mascot</h3>

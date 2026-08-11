@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { UberEatsButton, DoorDashButton, IcChevron } from "../components/DeliveryButtons";
 import { IcTub, IcCup, IcBag, IcPin } from "../components/Icons";
+import { asset } from "../lib/assetUrl";
 
 const IcBagel = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/></svg>
@@ -18,7 +19,7 @@ export default function Pickup() {
     <>
       <section className="hero home-hero hero-photo-fit">
         <div className="wrap hero-fit-wrap">
-          <img className="hero-fit-img" src="/assets/images/hero-main.jpg" alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1470px)" }} />
+          <img className="hero-fit-img" src={asset("/assets/images/hero-main.jpg")} alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1470px)" }} />
           <div className="hero-content">
             <h1>Order Online</h1>
             <p className="script" style={{ fontSize: "1.15rem", marginTop: 8 }}>Fresh bagels, ready when you are.</p>

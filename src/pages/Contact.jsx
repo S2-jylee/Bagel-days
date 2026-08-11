@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { IcBag, IcChat, IcMail, IcInsta, IcTikTok, IcFacebook, IcPhone, IcExternal } from "../components/Icons";
+import { asset } from "../lib/assetUrl";
 
 const SOCIAL_LINKS = [
   { ic: IcInsta, label: "Instagram", value: "@bageldays.au", href: "https://www.instagram.com/bageldays.au/" },
@@ -44,7 +45,7 @@ export default function Contact() {
     <>
       <section className="hero hero-photo-fit" style={{ paddingBottom: 0 }}>
         <div className="wrap hero-fit-wrap">
-          <img className="hero-fit-img" src="/assets/images/hero-main-contact.png" alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1000px)" }} />
+          <img className="hero-fit-img" src={asset("/assets/images/hero-main-contact.png")} alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1000px)" }} />
           <div className="hero-content">
             <h1>Contact Us</h1>
             <div className="divider" style={{ margin: "14px 0" }}></div>
@@ -64,7 +65,7 @@ export default function Contact() {
               <h4><IcBag /> Catering &amp; Bulk Orders</h4>
               <div className="divider left"></div>
               <p>Planning an event or placing a bulk order? Please fill out the contact form, and we'll get back to you as soon as possible.</p>
-              <img src="/assets/images/catering-box.png" alt="Catering box with sandwiches and a drink, ready for pickup" className="contact-card-img" />
+              <img src={asset("/assets/images/catering-box.png")} alt="Catering box with sandwiches and a drink, ready for pickup" className="contact-card-img" />
             </div>
 
             <div className="contact-card">
@@ -115,7 +116,7 @@ export default function Contact() {
           </div>
 
           <div className="thank-note">
-            <img src="/assets/images/candy-mascot.png" alt="Candy the mascot" />
+            <img src={asset("/assets/images/candy-mascot.png")} alt="Candy the mascot" />
             <div>
               <h3 className="script" style={{ fontSize: "1.2rem" }}>Thank you for supporting Bagel Days.</h3>
               <p style={{ marginTop: 6 }}>From our family to yours, thank you for being part of our journey. We can't wait to welcome you soon!</p>

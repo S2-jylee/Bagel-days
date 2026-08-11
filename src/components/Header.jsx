@@ -1,6 +1,7 @@
 import { NavLink, Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { IcInsta, IcTikTok } from "./Icons";
+import { asset } from "../lib/assetUrl";
 
 const IcFacebook = () => (
   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7.5H16l.5-3H13.5V8.2c0-.87.24-1.46 1.5-1.46h1.6V3.6C16.3 3.55 15.3 3.5 14.2 3.5c-2.4 0-4 1.46-4 4.15v2.85H7.7v3h2.5V21h3.3z"/></svg>
@@ -20,7 +21,7 @@ export default function Header({ onOpenCart, onOpenMobileNav }) {
     <header className="site">
       <div className="nav">
         <Link to="/" className="logo">
-          <img src="/assets/images/logo-mark.jpg" alt="Bagel Days logo" />
+          <img src={asset("/assets/images/logo-mark.jpg")} alt="Bagel Days logo" />
           Bagel Days
         </Link>
         <nav className="links">

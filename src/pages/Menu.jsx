@@ -4,6 +4,7 @@ import FoodCard from "../components/FoodCard";
 import CartList from "../components/CartList";
 import { useCart } from "../context/CartContext";
 import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup } from "../components/Icons";
+import { asset } from "../lib/assetUrl";
 
 const CATEGORY_ICONS = {
   bagels: IcDonut,
@@ -82,7 +83,7 @@ export default function Menu() {
 
               <div className="set-row">
                 <div className="set-banner">
-                  <img src="/assets/images/sandwich-set.jpg" alt="Bagel set" />
+                  <img src={asset("/assets/images/sandwich-set.jpg")} alt="Bagel set" />
                   <div className="set-banner-info">
                     <h3 style={{ fontSize: "1.2rem" }}>Make It A Set</h3>
                     <p style={{ color: "var(--body)", fontSize: ".9rem" }}>Any Bagel + Cream Cheese + Coffee</p>
