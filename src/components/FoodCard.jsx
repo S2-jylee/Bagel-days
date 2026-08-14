@@ -53,7 +53,7 @@ export default function FoodCard({ id, small }) {
           <img src={p.img} alt={p.name} />
         </button>
         <div className="body">
-          <h4>{p.name}</h4>
+          <h4 className="card-name-trigger" onClick={() => setOpen(true)}>{p.name}</h4>
           {typeof stock === "number" && stock > 0 && <span className="card-stock">{stock} left</span>}
           {!small && (
             <div className="card-quick-row">

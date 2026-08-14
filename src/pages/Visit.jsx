@@ -13,11 +13,15 @@ export default function Visit() {
           <img className="hero-fit-img" src={asset("/assets/images/storefront.jpg")} alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1600px)" }} />
           <div className="hero-content">
             <h1>We Can't Wait to Welcome You!</h1>
-            <p className="lede">We look forward to welcoming you to Bagel Days. Stop by for freshly baked bagels, house-made cream cheese, and Campos Specialty Coffee.</p>
+            <p className="lede hero-overlay-sub">We look forward to welcoming you to Bagel Days. Stop by for freshly baked bagels, house-made cream cheese, and Campos Specialty Coffee.</p>
             <span className="sr-only">Bagel Days storefront in Fortitude Valley</span>
           </div>
         </div>
       </section>
+
+      <div className="hero-fit-subtext wrap">
+        <p className="lede">We look forward to welcoming you to Bagel Days. Stop by for freshly baked bagels, house-made cream cheese, and Campos Specialty Coffee.</p>
+      </div>
 
       <section>
         <div className="wrap">

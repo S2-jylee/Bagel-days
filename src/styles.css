@@ -173,6 +173,13 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   background:linear-gradient(90deg, rgba(250,245,239,.97) 0%, rgba(250,245,239,.88) 26%, rgba(250,245,239,.4) 52%, rgba(250,245,239,0) 74%);
 }
 .hero-fit-wrap .hero-content{position:absolute; top:50%; left:20px; transform:translateY(-50%); z-index:2;}
+
+/* Mobile-only: on Visit/Contact/Pickup the tagline+description move out of the
+   photo overlay into their own block below the hero (see .hero-overlay-sub /
+   .hero-fit-subtext below) — only the h1 (+ divider, where present) stays on
+   the image. Desktop is untouched: .hero-overlay-sub keeps rendering there,
+   and .hero-fit-subtext (the duplicate) stays hidden. */
+.hero-fit-subtext{display:none;}
 @media (max-width:900px){
   .hero-fit-wrap::after{
     background:linear-gradient(90deg, rgba(250,245,239,.97) 0%, rgba(250,245,239,.9) 40%, rgba(250,245,239,.5) 66%, rgba(250,245,239,0) 88%);
@@ -180,11 +187,24 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 }
 @media (max-width:600px){
   .hero-fit-wrap::after{
-    background:linear-gradient(90deg, rgba(250,245,239,.98) 0%, rgba(250,245,239,.94) 60%, rgba(250,245,239,.65) 85%, rgba(250,245,239,.15) 100%);
+    background:linear-gradient(90deg, rgba(250,245,239,.9) 0%, rgba(250,245,239,.6) 20%, rgba(250,245,239,.2) 40%, rgba(250,245,239,0) 55%);
   }
   /* text wraps to more lines at phone widths (88% max-width column), so the
-     photo-driven height alone isn't always enough room — raise the floor. */
-  .hero-fit-wrap{min-height:300px;}
+     photo-driven height alone isn't always enough room — raise the floor.
+     Home keeps the full-height floor since its overlay still holds
+     script+lede+buttons; Visit/Contact/Pickup moved that text below the
+     hero (.hero-fit-subtext), leaving only the h1 on the photo, so their
+     floor can be much shorter — the old 300px just left a blank gap. */
+  .hero-fit-wrap{min-height:150px;}
+  .hero-fit-full .hero-fit-wrap{min-height:300px;}
+  /* .hero-fit-img sits inside .wrap, which has 20px side padding — margin-left:auto
+     already pushes it against that padding's inner edge, so it reads as full-bleed
+     on the left, but the right side was visibly inset by the same 20px. Canceling
+     just the right margin lets it reach the true edge without touching the text's
+     own padding (.hero-content still respects .wrap's padding as before). */
+  .hero-fit-img{margin-right:-20px;}
+  .hero-overlay-sub{display:none;}
+  .hero-fit-subtext{display:block; padding:22px 0 4px;}
 }
 
 /* ---------- Home page: compact hero + widget row (keeps desktop close to one screen) ---------- */
@@ -192,7 +212,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .home-widgets{padding:8px 0 36px;}
 .widgets-grid{display:grid; grid-template-columns:1.8fr 1fr 1fr 1fr; gap:20px; align-items:stretch;}
 .widget-card{
-  background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:22px;
+  background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:22px; min-width:0;
   display:flex; flex-direction:column; justify-content:space-between;
 }
 .widget-card h3{font-family:'PT Serif', serif; color:var(--maroon); font-size:1.08rem; margin-bottom:10px;}
@@ -244,7 +264,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .food-card .thumb{display:block; width:100%; margin:0; padding:0; border:none; background:none; overflow:hidden; cursor:pointer;}
 .food-card .thumb img{width:100%; height:100%; object-fit:cover;}
 .food-card .body{padding:14px 16px 18px; display:flex; flex-direction:column; flex:1;}
-.food-card h4{font-family:'PT Serif', serif; font-weight:500; font-size:.82rem; color:var(--ink); margin-bottom:0;}
+.food-card h4{font-family:'PT Serif', serif; font-weight:500; font-size:.82rem; color:var(--ink); margin-bottom:0; cursor:pointer;}
 .card-price{display:block; font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon); font-size:.85rem;}
 .card-stock{display:block; font-family:'Pretendard', sans-serif; font-size:.7rem; color:var(--body); margin-top:2px;}
 .card-sold-out{font-family:'Pretendard', sans-serif; font-weight:700; font-size:.78rem; letter-spacing:.03em; text-transform:uppercase; color:var(--maroon-light);}
@@ -593,7 +613,8 @@ footer ul li a:hover{color:#F0D9C9;}
   .split.reverse .imgcol{order:0;}
   .mascot-panel{grid-template-columns:1fr; text-align:center;}
   .special-grid{grid-template-columns:repeat(2,1fr);}
-  .menu-order-layout{grid-template-columns:1fr;}
+  .menu-order-layout{grid-template-columns:1fr; gap:14px;}
+  .menu-products{padding-top:0;}
   .menu-cart-panel{display:none;}
   .menu-maincats{
     flex-direction:row; flex-wrap:wrap; justify-content:center; overflow-x:auto; position:static;
@@ -646,7 +667,7 @@ footer ul li a:hover{color:#F0D9C9;}
   .widget-order{flex-direction:row; align-items:center; justify-content:space-between; gap:14px;}
   .widget-order-text{flex:1; min-width:0;}
   .widget-order-text p{margin-bottom:0;}
-  .widget-order .widget-btn-col{flex-direction:row; margin-top:0; flex-shrink:0; gap:8px;}
+  .widget-order .widget-btn-col{flex-direction:row; flex-wrap:wrap; justify-content:flex-end; margin-top:0; min-width:0; gap:8px;}
   .widget-order .widget-btn-col .btn-block{width:auto; flex:1;}
   .widget-order .delivery-btn{padding:12px 14px; font-size:.8rem;}
   .widget-order .delivery-btn span{white-space:nowrap;}

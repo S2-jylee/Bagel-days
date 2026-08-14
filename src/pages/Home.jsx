@@ -10,7 +10,7 @@ const BEST_SELLERS = ["bagel-plain", "bagel-blueberry", "salt-bread", "dessert-s
 export default function Home() {
   return (
     <>
-      <section className="hero home-hero hero-photo-fit">
+      <section className="hero home-hero hero-photo-fit hero-fit-full">
         <div className="wrap hero-fit-wrap">
           <img className="hero-fit-img" src={asset("/assets/images/hero-main.jpg")} alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1470px)" }} />
           <div className="hero-content">
