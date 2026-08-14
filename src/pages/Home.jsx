@@ -18,7 +18,7 @@ export default function Home() {
             <p className="script" style={{ fontSize: "1.2rem", display: "block", marginTop: 6 }}>
               Freshly Baked, Every Morning.
             </p>
-            <p className="lede">
+            <p className="lede hero-overlay-sub">
               Fresh bagles, house-made cream cheese<br /> & Campos Specialty Coffee.
             </p>
             <div className="cta-row">
@@ -29,6 +29,12 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <div className="hero-fit-subtext wrap">
+        <p className="lede">
+          Fresh bagles, house-made cream cheese<br /> & Campos Specialty Coffee.
+        </p>
+      </div>
 
       <section className="home-widgets">
         <div className="wrap widgets-grid">

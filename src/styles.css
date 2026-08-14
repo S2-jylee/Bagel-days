@@ -187,7 +187,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 }
 @media (max-width:600px){
   .hero-fit-wrap::after{
-    background:linear-gradient(90deg, rgba(250,245,239,.9) 0%, rgba(250,245,239,.6) 20%, rgba(250,245,239,.2) 40%, rgba(250,245,239,0) 55%);
+    background:linear-gradient(90deg, rgba(250,245,239,.96) 0%, rgba(250,245,239,.85) 30%, rgba(250,245,239,.55) 55%, rgba(250,245,239,.2) 75%, rgba(250,245,239,0) 92%);
   }
   /* text wraps to more lines at phone widths (88% max-width column), so the
      photo-driven height alone isn't always enough room — raise the floor.
@@ -196,7 +196,10 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
      hero (.hero-fit-subtext), leaving only the h1 on the photo, so their
      floor can be much shorter — the old 300px just left a blank gap. */
   .hero-fit-wrap{min-height:150px;}
-  .hero-fit-full .hero-fit-wrap{min-height:300px;}
+  /* Home's overlay still holds h1+script+cta-row (only the lede moved out),
+     so it needs a bit more room than the h1-only pages, but nowhere near the
+     old 300px — that was sized for the full h1+script+lede+cta-row stack. */
+  .hero-fit-full .hero-fit-wrap{min-height:190px;}
   /* .hero-fit-img sits inside .wrap, which has 20px side padding — margin-left:auto
      already pushes it against that padding's inner edge, so it reads as full-bleed
      on the left, but the right side was visibly inset by the same 20px. Canceling
@@ -204,7 +207,16 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
      own padding (.hero-content still respects .wrap's padding as before). */
   .hero-fit-img{margin-right:-20px;}
   .hero-overlay-sub{display:none;}
-  .hero-fit-subtext{display:block; padding:22px 0 4px;}
+  .hero-content .divider{display:none;}
+  /* padding-top/bottom only — leaving left/right alone so this still inherits
+     .wrap's 20px side padding instead of zeroing it out. */
+  .hero-fit-subtext{display:block; padding-top:22px; padding-bottom:4px;}
+  /* .hero-content is shrink-to-fit (absolutely positioned, no explicit width),
+     so it normally sizes itself to its widest line — leaving no slack for
+     justify-content:center to act on. Force it to the full column width here
+     so the row actually has room to center within. */
+  .home-hero .hero-content{width:88%;}
+  .home-hero .cta-row{justify-content:center;}
 }
 
 /* ---------- Home page: compact hero + widget row (keeps desktop close to one screen) ---------- */
@@ -469,6 +481,9 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 
 /* ---------- Delivery / pickup ---------- */
 .pickup-order-section{padding:0;}
+@media (max-width:600px){
+  .pickup-order-section{padding-top:28px;}
+}
 .delivery-hero{text-align:center; max-width:640px; margin:0 auto 40px;}
 .delivery-buttons{display:flex; gap:18px; justify-content:center; flex-wrap:wrap; margin:36px 0;}
 .delivery-buttons .delivery-btn{padding:17px 28px; font-size:1rem;}
@@ -482,6 +497,10 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 
 /* ---------- Location / visit ---------- */
 .loc-cards{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:32px;}
+@media (max-width:600px){
+  .visit-loc-section{padding-top:24px;}
+  .visit-loc-section .loc-cards{margin-top:0;}
+}
 .loc-card{background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:26px;}
 .loc-card-row{display:flex; align-items:flex-start; gap:14px;}
 .loc-card .ic{width:40px; height:40px; border-radius:50%; background:var(--tan); display:flex; align-items:center; justify-content:center; color:var(--maroon); flex-shrink:0;}

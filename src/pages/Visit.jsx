@@ -23,7 +23,7 @@ export default function Visit() {
         <p className="lede">We look forward to welcoming you to Bagel Days. Stop by for freshly baked bagels, house-made cream cheese, and Campos Specialty Coffee.</p>
       </div>
 
-      <section>
+      <section className="visit-loc-section">
         <div className="wrap">
           <div className="loc-cards">
             <div className="loc-card">
