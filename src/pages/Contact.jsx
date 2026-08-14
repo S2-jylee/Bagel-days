@@ -58,7 +58,7 @@ export default function Contact() {
       </section>
 
       <div className="hero-fit-subtext wrap">
-        <p className="lede" style={{ marginTop: 14 }}>
+        <p className="lede">
           Have a question, catering enquiry, or collaboration idea? Send us a message and we'll get back to you as soon as possible.
         </p>
       </div>
@@ -110,7 +110,7 @@ export default function Contact() {
                       <span className="git-label">{label}</span>
                       <a href={href} target="_blank" rel="noopener noreferrer" className="git-value">{value}</a>
                     </div>
-                    <span className="git-ext"><IcExternal /></span>
+                    <a href={href} target="_blank" rel="noopener noreferrer" className="git-ext" aria-label={`Open ${label}`}><IcExternal /></a>
                   </li>
                 ))}
               </ul>
