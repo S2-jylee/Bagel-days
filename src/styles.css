@@ -676,6 +676,15 @@ footer ul li a:hover{color:#F0D9C9;}
   .widget-bestsellers .mini-grid{grid-template-columns:repeat(4,1fr); gap:6px;}
   .widget-bestsellers .mini-grid > :nth-child(n+5){display:none;}
   .widget-about-badge{display:block; width:90px;}
+  /* Order Online widget: text on the left, Uber Eats/DoorDash stacked
+     top-to-bottom in a column on the right (not full-width below the text,
+     and not side-by-side — matches the reference layout). */
+  .widget-order{flex-direction:row; align-items:center; gap:14px;}
+  .widget-order-text{flex:1; min-width:0;}
+  .widget-order-text p{margin-bottom:0;}
+  .widget-order .widget-btn-col{flex:1; min-width:0; margin-top:0;}
+  .widget-order .delivery-btn{padding:12px 14px; font-size:.8rem;}
+  .widget-order .delivery-btn span{white-space:nowrap;}
   .loc-card{padding:20px;}
   .getting-here{padding:20px;}
   /* Make It A Set + Add-ons stay side by side down to 980px now that the menu
