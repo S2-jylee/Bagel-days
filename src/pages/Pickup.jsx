@@ -22,7 +22,7 @@ export default function Pickup() {
           <img className="hero-fit-img" src={asset("/assets/images/hero-main.jpg")} alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1470px)" }} />
           <div className="hero-content">
             <h1>Order Online</h1>
-            <p className="script hero-overlay-sub" style={{ fontSize: "1.15rem", marginTop: 8 }}>Fresh bagels, ready when you are.</p>
+            <p className="script" style={{ fontSize: "1.15rem", marginTop: 8 }}>Fresh bagels, ready when you are.</p>
             <p className="lede hero-overlay-sub">
               Order your favourite bagels and drinks for pickup or delivery. Freshly made, carefully packed, ready for you.
             </p>
@@ -32,7 +32,6 @@ export default function Pickup() {
       </section>
 
       <div className="hero-fit-subtext wrap">
-        <p className="script" style={{ fontSize: "1.15rem", marginTop: 8 }}>Fresh bagels, ready when you are.</p>
         <p className="lede">
           Order your favourite bagels and drinks for pickup or delivery. Freshly made, carefully packed, ready for you.
         </p>

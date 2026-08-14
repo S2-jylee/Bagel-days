@@ -48,7 +48,7 @@ export default function Contact() {
           <img className="hero-fit-img" src={asset("/assets/images/hero-main-contact.png")} alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1000px)" }} />
           <div className="hero-content">
             <h1>Contact Us</h1>
-            <p className="script hero-overlay-sub" style={{ fontSize: "1.2rem" }}>We'd love to hear from you.</p>
+            <p className="script" style={{ fontSize: "1.2rem" }}>We'd love to hear from you.</p>
             <p className="lede hero-overlay-sub" style={{ marginTop: 14 }}>
               Have a question, catering enquiry, or collaboration idea? Send us a message and we'll get back to you as soon as possible.
             </p>
@@ -58,7 +58,6 @@ export default function Contact() {
       </section>
 
       <div className="hero-fit-subtext wrap">
-        <p className="script" style={{ fontSize: "1.2rem" }}>We'd love to hear from you.</p>
         <p className="lede" style={{ marginTop: 14 }}>
           Have a question, catering enquiry, or collaboration idea? Send us a message and we'll get back to you as soon as possible.
         </p>
