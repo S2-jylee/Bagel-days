@@ -48,7 +48,6 @@ export default function Contact() {
           <img className="hero-fit-img" src={asset("/assets/images/hero-main-contact.png")} alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1000px)" }} />
           <div className="hero-content">
             <h1>Contact Us</h1>
-            <div className="divider" style={{ margin: "14px 0" }}></div>
             <p className="script hero-overlay-sub" style={{ fontSize: "1.2rem" }}>We'd love to hear from you.</p>
             <p className="lede hero-overlay-sub" style={{ marginTop: 14 }}>
               Have a question, catering enquiry, or collaboration idea? Send us a message and we'll get back to you as soon as possible.
@@ -70,14 +69,12 @@ export default function Contact() {
           <div className="contact-layout">
             <div className="contact-card">
               <h4><IcBag /> Catering &amp; Bulk Orders</h4>
-              <div className="divider left"></div>
               <p>Planning an event or placing a bulk order? Please fill out the contact form, and we'll get back to you as soon as possible.</p>
               <img src={asset("/assets/images/catering-box.png")} alt="Catering box with sandwiches and a drink, ready for pickup" className="contact-card-img" />
             </div>
 
             <div className="contact-card">
               <h4><IcChat /> Send Us a Message</h4>
-              <div className="divider left"></div>
               <form onSubmit={handleSubmit} className="contact-form">
                 <div className="form-grid">
                   <div className="field"><label>First Name</label><input type="text" name="first_name" required /></div>
@@ -99,7 +96,6 @@ export default function Contact() {
 
             <div className="contact-card">
               <h4><IcPhone /> Get in Touch</h4>
-              <div className="divider left"></div>
               <ul className="get-in-touch">
                 <li>
                   <span className="ic"><IcMail /></span>

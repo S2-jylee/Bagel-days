@@ -38,7 +38,6 @@ section{padding:40px 0;}
 .section-head{max-width:640px; margin:0 0 44px;}
 .section-head.center{margin:0 auto 44px; text-align:center;}
 .section-head h2{font-size:clamp(1.9rem,3.4vw,2.6rem); padding-top: 0;}
-.divider{width:60px; height:2px; background:var(--maroon); margin:14px auto; opacity:.5;}
 .center{text-align:center;}
 
 /* ---------- Buttons ---------- */
@@ -176,9 +175,9 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 
 /* Mobile-only: on Visit/Contact/Pickup the tagline+description move out of the
    photo overlay into their own block below the hero (see .hero-overlay-sub /
-   .hero-fit-subtext below) — only the h1 (+ divider, where present) stays on
-   the image. Desktop is untouched: .hero-overlay-sub keeps rendering there,
-   and .hero-fit-subtext (the duplicate) stays hidden. */
+   .hero-fit-subtext below) — only the h1 stays on the image. Desktop is
+   untouched: .hero-overlay-sub keeps rendering there, and .hero-fit-subtext
+   (the duplicate) stays hidden. */
 .hero-fit-subtext{display:none;}
 @media (max-width:900px){
   .hero-fit-wrap::after{
@@ -191,15 +190,11 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   }
   /* text wraps to more lines at phone widths (88% max-width column), so the
      photo-driven height alone isn't always enough room — raise the floor.
-     Home keeps the full-height floor since its overlay still holds
-     script+lede+buttons; Visit/Contact/Pickup moved that text below the
-     hero (.hero-fit-subtext), leaving only the h1 on the photo, so their
-     floor can be much shorter — the old 300px just left a blank gap. */
+     Every hero-photo-fit page now moves its tagline/lede/buttons below the
+     hero (.hero-fit-subtext), leaving only h1 (+ script, on Home) on the
+     photo, so one shared floor covers all of them — the old 300px just
+     left a blank gap. */
   .hero-fit-wrap{min-height:150px;}
-  /* Home's overlay still holds h1+script+cta-row (only the lede moved out),
-     so it needs a bit more room than the h1-only pages, but nowhere near the
-     old 300px — that was sized for the full h1+script+lede+cta-row stack. */
-  .hero-fit-full .hero-fit-wrap{min-height:190px;}
   /* .hero-fit-img sits inside .wrap, which has 20px side padding — margin-left:auto
      already pushes it against that padding's inner edge, so it reads as full-bleed
      on the left, but the right side was visibly inset by the same 20px. Canceling
@@ -207,16 +202,10 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
      own padding (.hero-content still respects .wrap's padding as before). */
   .hero-fit-img{margin-right:-20px;}
   .hero-overlay-sub{display:none;}
-  .hero-content .divider{display:none;}
   /* padding-top/bottom only — leaving left/right alone so this still inherits
      .wrap's 20px side padding instead of zeroing it out. */
   .hero-fit-subtext{display:block; padding-top:22px; padding-bottom:4px;}
-  /* .hero-content is shrink-to-fit (absolutely positioned, no explicit width),
-     so it normally sizes itself to its widest line — leaving no slack for
-     justify-content:center to act on. Force it to the full column width here
-     so the row actually has room to center within. */
-  .home-hero .hero-content{width:88%;}
-  .home-hero .cta-row{justify-content:center;}
+  .hero-fit-subtext .cta-row{justify-content:center;}
 }
 
 /* ---------- Home page: compact hero + widget row (keeps desktop close to one screen) ---------- */
@@ -528,7 +517,6 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .contact-card h4 svg{width:17px; height:17px; color:var(--maroon);}
 .contact-card p{font-size:.88rem; color:var(--body);}
 .contact-card-img{margin:16px auto 0; width:50%; aspect-ratio:4/3; object-fit:cover; border-radius:8px;}
-.divider.left{margin:0 0 20px;}
 .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
 .form-grid .full{grid-column:1/-1;}
 input[type=text], input[type=email], input[type=tel], input[type=password], textarea, select{
@@ -683,13 +671,6 @@ footer ul li a:hover{color:#F0D9C9;}
   .widget-bestsellers .mini-grid{grid-template-columns:repeat(4,1fr); gap:6px;}
   .widget-bestsellers .mini-grid > :nth-child(n+5){display:none;}
   .widget-about-badge{display:block; width:90px;}
-  .widget-order{flex-direction:row; align-items:center; justify-content:space-between; gap:14px;}
-  .widget-order-text{flex:1; min-width:0;}
-  .widget-order-text p{margin-bottom:0;}
-  .widget-order .widget-btn-col{flex-direction:row; flex-wrap:wrap; justify-content:flex-end; margin-top:0; min-width:0; gap:8px;}
-  .widget-order .widget-btn-col .btn-block{width:auto; flex:1;}
-  .widget-order .delivery-btn{padding:12px 14px; font-size:.8rem;}
-  .widget-order .delivery-btn span{white-space:nowrap;}
   .loc-card{padding:20px;}
   .getting-here{padding:20px;}
   /* Make It A Set + Add-ons stay side by side down to 980px now that the menu

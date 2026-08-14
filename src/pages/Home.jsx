@@ -10,7 +10,7 @@ const BEST_SELLERS = ["bagel-plain", "bagel-blueberry", "salt-bread", "dessert-s
 export default function Home() {
   return (
     <>
-      <section className="hero home-hero hero-photo-fit hero-fit-full">
+      <section className="hero home-hero hero-photo-fit">
         <div className="wrap hero-fit-wrap">
           <img className="hero-fit-img" src={asset("/assets/images/hero-main.jpg")} alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1470px)" }} />
           <div className="hero-content">
@@ -21,7 +21,7 @@ export default function Home() {
             <p className="lede hero-overlay-sub">
               Fresh bagles, house-made cream cheese<br /> & Campos Specialty Coffee.
             </p>
-            <div className="cta-row">
+            <div className="cta-row hero-overlay-sub">
               <Link to="/menu" className="btn btn-primary btn-lg">View Menu</Link>
               <Link to="/pickup" className="btn btn-ghost btn-lg">Order Online</Link>
             </div>
@@ -34,6 +34,10 @@ export default function Home() {
         <p className="lede">
           Fresh bagles, house-made cream cheese<br /> & Campos Specialty Coffee.
         </p>
+        <div className="cta-row">
+          <Link to="/menu" className="btn btn-primary btn-lg">View Menu</Link>
+          <Link to="/pickup" className="btn btn-ghost btn-lg">Order Online</Link>
+        </div>
       </div>
 
       <section className="home-widgets">
