@@ -59,14 +59,6 @@ export default function Visit() {
             </div>
           </div>
 
-          <iframe
-            className="map-embed"
-            src={MAPS_EMBED}
-            title="Bagel Days location on Google Maps"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
-
           <div className="getting-here">
             <div className="ic"><IcCar /></div>
             <div className="getting-here-text">

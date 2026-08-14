@@ -205,7 +205,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   /* padding-top/bottom only — leaving left/right alone so this still inherits
      .wrap's 20px side padding instead of zeroing it out. */
   .hero-fit-subtext{display:block; padding-top:22px; padding-bottom:4px;}
-  .hero-fit-subtext .cta-row{justify-content:center;}
+  .hero-fit-subtext .cta-row{justify-content:center; margin-top:16px;}
 }
 
 /* ---------- Home page: compact hero + widget row (keeps desktop close to one screen) ---------- */
@@ -666,6 +666,11 @@ footer ul li a:hover{color:#F0D9C9;}
   .delivery-buttons{flex-direction:column;}
   .delivery-buttons .btn{padding:16px 20px;}
   .mini-find{flex-direction:column; align-items:flex-start; gap:16px;}
+  /* .home-hero's own bottom padding (28px, from the base rule above) was set
+     for the old full-overlay layout; now that .hero-fit-subtext sits right
+     after it with its own top padding, the two stacked into an oversized
+     gap above the moved-out lede. */
+  .home-hero{padding-bottom:0;}
   .widgets-grid{grid-template-columns:1fr;}
   .widget-bestsellers{grid-column:auto;}
   .widget-bestsellers .mini-grid{grid-template-columns:repeat(4,1fr); gap:6px;}
