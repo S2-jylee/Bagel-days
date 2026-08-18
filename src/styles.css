@@ -78,7 +78,7 @@ section{padding:40px 0;}
 /* ---------- Header ---------- */
 header.site{position:sticky; top:0; z-index:80; background:rgba(251,246,241,.94); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
 .nav{display:flex; align-items:center; justify-content:space-between; padding:14px 20px; max-width:var(--maxw); margin:0 auto; gap:18px;}
-.logo{display:flex; align-items:center; gap:10px; font-family:'Playfair Display', serif; font-weight:700; font-size:1.45rem; color:var(--maroon); white-space:nowrap;}
+.logo{display:flex; align-items:center; gap:10px; font-family:'PT Serif', serif; font-weight:700; font-size:1.45rem; color:var(--maroon); white-space:nowrap;}
 .logo img{height:38px; width:auto; flex-shrink:0;}
 nav.links{display:flex; gap:clamp(6px, 1.6vw, 26px); font-size:.86rem; font-weight:600; letter-spacing:.02em;}
 nav.links a{padding:6px 0; border-bottom:2px solid transparent; color:var(--ink); white-space:nowrap;}
