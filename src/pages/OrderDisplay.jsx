@@ -35,19 +35,26 @@ const PAGE_SIZE = 10;
 // TODO: point this at your deployed /server-example (see PAYMENT_ENDPOINT in Checkout.jsx for the same pattern)
 const REJECT_ENDPOINT = "/api/reject-order";
 
+// Two-tone "ding-dong" doorbell chime (synthesized, not a sampled sound).
 function playBeep() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "sine";
-    osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.2, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.5);
+    const now = ctx.currentTime;
+    function tone(freq, start, duration) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, now + start);
+      gain.gain.exponentialRampToValueAtTime(0.28, now + start + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + start + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + start);
+      osc.stop(now + start + duration + 0.05);
+    }
+    tone(880, 0, 0.55); // "ding" — A5
+    tone(659.25, 0.4, 0.7); // "dong" — E5
   } catch {
     // ignore — audio isn't essential, the visual banner still updates
   }
