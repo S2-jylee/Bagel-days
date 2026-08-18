@@ -710,6 +710,16 @@ footer ul li a:hover{color:#F0D9C9;}
 .staff-login-form .btn{margin-top:6px;}
 
 .order-display{min-height:100vh; background:var(--maroon-dark); color:#fff; padding:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:36px;}
+.order-display-enable-sound{
+  position:fixed; top:18px; right:18px; z-index:20;
+  background:#c9992e; color:#fff; border:none; border-radius:30px; padding:12px 20px;
+  font-family:'Pretendard', sans-serif; font-weight:700; font-size:.85rem; cursor:pointer;
+  box-shadow:0 6px 20px rgba(0,0,0,.35); animation:order-display-sound-pulse 1.8s ease-in-out infinite;
+}
+@keyframes order-display-sound-pulse{
+  0%, 100%{ box-shadow:0 6px 20px rgba(0,0,0,.35); }
+  50%{ box-shadow:0 6px 20px rgba(201,153,46,.7); }
+}
 .order-display-empty{font-family:'PT Serif', serif; font-size:1.6rem; color:rgba(255,255,255,.7);}
 .order-display-banner{
   width:100%; max-width:720px; background:#fff; color:var(--ink); border-radius:16px;

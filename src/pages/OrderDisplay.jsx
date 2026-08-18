@@ -36,9 +36,13 @@ const PAGE_SIZE = 10;
 const REJECT_ENDPOINT = "/api/reject-order";
 
 // Two-tone "ding-dong" doorbell chime (synthesized, not a sampled sound).
-function playBeep() {
+// Takes an already-unlocked AudioContext — see the "Enable sound" tap in the
+// component below. Browsers (especially Safari/iOS, common on shop tablets)
+// silently block audio that isn't tied to a real user tap, so a context
+// created inside a realtime callback never actually makes sound.
+function playChime(ctx) {
+  if (!ctx) return;
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const now = ctx.currentTime;
     function tone(freq, start, duration) {
       const osc = ctx.createOscillator();
@@ -73,6 +77,20 @@ export default function OrderDisplay() {
   const [rejecting, setRejecting] = useState(false);
   const [actionError, setActionError] = useState("");
   const isFirstLoad = useRef(true);
+  const audioCtxRef = useRef(null);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+
+  function enableSound() {
+    try {
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      audioCtxRef.current.resume();
+      setSoundEnabled(true);
+    } catch {
+      // ignore — the display still works without sound
+    }
+  }
 
   useEffect(() => {
     if (!session) return;
@@ -94,7 +112,7 @@ export default function OrderDisplay() {
         setOrders((prev) => [payload.new, ...prev].sort((a, b) => b.order_no - a.order_no).slice(0, FETCH_LIMIT));
         setSelectedId(null); // a new order always takes over the banner
         setPage(1);
-        if (!isFirstLoad.current) playBeep();
+        if (!isFirstLoad.current) playChime(audioCtxRef.current);
       })
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders" }, (payload) => {
         setOrders((prev) => prev.map((o) => (o.id === payload.new.id ? payload.new : o)));
@@ -150,6 +168,11 @@ export default function OrderDisplay() {
 
   return (
     <div className="order-display">
+      {!soundEnabled && (
+        <button type="button" className="order-display-enable-sound" onClick={enableSound}>
+          🔔 Tap to enable order sound
+        </button>
+      )}
       {latest ? (
         <div className="order-display-banner">
           <div className="order-display-banner-no">Order #{latest.order_no}</div>
