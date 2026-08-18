@@ -49,7 +49,7 @@ export default function OrderDisplay() {
       const { data } = await supabase
         .from("orders")
         .select("*")
-        .order("created_at", { ascending: false })
+        .order("order_no", { ascending: false })
         .limit(FETCH_LIMIT);
       setOrders(data || []);
       isFirstLoad.current = false;
@@ -59,7 +59,7 @@ export default function OrderDisplay() {
     const channel = supabase
       .channel("orders-live")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, (payload) => {
-        setOrders((prev) => [payload.new, ...prev].slice(0, FETCH_LIMIT));
+        setOrders((prev) => [payload.new, ...prev].sort((a, b) => b.order_no - a.order_no).slice(0, FETCH_LIMIT));
         setSelectedId(null); // a new order always takes over the banner
         setPage(1);
         if (!isFirstLoad.current) playBeep();
