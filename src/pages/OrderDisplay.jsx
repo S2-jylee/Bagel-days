@@ -11,8 +11,8 @@ const CATEGORY_BY_NAME = {};
 for (const cat of CATEGORIES) {
   for (const sub of cat.subcategories) {
     for (const id of sub.items) {
-      CATEGORY_BY_PRODUCT[id] = cat.label;
-      if (PRODUCTS[id]) CATEGORY_BY_NAME[PRODUCTS[id].name] = cat.label;
+      CATEGORY_BY_PRODUCT[id] = cat;
+      if (PRODUCTS[id]) CATEGORY_BY_NAME[PRODUCTS[id].name] = cat;
     }
   }
 }
@@ -22,12 +22,12 @@ function itemCategory(it) {
 }
 
 function orderCategories(order) {
-  const labels = new Set();
+  const map = new Map();
   for (const it of order.items || []) {
-    const label = itemCategory(it);
-    if (label) labels.add(label);
+    const cat = itemCategory(it);
+    if (cat) map.set(cat.id, cat);
   }
-  return [...labels];
+  return [...map.values()];
 }
 
 const FETCH_LIMIT = 60;
@@ -155,7 +155,9 @@ export default function OrderDisplay() {
                 <div className="order-display-item-info">
                   <div className="order-display-item-name">
                     {it.name} &times; {it.qty}
-                    {itemCategory(it) && <span className="order-cat-badge order-cat-badge-light">{itemCategory(it)}</span>}
+                    {itemCategory(it) && (
+                      <span className={`order-cat-badge cat-${itemCategory(it).id}`}>{itemCategory(it).label}</span>
+                    )}
                   </div>
                   {it.addons?.length > 0 && (
                     <ul className="order-display-item-addons">
@@ -198,8 +200,8 @@ export default function OrderDisplay() {
                 <button type="button" onClick={() => selectOrder(o)}>
                   <span className="order-display-queue-info">
                     #{o.order_no} &middot; {o.customer_name} &middot; ****{last4(o.customer_phone)}
-                    {orderCategories(o).map((label) => (
-                      <span key={label} className="order-cat-badge">{label}</span>
+                    {orderCategories(o).map((cat) => (
+                      <span key={cat.id} className={`order-cat-badge cat-${cat.id}`}>{cat.label}</span>
                     ))}
                     <span className={`order-status ${o.viewed_at ? "seen" : "unseen"}`}>
                       {o.viewed_at ? "Confirmed" : "Unconfirmed"}

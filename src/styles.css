@@ -757,9 +757,13 @@ footer ul li a:hover{color:#F0D9C9;}
 .order-status.status-rejected{background:rgba(255,255,255,.16); color:rgba(255,255,255,.6); text-decoration:line-through;}
 .order-cat-badge{
   font-family:'Pretendard', sans-serif; font-weight:600; font-size:.62rem; letter-spacing:.03em;
-  padding:3px 9px; border-radius:20px; background:transparent; color:#F0D9C9; border:1px solid rgba(240,217,201,.5);
+  padding:3px 9px; border-radius:20px;
 }
-.order-cat-badge-light{background:var(--tan); color:var(--maroon); border:none;}
+.order-cat-badge.cat-bagels{background:#E3B873; color:#5C3B10;}
+.order-cat-badge.cat-cream-cheese{background:#D9E8D5; color:#3D6B3F;}
+.order-cat-badge.cat-salt-bread{background:#D7E3EC; color:#34586B;}
+.order-cat-badge.cat-dessert{background:#F6D9E3; color:#8A3358;}
+.order-cat-badge.cat-coffee{background:#4B2E1F; color:#F1DFC9;}
 
 .order-display-actions{display:flex; gap:12px; margin-top:20px; padding-top:16px; border-top:1px solid var(--line);}
 .btn-accept, .btn-reject{
