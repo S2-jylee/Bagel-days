@@ -775,6 +775,10 @@ footer ul li a:hover{color:#F0D9C9;}
 .btn-reject{background:#fff; color:#c0392b; border:1.5px solid #c0392b;}
 .btn-reject:hover{background:#fbe9e7;}
 .btn-accept:disabled, .btn-reject:disabled{opacity:.5; cursor:not-allowed;}
+.order-display-action-error{
+  margin-top:14px; padding:12px 14px; border-radius:8px; background:#fdecea; border-left:4px solid #c0392b;
+  color:#c0392b; font-family:'Pretendard', sans-serif; font-weight:600; font-size:.85rem; line-height:1.4;
+}
 .order-display-status-badge{
   margin-top:20px; padding-top:16px; border-top:1px solid var(--line);
   text-align:center; font-family:'Pretendard', sans-serif; font-weight:700; font-size:.9rem; letter-spacing:.03em; text-transform:uppercase;

@@ -123,7 +123,7 @@ export default function OrderDisplay() {
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || "Reject failed");
+        throw new Error(body.error || `server returned ${res.status}`);
       }
     } catch (err) {
       setActionError(err.message);
@@ -185,7 +185,11 @@ export default function OrderDisplay() {
           )}
           {latest.status === "accepted" && <div className="order-display-status-badge accepted">Accepted</div>}
           {latest.status === "rejected" && <div className="order-display-status-badge rejected">Rejected &amp; Refunded</div>}
-          {actionError && <p className="form-status err">{actionError}</p>}
+          {actionError && (
+            <p className="order-display-action-error">
+              Reject failed — the order is still pending, nothing was refunded or sent. ({actionError})
+            </p>
+          )}
         </div>
       ) : (
         <div className="order-display-empty">Waiting for orders&hellip;</div>
