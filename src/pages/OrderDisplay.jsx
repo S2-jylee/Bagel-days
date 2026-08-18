@@ -17,10 +17,14 @@ for (const cat of CATEGORIES) {
   }
 }
 
+function itemCategory(it) {
+  return CATEGORY_BY_PRODUCT[it.id] || CATEGORY_BY_NAME[it.name];
+}
+
 function orderCategories(order) {
   const labels = new Set();
   for (const it of order.items || []) {
-    const label = CATEGORY_BY_PRODUCT[it.id] || CATEGORY_BY_NAME[it.name];
+    const label = itemCategory(it);
     if (label) labels.add(label);
   }
   return [...labels];
@@ -149,7 +153,10 @@ export default function OrderDisplay() {
             {(latest.items || []).map((it, i) => (
               <li key={i} className="order-display-item-row">
                 <div className="order-display-item-info">
-                  <div className="order-display-item-name">{it.name} &times; {it.qty}</div>
+                  <div className="order-display-item-name">
+                    {it.name} &times; {it.qty}
+                    {itemCategory(it) && <span className="order-cat-badge order-cat-badge-light">{itemCategory(it)}</span>}
+                  </div>
                   {it.addons?.length > 0 && (
                     <ul className="order-display-item-addons">
                       {it.addons.map((a, j) => (
