@@ -4,19 +4,23 @@ import { useStaffAuth } from "../lib/useStaffAuth";
 import StaffLogin from "../components/StaffLogin";
 import Pagination from "../components/Pagination";
 import { fmt } from "../context/CartContext";
-import { CATEGORIES } from "../data/products";
+import { CATEGORIES, PRODUCTS } from "../data/products";
 
 const CATEGORY_BY_PRODUCT = {};
+const CATEGORY_BY_NAME = {};
 for (const cat of CATEGORIES) {
   for (const sub of cat.subcategories) {
-    for (const id of sub.items) CATEGORY_BY_PRODUCT[id] = cat.label;
+    for (const id of sub.items) {
+      CATEGORY_BY_PRODUCT[id] = cat.label;
+      if (PRODUCTS[id]) CATEGORY_BY_NAME[PRODUCTS[id].name] = cat.label;
+    }
   }
 }
 
 function orderCategories(order) {
   const labels = new Set();
   for (const it of order.items || []) {
-    const label = CATEGORY_BY_PRODUCT[it.id];
+    const label = CATEGORY_BY_PRODUCT[it.id] || CATEGORY_BY_NAME[it.name];
     if (label) labels.add(label);
   }
   return [...labels];
