@@ -4,6 +4,23 @@ import { useStaffAuth } from "../lib/useStaffAuth";
 import StaffLogin from "../components/StaffLogin";
 import Pagination from "../components/Pagination";
 import { fmt } from "../context/CartContext";
+import { CATEGORIES } from "../data/products";
+
+const CATEGORY_BY_PRODUCT = {};
+for (const cat of CATEGORIES) {
+  for (const sub of cat.subcategories) {
+    for (const id of sub.items) CATEGORY_BY_PRODUCT[id] = cat.label;
+  }
+}
+
+function orderCategories(order) {
+  const labels = new Set();
+  for (const it of order.items || []) {
+    const label = CATEGORY_BY_PRODUCT[it.id];
+    if (label) labels.add(label);
+  }
+  return [...labels];
+}
 
 const FETCH_LIMIT = 60;
 const PAGE_SIZE = 10;
@@ -170,6 +187,9 @@ export default function OrderDisplay() {
                 <button type="button" onClick={() => selectOrder(o)}>
                   <span className="order-display-queue-info">
                     #{o.order_no} &middot; {o.customer_name} &middot; ****{last4(o.customer_phone)}
+                    {orderCategories(o).map((label) => (
+                      <span key={label} className="order-cat-badge">{label}</span>
+                    ))}
                     <span className={`order-status ${o.viewed_at ? "seen" : "unseen"}`}>
                       {o.viewed_at ? "Confirmed" : "Unconfirmed"}
                     </span>

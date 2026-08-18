@@ -755,6 +755,10 @@ footer ul li a:hover{color:#F0D9C9;}
 .order-status.status-pending{background:#c9992e; color:#fff;}
 .order-status.status-accepted{background:#3f7d4d; color:#fff;}
 .order-status.status-rejected{background:rgba(255,255,255,.16); color:rgba(255,255,255,.6); text-decoration:line-through;}
+.order-cat-badge{
+  font-family:'Pretendard', sans-serif; font-weight:600; font-size:.62rem; letter-spacing:.03em;
+  padding:3px 9px; border-radius:20px; background:transparent; color:#F0D9C9; border:1px solid rgba(240,217,201,.5);
+}
 
 .order-display-actions{display:flex; gap:12px; margin-top:20px; padding-top:16px; border-top:1px solid var(--line);}
 .btn-accept, .btn-reject{
