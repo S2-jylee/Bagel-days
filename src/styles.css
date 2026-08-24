@@ -264,7 +264,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 /* aspect-ratio + object-fit:contain (not cover) so every card is the same
    height regardless of a photo's native proportions, and the photo is
    letterboxed on white rather than cropped or stretched to fill it. */
-.food-card .thumb{display:block; width:100%; aspect-ratio:1/1; margin:0; padding:0; border:none; background:#fff; overflow:hidden; cursor:pointer;}
+.food-card .thumb{display:block; width:100%; aspect-ratio:4/3; margin:0; padding:0; border:none; background:#fff; overflow:hidden; cursor:pointer;}
 .food-card .thumb img{width:100%; height:100%; object-fit:contain;}
 .food-card .body{padding:14px 16px 18px; display:flex; flex-direction:column; flex:1;}
 .food-card h4{font-family:'PT Serif', serif; font-weight:500; font-size:.82rem; color:var(--ink); margin-bottom:0; cursor:pointer;}
@@ -876,7 +876,7 @@ footer ul li a:hover{color:#F0D9C9;}
 .inventory-row{display:flex; align-items:center; gap:14px; background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:12px 16px; transition:border-color .15s ease, background .15s ease;}
 .inventory-row.selected{border-color:var(--maroon-light); background:var(--cream-alt);}
 .inventory-row-check{width:17px; height:17px; accent-color:var(--maroon); cursor:pointer; flex-shrink:0;}
-.inventory-row img{width:48px; height:48px; border-radius:8px; object-fit:contain; background:#fff; border:1px solid var(--line); flex-shrink:0;}
+.inventory-row img{width:64px; aspect-ratio:4/3; border-radius:8px; object-fit:contain; background:#fff; border:1px solid var(--line); flex-shrink:0;}
 .inventory-row-info{flex:1; min-width:0;}
 .inventory-row-name{font-family:'PT Serif', serif; font-weight:600; font-size:.95rem; color:var(--ink);}
 .inventory-row-price{font-family:'Pretendard', sans-serif; font-size:.8rem; color:var(--body); margin-top:2px;}
@@ -908,8 +908,8 @@ footer ul li a:hover{color:#F0D9C9;}
 
 .menu-manager-row{justify-content:space-between;}
 .menu-manager-row.inactive{opacity:.55;}
-.menu-manager-noimg{width:48px; height:48px; border-radius:8px; background:var(--cream-alt); flex-shrink:0;}
-.menu-manager-noimg.large{width:100%; height:100%;}
+.menu-manager-noimg{width:64px; aspect-ratio:4/3; border-radius:8px; background:var(--cream-alt); flex-shrink:0;}
+.menu-manager-noimg.large{width:140px;}
 .menu-manager-hidden-badge{
   font-family:'Pretendard', sans-serif; font-weight:700; font-size:.62rem; letter-spacing:.04em; text-transform:uppercase;
   color:var(--body); background:var(--cream-alt); border-radius:20px; padding:2px 8px; margin-left:8px;
@@ -927,7 +927,9 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 .admin-form-panel h3{font-size:1.2rem; margin-bottom:18px;}
 .menu-manager-photo-row{display:flex; align-items:center; gap:16px; margin-bottom:18px;}
-.menu-manager-photo-preview{width:84px; height:84px; border-radius:8px; object-fit:contain; background:#fff; border:1px solid var(--line); flex-shrink:0;}
+.menu-manager-photo-preview{width:140px; aspect-ratio:4/3; border-radius:8px; object-fit:contain; background:#fff; border:1px solid var(--line); flex-shrink:0;}
+.menu-manager-toolbar{display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-top:6px;}
+.menu-manager-toolbar .menu-subcat-pills{margin:0;}
 .menu-manager-upload-btn{display:inline-flex; cursor:pointer;}
 .menu-manager-active-toggle{display:flex; align-items:center; gap:8px; font-family:'Pretendard', sans-serif; font-size:.85rem; color:var(--ink); margin:4px 0 6px; cursor:pointer;}
 .menu-manager-active-toggle input{width:16px; height:16px; accent-color:var(--maroon); cursor:pointer;}

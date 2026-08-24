@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { useProducts } from "../../context/ProductsContext";
 import { CATEGORIES } from "../../data/categories";
@@ -38,29 +38,32 @@ function uniqueId(name, existingIds) {
   return id;
 }
 
-const CANVAS_SIZE = 1200;
+// Matches the original catalog photos' native 800x600 (4:3) ratio, so legacy
+// and freshly-uploaded photos both display at the same proportions.
+const CANVAS_W = 1200;
+const CANVAS_H = 900;
 
 // Different photos come in at wildly different aspect ratios, which made the
 // menu grid look jagged (each thumb sized itself to its own image). Instead
 // of cropping (loses part of the photo) or stretching (distorts it), draw the
-// photo onto a fixed white square, scaled to fit — the file itself is
+// photo onto a fixed white 4:3 canvas, scaled to fit — the file itself is
 // normalized once here, so every display context (grid, modal, admin list)
-// gets a consistent square without needing to special-case legacy photos.
-function normalizeToWhiteSquare(file, size = CANVAS_SIZE) {
+// gets a consistent shape without needing to special-case legacy photos.
+function normalizeToWhiteCanvas(file, w = CANVAS_W, h = CANVAS_H) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
     img.onload = () => {
       const canvas = document.createElement("canvas");
-      canvas.width = size;
-      canvas.height = size;
+      canvas.width = w;
+      canvas.height = h;
       const ctx = canvas.getContext("2d");
       ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, size, size);
-      const scale = Math.min(size / img.width, size / img.height);
-      const w = img.width * scale;
-      const h = img.height * scale;
-      ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
+      ctx.fillRect(0, 0, w, h);
+      const scale = Math.min(w / img.width, h / img.height);
+      const dw = img.width * scale;
+      const dh = img.height * scale;
+      ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
       URL.revokeObjectURL(url);
       canvas.toBlob(
         (blob) => (blob ? resolve(new File([blob], "product.jpg", { type: "image/jpeg" })) : reject(new Error("Could not process image"))),
@@ -77,7 +80,7 @@ function normalizeToWhiteSquare(file, size = CANVAS_SIZE) {
 }
 
 async function uploadProductImage(file) {
-  const normalized = await normalizeToWhiteSquare(file);
+  const normalized = await normalizeToWhiteCanvas(file);
   const path = `${crypto.randomUUID()}.jpg`;
   const { error } = await supabase.storage.from(BUCKET).upload(path, normalized, { cacheControl: "3600", upsert: false });
   if (error) throw error;
@@ -110,17 +113,100 @@ export default function MenuManager() {
   const [newAddonName, setNewAddonName] = useState("");
   const [newAddonPrice, setNewAddonPrice] = useState("");
 
+  // ---- stock (merged in from the old Inventory tab) ----
+  const [stockMap, setStockMap] = useState({});
+  const [saved, setSaved] = useState(null);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [bulkQty, setBulkQty] = useState("");
+  const [applying, setApplying] = useState(false);
+  const [fillAllQty, setFillAllQty] = useState("");
+  const [fillingAll, setFillingAll] = useState(false);
+
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase.from("product_stock").select("product_id, stock_qty");
+      if (data) {
+        const map = {};
+        for (const row of data) map[row.product_id] = row.stock_qty;
+        setStockMap(map);
+      }
+    }
+    load();
+  }, []);
+
   const activeCategory = CATEGORIES.find((c) => c.id === activeCat);
   const activeSubcategory = activeCategory.subcategories?.find((s) => s.id === activeSubcat) ?? null;
   const visibleItems = Object.values(products)
     .filter((p) => p.categoryId === activeCat && (!activeSubcategory || p.subcategoryId === activeSubcat))
     .sort((a, b) => a.sortOrder - b.sortOrder);
   const addonList = Object.values(addons);
+  const allProductIds = Object.keys(products);
+  const allVisibleSelected = visibleItems.length > 0 && visibleItems.every((p) => selectedIds.has(p.id));
 
   function selectCategory(cat) {
     setActiveCat(cat.id);
     setActiveSubcat(cat.subcategories?.[0]?.id ?? null);
   }
+
+  function toggleOne(id) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAllVisible() {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allVisibleSelected) visibleItems.forEach((p) => next.delete(p.id));
+      else visibleItems.forEach((p) => next.add(p.id));
+      return next;
+    });
+  }
+
+  async function saveStock(id, value) {
+    const qty = value === "" ? null : Math.max(0, parseInt(value, 10) || 0);
+    setStockMap((prev) => ({ ...prev, [id]: qty }));
+    const { error } = await supabase.from("product_stock").update({ stock_qty: qty }).eq("product_id", id);
+    if (!error) {
+      setSaved(id);
+      setTimeout(() => setSaved((s) => (s === id ? null : s)), 1200);
+    }
+  }
+
+  async function applyBulk() {
+    const qty = bulkQty === "" ? null : Math.max(0, parseInt(bulkQty, 10) || 0);
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+    setApplying(true);
+    setStockMap((prev) => {
+      const next = { ...prev };
+      ids.forEach((id) => (next[id] = qty));
+      return next;
+    });
+    await supabase.from("product_stock").update({ stock_qty: qty }).in("product_id", ids);
+    setApplying(false);
+    setSelectedIds(new Set());
+    setBulkQty("");
+  }
+
+  async function fillAllStock() {
+    if (fillAllQty === "") return;
+    const qty = Math.max(0, parseInt(fillAllQty, 10) || 0);
+    setFillingAll(true);
+    setStockMap((prev) => {
+      const next = { ...prev };
+      allProductIds.forEach((id) => (next[id] = qty));
+      return next;
+    });
+    await supabase.from("product_stock").update({ stock_qty: qty }).in("product_id", allProductIds);
+    setFillingAll(false);
+    setFillAllQty("");
+  }
+
+  // ---- product CRUD ----
 
   function openCreate() {
     setFormError("");
@@ -185,7 +271,7 @@ export default function MenuManager() {
     setSaving(true);
     setFormError("");
     try {
-      const id = form.id || uniqueId(form.name, new Set(Object.keys(products)));
+      const id = form.id || uniqueId(form.name, new Set(allProductIds));
       const row = {
         id,
         name: form.name.trim(),
@@ -203,8 +289,9 @@ export default function MenuManager() {
       } else {
         const { error } = await supabase.from("products").insert(row);
         if (error) throw error;
-        // New items start with no stock set (shows as Sold Out until staff fills it in via Inventory).
+        // New items start with no stock set (shows as Sold Out until staff fills it in below).
         await supabase.from("product_stock").insert({ product_id: id, stock_qty: null });
+        setStockMap((prev) => ({ ...prev, [id]: null }));
       }
 
       await supabase.from("product_addons").delete().eq("product_id", id);
@@ -243,7 +330,6 @@ export default function MenuManager() {
     <div>
       <div className="admin-section-header">
         <h2>Menu Items</h2>
-        <button type="button" className="btn btn-primary btn-sm" onClick={openCreate}>+ Add New Item</button>
       </div>
 
       <div className="inventory-fillall-bar">
@@ -276,6 +362,21 @@ export default function MenuManager() {
         </div>
       )}
 
+      <div className="inventory-fillall-bar">
+        <div className="inventory-fillall-text">
+          <strong>Fill every product</strong>
+          <span>Sets stock for all {allProductIds.length} products at once, across every category &mdash; no need to select items first.</span>
+        </div>
+        <div className="inventory-bulk-apply">
+          <input type="number" min="0" placeholder="Qty" value={fillAllQty} onChange={(e) => setFillAllQty(e.target.value)} />
+          <button type="button" className="btn btn-primary btn-sm" onClick={fillAllStock} disabled={fillAllQty === "" || fillingAll}>
+            {fillingAll ? "Filling…" : "Fill All Products"}
+          </button>
+        </div>
+      </div>
+
+      <p className="inventory-hint">Edit an item's details or photo, or enter today's available quantity &mdash; anything left blank shows as Sold Out on the menu.</p>
+
       <div className="inventory-layout">
         <nav className="menu-maincats" aria-label="Menu categories">
           <h3 className="menu-maincats-label">Menu</h3>
@@ -292,19 +393,37 @@ export default function MenuManager() {
 
         <div className="inventory-products">
           <h2>{activeCategory.label}</h2>
-          {activeCategory.subcategories && (
-            <div className="menu-subcat-pills">
-              {activeCategory.subcategories.map((sub) => (
-                <button key={sub.id} className={activeSubcat === sub.id ? "active" : ""} onClick={() => setActiveSubcat(sub.id)}>
-                  {sub.label}
-                </button>
-              ))}
+
+          <div className="menu-manager-toolbar">
+            {activeCategory.subcategories && (
+              <div className="menu-subcat-pills">
+                {activeCategory.subcategories.map((sub) => (
+                  <button key={sub.id} className={activeSubcat === sub.id ? "active" : ""} onClick={() => setActiveSubcat(sub.id)}>
+                    {sub.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            <button type="button" className="btn btn-primary btn-sm" onClick={openCreate}>+ Add New Item</button>
+          </div>
+
+          <div className="inventory-bulk-bar">
+            <label className="inventory-select-all">
+              <input type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} />
+              Select all shown ({visibleItems.length})
+            </label>
+            <div className="inventory-bulk-apply">
+              <input type="number" min="0" placeholder="Qty" value={bulkQty} onChange={(e) => setBulkQty(e.target.value)} />
+              <button type="button" className="btn btn-primary btn-sm" onClick={applyBulk} disabled={selectedIds.size === 0 || applying}>
+                {applying ? "Applying…" : `Apply to ${selectedIds.size} selected`}
+              </button>
             </div>
-          )}
+          </div>
 
           <div className="inventory-list">
             {visibleItems.map((p) => (
-              <div className={`inventory-row menu-manager-row${p.isActive === false ? " inactive" : ""}`} key={p.id}>
+              <div className={`inventory-row menu-manager-row${p.isActive === false ? " inactive" : ""}${selectedIds.has(p.id) ? " selected" : ""}`} key={p.id}>
+                <input type="checkbox" className="inventory-row-check" checked={selectedIds.has(p.id)} onChange={() => toggleOne(p.id)} />
                 {p.img ? <img src={p.img} alt={p.name} /> : <div className="menu-manager-noimg" />}
                 <div className="inventory-row-info">
                   <div className="inventory-row-name">
@@ -312,6 +431,18 @@ export default function MenuManager() {
                     {p.isActive === false && <span className="menu-manager-hidden-badge">Hidden</span>}
                   </div>
                   <div className="inventory-row-price">${p.price.toFixed(2)}</div>
+                </div>
+                <div className="inventory-row-stock">
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="Sold out"
+                    defaultValue={stockMap[p.id] ?? ""}
+                    key={stockMap[p.id]}
+                    onBlur={(e) => saveStock(p.id, e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && e.target.blur()}
+                  />
+                  {saved === p.id && <IcCheck />}
                 </div>
                 <div className="menu-manager-row-actions">
                   <button type="button" className="btn btn-ghost btn-sm" onClick={() => openEdit(p)}>Edit</button>
