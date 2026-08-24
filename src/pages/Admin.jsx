@@ -3,6 +3,7 @@ import { useStaffAuth } from "../lib/useStaffAuth";
 import StaffLogin from "../components/StaffLogin";
 import OrderHistory from "./admin/OrderHistory";
 import Inventory from "./admin/Inventory";
+import MenuManager from "./admin/MenuManager";
 
 export default function Admin() {
   const { session, loading, signIn, signOut } = useStaffAuth();
@@ -17,11 +18,14 @@ export default function Admin() {
         <div className="admin-tabs">
           <button className={tab === "orders" ? "active" : ""} onClick={() => setTab("orders")}>Order History</button>
           <button className={tab === "inventory" ? "active" : ""} onClick={() => setTab("inventory")}>Inventory</button>
+          <button className={tab === "menu" ? "active" : ""} onClick={() => setTab("menu")}>Menu</button>
         </div>
         <button className="btn btn-ghost btn-sm" onClick={signOut}>Sign Out</button>
       </div>
 
-      {tab === "orders" ? <OrderHistory /> : <Inventory />}
+      {tab === "orders" && <OrderHistory />}
+      {tab === "inventory" && <Inventory />}
+      {tab === "menu" && <MenuManager />}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { PRODUCTS } from "../data/products";
+import { useProducts } from "./ProductsContext";
 
 const CART_KEY = "bageldays_cart";
 const CartContext = createContext(null);
@@ -33,6 +33,7 @@ function loadCart() {
 
 export function CartProvider({ children }) {
   const [cart, setCart] = useState(loadCart);
+  const { products, loading: productsLoading } = useProducts();
 
   useEffect(() => {
     sessionStorage.setItem(CART_KEY, JSON.stringify(cart));
@@ -65,12 +66,15 @@ export function CartProvider({ children }) {
 
   const clearCart = useCallback(() => setCart({}), []);
 
-  const ids = Object.keys(cart).filter((lid) => PRODUCTS[cart[lid].id]);
+  // While products are still loading, trust the cart as-is rather than filtering
+  // everything out (products starts as {} before the first fetch resolves) —
+  // avoids a flash of "cart is empty" on first render.
+  const ids = Object.keys(cart).filter((lid) => productsLoading || products[cart[lid].id]);
   const count = ids.reduce((sum, lid) => sum + cart[lid].qty, 0);
   const lineUnitPrice = (lid) => {
     const entry = cart[lid];
     const addonsTotal = (entry.addons || []).reduce((s, a) => s + a.price, 0);
-    return PRODUCTS[entry.id].price + addonsTotal;
+    return (products[entry.id]?.price ?? 0) + addonsTotal;
   };
   const subtotal = ids.reduce((sum, lid) => sum + lineUnitPrice(lid) * cart[lid].qty, 0);
 

@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../../lib/supabase";
-import { CATEGORIES, PRODUCTS } from "../../data/products";
+import { CATEGORIES } from "../../data/categories";
+import { useProducts } from "../../context/ProductsContext";
 import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcCheck } from "../../components/Icons";
 
 const CATEGORY_ICONS = {
@@ -21,6 +22,8 @@ export default function Inventory() {
   const [applying, setApplying] = useState(false);
   const [fillAllQty, setFillAllQty] = useState("");
   const [fillingAll, setFillingAll] = useState(false);
+  const { products } = useProducts();
+  const allProductIds = useMemo(() => Object.keys(products), [products]);
 
   useEffect(() => {
     async function load() {
@@ -36,7 +39,10 @@ export default function Inventory() {
 
   const activeCategory = CATEGORIES.find((c) => c.id === activeCat);
   const activeSubcategory = activeCategory.subcategories?.find((s) => s.id === activeSubcat) ?? null;
-  const visibleItems = (activeSubcategory ? activeSubcategory.items : activeCategory.items).filter((id) => PRODUCTS[id]);
+  const visibleItems = Object.values(products)
+    .filter((p) => p.categoryId === activeCat && (!activeSubcategory || p.subcategoryId === activeSubcat))
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((p) => p.id);
   const allVisibleSelected = visibleItems.length > 0 && visibleItems.every((id) => selectedIds.has(id));
 
   function selectCategory(cat) {
@@ -91,7 +97,7 @@ export default function Inventory() {
   async function fillAllStock() {
     if (fillAllQty === "") return;
     const qty = Math.max(0, parseInt(fillAllQty, 10) || 0);
-    const ids = Object.keys(PRODUCTS);
+    const ids = allProductIds;
     setFillingAll(true);
     setStockMap((prev) => {
       const next = { ...prev };
@@ -114,7 +120,7 @@ export default function Inventory() {
       <div className="inventory-fillall-bar">
         <div className="inventory-fillall-text">
           <strong>Fill every product</strong>
-          <span>Sets stock for all {Object.keys(PRODUCTS).length} products at once, across every category &mdash; no need to select items first.</span>
+          <span>Sets stock for all {allProductIds.length} products at once, across every category &mdash; no need to select items first.</span>
         </div>
         <div className="inventory-bulk-apply">
           <input
@@ -187,7 +193,7 @@ export default function Inventory() {
 
           <div className="inventory-list">
             {visibleItems.map((id) => {
-              const p = PRODUCTS[id];
+              const p = products[id];
               const qty = stockMap[id];
               return (
                 <div className={`inventory-row${selectedIds.has(id) ? " selected" : ""}`} key={id}>

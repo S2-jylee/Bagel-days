@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart, fmt } from "../context/CartContext";
-import { PRODUCTS } from "../data/products";
+import { useProducts } from "../context/ProductsContext";
 
 // ---------------------------------------------------------------
 // TODO: replace with your real Square sandbox/production credentials.
@@ -16,6 +16,7 @@ const SQUARE_SDK_URL = "https://sandbox.web.squarecdn.com/v1/square.js"; // swit
 
 export default function Checkout() {
   const { ids, cart, subtotal, lineUnitPrice, clearCart } = useCart();
+  const { products } = useProducts();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [note, setNote] = useState("");
@@ -73,11 +74,14 @@ export default function Checkout() {
         setStatus({ text: "Card details couldn't be verified. Please check and try again.", type: "err" });
         return;
       }
-      const items = ids.map((lid) => {
-        const entry = cart[lid];
-        const p = PRODUCTS[entry.id];
-        return { id: entry.id, name: p.name, qty: entry.qty, unitPrice: lineUnitPrice(lid), addons: entry.addons || [] };
-      });
+      const items = ids
+        .map((lid) => {
+          const entry = cart[lid];
+          const p = products[entry.id];
+          if (!p) return null;
+          return { id: entry.id, name: p.name, qty: entry.qty, unitPrice: lineUnitPrice(lid), addons: entry.addons || [] };
+        })
+        .filter(Boolean);
       const payload = {
         sourceId: result.token,
         amount: subtotal,
@@ -154,7 +158,8 @@ export default function Checkout() {
               ) : (
                 ids.map((lid) => {
                   const entry = cart[lid];
-                  const p = PRODUCTS[entry.id];
+                  const p = products[entry.id];
+                  if (!p) return null;
                   const qty = entry.qty;
                   const unitPrice = lineUnitPrice(lid);
                   return (

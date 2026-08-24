@@ -890,3 +890,46 @@ footer ul li a:hover{color:#F0D9C9;}
   .admin-section-header h2{font-size:1.3rem;}
   .inventory-row{flex-wrap:wrap;}
 }
+
+/* ---------- Menu manager (admin) ---------- */
+.addon-pool-editor{background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; margin:-14px 0 24px;}
+.addon-pool-list{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
+.addon-pool-list li{display:flex; align-items:center; gap:10px; font-family:'Pretendard', sans-serif; font-size:.85rem; color:var(--ink); padding:6px 0; border-bottom:1px solid var(--line);}
+.addon-pool-list li:last-child{border-bottom:none;}
+.addon-pool-list li span:first-child{flex:1;}
+.addon-pool-empty{color:var(--body); border-bottom:none !important;}
+.addon-pool-remove{width:22px; height:22px; border-radius:50%; border:1px solid var(--line); background:#fff; color:var(--maroon); cursor:pointer; font-size:1rem; line-height:1; flex-shrink:0;}
+.addon-pool-remove:hover{background:var(--cream-alt);}
+.addon-pool-add{display:flex; gap:8px; flex-wrap:wrap;}
+.addon-pool-add input[type=text]{flex:1; min-width:140px; padding:9px 10px; border:1px solid var(--line); border-radius:6px; font-family:'Pretendard',sans-serif; font-size:.85rem; background:#fff; color:var(--ink);}
+.addon-pool-add input[type=number]{width:90px; padding:9px 10px; border:1px solid var(--line); border-radius:6px; font-family:'Pretendard',sans-serif; font-size:.85rem; background:#fff; color:var(--ink);}
+
+.menu-manager-row{justify-content:space-between;}
+.menu-manager-row.inactive{opacity:.55;}
+.menu-manager-noimg{width:48px; height:48px; border-radius:8px; background:var(--cream-alt); flex-shrink:0;}
+.menu-manager-noimg.large{width:100%; height:100%;}
+.menu-manager-hidden-badge{
+  font-family:'Pretendard', sans-serif; font-weight:700; font-size:.62rem; letter-spacing:.04em; text-transform:uppercase;
+  color:var(--body); background:var(--cream-alt); border-radius:20px; padding:2px 8px; margin-left:8px;
+}
+.menu-manager-row-actions{display:flex; gap:8px; flex-shrink:0;}
+.menu-manager-delete{color:var(--maroon-light);}
+
+.admin-form-overlay{
+  position:fixed; inset:0; z-index:200; background:rgba(43,27,20,.55);
+  display:flex; align-items:center; justify-content:center; padding:20px;
+}
+.admin-form-panel{
+  background:#fff; border-radius:var(--radius); padding:26px 28px 28px; overflow-y:auto;
+  max-width:520px; width:100%; max-height:90vh; box-shadow:0 20px 50px rgba(0,0,0,.3);
+}
+.admin-form-panel h3{font-size:1.2rem; margin-bottom:18px;}
+.menu-manager-photo-row{display:flex; align-items:center; gap:16px; margin-bottom:18px;}
+.menu-manager-photo-preview{width:84px; height:84px; border-radius:8px; object-fit:cover; flex-shrink:0;}
+.menu-manager-upload-btn{display:inline-flex; cursor:pointer;}
+.menu-manager-active-toggle{display:flex; align-items:center; gap:8px; font-family:'Pretendard', sans-serif; font-size:.85rem; color:var(--ink); margin:4px 0 6px; cursor:pointer;}
+.menu-manager-active-toggle input{width:16px; height:16px; accent-color:var(--maroon); cursor:pointer;}
+.menu-manager-form-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:20px;}
+@media (max-width:600px){
+  .menu-manager-row-actions{width:100%; justify-content:flex-end;}
+}

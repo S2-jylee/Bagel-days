@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { CATEGORIES, ADDONS } from "../data/products";
+import { useState, useMemo } from "react";
+import { CATEGORIES } from "../data/categories";
 import FoodCard from "../components/FoodCard";
 import CartList from "../components/CartList";
 import { useCart } from "../context/CartContext";
+import { useProducts } from "../context/ProductsContext";
 import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup } from "../components/Icons";
 import { asset } from "../lib/assetUrl";
 
@@ -18,10 +19,17 @@ export default function Menu() {
   const [activeCat, setActiveCat] = useState(CATEGORIES[0].id);
   const [activeSubcat, setActiveSubcat] = useState(CATEGORIES[0].subcategories?.[0]?.id ?? null);
   const { addToCart } = useCart();
+  const { products, addons } = useProducts();
 
   const activeCategory = CATEGORIES.find((c) => c.id === activeCat);
   const activeSubcategory = activeCategory.subcategories?.find((s) => s.id === activeSubcat) ?? null;
-  const visibleItems = activeSubcategory ? activeSubcategory.items : activeCategory.items;
+  const visibleItems = useMemo(() => {
+    return Object.values(products)
+      .filter((p) => p.isActive !== false && p.categoryId === activeCat && (!activeSubcategory || p.subcategoryId === activeSubcat))
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map((p) => p.id);
+  }, [products, activeCat, activeSubcat, activeSubcategory]);
+  const addonList = useMemo(() => Object.values(addons), [addons]);
 
   function selectCategory(cat) {
     setActiveCat(cat.id);
@@ -99,8 +107,8 @@ export default function Menu() {
                 <div className="addons-panel">
                   <h4>Add-ons</h4>
                   <ul>
-                    {ADDONS.map((a) => (
-                      <li key={a.name}>
+                    {addonList.map((a) => (
+                      <li key={a.id}>
                         <span>{a.name}</span>
                         <span className="p">${a.price.toFixed(2)}</span>
                       </li>

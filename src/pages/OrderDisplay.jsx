@@ -1,34 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useStaffAuth } from "../lib/useStaffAuth";
 import StaffLogin from "../components/StaffLogin";
 import Pagination from "../components/Pagination";
 import { fmt } from "../context/CartContext";
-import { CATEGORIES, PRODUCTS } from "../data/products";
-
-const CATEGORY_BY_PRODUCT = {};
-const CATEGORY_BY_NAME = {};
-for (const cat of CATEGORIES) {
-  for (const sub of cat.subcategories) {
-    for (const id of sub.items) {
-      CATEGORY_BY_PRODUCT[id] = cat;
-      if (PRODUCTS[id]) CATEGORY_BY_NAME[PRODUCTS[id].name] = cat;
-    }
-  }
-}
-
-function itemCategory(it) {
-  return CATEGORY_BY_PRODUCT[it.id] || CATEGORY_BY_NAME[it.name];
-}
-
-function orderCategories(order) {
-  const map = new Map();
-  for (const it of order.items || []) {
-    const cat = itemCategory(it);
-    if (cat) map.set(cat.id, cat);
-  }
-  return [...map.values()];
-}
+import { useProducts } from "../context/ProductsContext";
+import { CATEGORIES } from "../data/categories";
 
 const FETCH_LIMIT = 60;
 const PAGE_SIZE = 10;
@@ -71,6 +48,7 @@ function last4(phone) {
 
 export default function OrderDisplay() {
   const { session, loading, signIn } = useStaffAuth();
+  const { products } = useProducts();
   const [orders, setOrders] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [page, setPage] = useState(1);
@@ -79,6 +57,36 @@ export default function OrderDisplay() {
   const isFirstLoad = useRef(true);
   const audioCtxRef = useRef(null);
   const [soundEnabled, setSoundEnabled] = useState(false);
+
+  // Order line items are stored as a denormalized JSON snapshot (id/name at the
+  // time of purchase, not FK'd to products), so historical orders still classify
+  // correctly even after a product is later edited or deleted — id lookup first,
+  // name as a fallback for older orders placed before a product existed with a
+  // matching id (e.g. delivery-platform items entered by name only).
+  const categoryLookup = useMemo(() => {
+    const byProduct = {};
+    const byName = {};
+    for (const p of Object.values(products)) {
+      const cat = CATEGORIES.find((c) => c.id === p.categoryId);
+      if (!cat) continue;
+      byProduct[p.id] = cat;
+      byName[p.name] = cat;
+    }
+    return { byProduct, byName };
+  }, [products]);
+
+  function itemCategory(it) {
+    return categoryLookup.byProduct[it.id] || categoryLookup.byName[it.name];
+  }
+
+  function orderCategories(order) {
+    const map = new Map();
+    for (const it of order.items || []) {
+      const cat = itemCategory(it);
+      if (cat) map.set(cat.id, cat);
+    }
+    return [...map.values()];
+  }
 
   function enableSound() {
     try {

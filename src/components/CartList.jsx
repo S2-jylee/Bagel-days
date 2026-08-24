@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { useCart, fmt } from "../context/CartContext";
-import { PRODUCTS } from "../data/products";
+import { useProducts } from "../context/ProductsContext";
 
 export default function CartList({ showCheckoutButton = true }) {
   const { ids, cart, subtotal, lineUnitPrice, setQty, removeFromCart } = useCart();
+  const { products } = useProducts();
 
   return (
     <>
@@ -17,7 +18,8 @@ export default function CartList({ showCheckoutButton = true }) {
         ) : (
           ids.map((lid) => {
             const entry = cart[lid];
-            const p = PRODUCTS[entry.id];
+            const p = products[entry.id];
+            if (!p) return null;
             const qty = entry.qty;
             const addons = entry.addons || [];
             return (

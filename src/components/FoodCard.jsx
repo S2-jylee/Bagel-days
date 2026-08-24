@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useStock } from "../context/StockContext";
-import { PRODUCTS, ADDONS } from "../data/products";
+import { useProducts } from "../context/ProductsContext";
 import { IcPlus, IcCheck } from "./Icons";
 
 const IcClose = () => (
@@ -11,7 +11,8 @@ const IcClose = () => (
 );
 
 export default function FoodCard({ id, small }) {
-  const p = PRODUCTS[id];
+  const { products } = useProducts();
+  const p = products[id];
   const { addToCart } = useCart();
   const stock = useStock(id);
   const [added, setAdded] = useState(false);
@@ -87,26 +88,28 @@ export default function FoodCard({ id, small }) {
               <h3>{p.name}</h3>
               <p>{p.desc}</p>
 
-              <div className="modal-addons">
-                <h4>Add-ons</h4>
-                <div className="modal-addon-list">
-                  {ADDONS.map((a) => {
-                    const active = selectedAddons.some((s) => s.name === a.name);
-                    return (
-                      <button
-                        key={a.name}
-                        type="button"
-                        className={`modal-addon-btn${active ? " active" : ""}`}
-                        onClick={() => toggleAddon(a)}
-                        disabled={soldOut}
-                      >
-                        <span>{active ? <IcCheck /> : <IcPlus />} {a.name}</span>
-                        <span className="p">${a.price.toFixed(2)}</span>
-                      </button>
-                    );
-                  })}
+              {p.addons.length > 0 && (
+                <div className="modal-addons">
+                  <h4>Add-ons</h4>
+                  <div className="modal-addon-list">
+                    {p.addons.map((a) => {
+                      const active = selectedAddons.some((s) => s.name === a.name);
+                      return (
+                        <button
+                          key={a.name}
+                          type="button"
+                          className={`modal-addon-btn${active ? " active" : ""}`}
+                          onClick={() => toggleAddon(a)}
+                          disabled={soldOut}
+                        >
+                          <span>{active ? <IcCheck /> : <IcPlus />} {a.name}</span>
+                          <span className="p">${a.price.toFixed(2)}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="row">
                 {soldOut ? (
