@@ -92,6 +92,7 @@ export default function Menu() {
               {addonList.length > 0 && (
                 <div className="addons-panel">
                   <h4>{activeCategory.label} Add-ons</h4>
+                  <p className="addons-panel-hint">Options you can add &mdash; tap a menu photo to add them to your order.</p>
                   <ul>
                     {addonList.map((a) => (
                       <li key={a.id}>

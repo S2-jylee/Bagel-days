@@ -415,16 +415,18 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .set-banner-row{display:flex; align-items:center; gap:18px; margin-top:10px; flex-wrap:wrap;}
 .set-banner .price{font-family:'PT Serif',serif; font-weight:700; font-size:clamp(1rem, 0.65rem + 0.9vw, 1.5rem); color:var(--maroon); white-space:nowrap;}
 
-/* Add-ons: a horizontal chip bar under the subcategory pills, above the
-   product grid — scoped to whichever category is active (see Menu.jsx). */
-.addons-panel{background:var(--cream-alt); border-radius:var(--radius); padding:14px 20px; margin:0 0 26px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
-.addons-panel h4{font-family:'PT Serif', serif; font-size:.92rem; color:var(--maroon); white-space:nowrap; flex-shrink:0;}
-.addons-panel ul{display:flex; flex-wrap:wrap; gap:10px; flex:1; min-width:0;}
-.addons-panel li{display:flex; align-items:center; gap:7px; background:#fff; border:1px solid var(--tan-dark); border-radius:20px; padding:6px 12px; font-size:.82rem; color:var(--ink); white-space:nowrap;}
+/* Add-ons: an informational list under the subcategory pills, above the
+   product grid — scoped to whichever category is active (see Menu.jsx).
+   Plain rows, not pill/button-shaped — these aren't clickable here, they're
+   only added via a menu item's own photo/modal, so they shouldn't look
+   like an interactive control. */
+.addons-panel{background:var(--cream-alt); border-radius:var(--radius); padding:16px 20px; margin:0 0 26px;}
+.addons-panel h4{font-family:'PT Serif', serif; font-size:1rem; color:var(--maroon); margin-bottom:2px;}
+.addons-panel-hint{font-family:'Pretendard', sans-serif; font-size:.78rem; color:var(--body); margin-bottom:12px;}
+.addons-panel ul{display:flex; flex-direction:column; gap:8px;}
+.addons-panel li{display:flex; justify-content:space-between; gap:10px; font-size:.85rem; color:var(--ink); padding:6px 0; border-bottom:1px solid var(--line);}
+.addons-panel li:last-child{border-bottom:none;}
 .addons-panel .p{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon);}
-@media (max-width:600px){
-  .addons-panel{flex-direction:column; align-items:flex-start; gap:10px;}
-}
 
 /* ---------- Cart drawer ---------- */
 .cart-drawer{position:fixed; inset:0; z-index:150; display:none;}
