@@ -14,8 +14,17 @@ const CATEGORY_ICONS = {
 
 const BUCKET = "product-images";
 
+// Unicode-aware: keeps letters from any script (Korean names included) instead
+// of stripping everything down to "item" the way an ASCII-only [a-z0-9] filter
+// would — non-Latin names still get a meaningful, readable id this way.
 function slugify(name) {
-  return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\p{L}\p{N}-]+/gu, "")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 function uniqueId(name, existingIds) {
@@ -29,10 +38,48 @@ function uniqueId(name, existingIds) {
   return id;
 }
 
+const CANVAS_SIZE = 1200;
+
+// Different photos come in at wildly different aspect ratios, which made the
+// menu grid look jagged (each thumb sized itself to its own image). Instead
+// of cropping (loses part of the photo) or stretching (distorts it), draw the
+// photo onto a fixed white square, scaled to fit — the file itself is
+// normalized once here, so every display context (grid, modal, admin list)
+// gets a consistent square without needing to special-case legacy photos.
+function normalizeToWhiteSquare(file, size = CANVAS_SIZE) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, size, size);
+      const scale = Math.min(size / img.width, size / img.height);
+      const w = img.width * scale;
+      const h = img.height * scale;
+      ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(
+        (blob) => (blob ? resolve(new File([blob], "product.jpg", { type: "image/jpeg" })) : reject(new Error("Could not process image"))),
+        "image/jpeg",
+        0.92
+      );
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Could not read image file"));
+    };
+    img.src = url;
+  });
+}
+
 async function uploadProductImage(file) {
-  const ext = file.name.split(".").pop();
-  const path = `${crypto.randomUUID()}.${ext}`;
-  const { error } = await supabase.storage.from(BUCKET).upload(path, file, { cacheControl: "3600", upsert: false });
+  const normalized = await normalizeToWhiteSquare(file);
+  const path = `${crypto.randomUUID()}.jpg`;
+  const { error } = await supabase.storage.from(BUCKET).upload(path, normalized, { cacheControl: "3600", upsert: false });
   if (error) throw error;
   return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }

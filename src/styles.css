@@ -245,7 +245,6 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .mini-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
 .widget-bestsellers .mini-grid{grid-template-columns:repeat(4,1fr); gap:8px; flex:1; align-content:center;}
 .widget-bestsellers .mini-grid > :nth-child(n+5){display:none;}
-.food-card-small .thumb{aspect-ratio:1/1;}
 .food-card-small .body{padding:8px 4px 0; text-align:center;}
 .food-card-small h4{font-size:.7rem; margin-bottom:0; line-height:1.2;}
 
@@ -262,8 +261,11 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .card-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:24px;}
 .food-card{background:#fff; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; min-width:0; display:flex; flex-direction:column; transition:transform .15s ease, box-shadow .15s ease;}
 .food-card:hover{transform:translateY(-4px); }
-.food-card .thumb{display:block; width:100%; margin:0; padding:0; border:none; background:none; overflow:hidden; cursor:pointer;}
-.food-card .thumb img{width:100%; height:100%; object-fit:cover;}
+/* aspect-ratio + object-fit:contain (not cover) so every card is the same
+   height regardless of a photo's native proportions, and the photo is
+   letterboxed on white rather than cropped or stretched to fill it. */
+.food-card .thumb{display:block; width:100%; aspect-ratio:1/1; margin:0; padding:0; border:none; background:#fff; overflow:hidden; cursor:pointer;}
+.food-card .thumb img{width:100%; height:100%; object-fit:contain;}
 .food-card .body{padding:14px 16px 18px; display:flex; flex-direction:column; flex:1;}
 .food-card h4{font-family:'PT Serif', serif; font-weight:500; font-size:.82rem; color:var(--ink); margin-bottom:0; cursor:pointer;}
 .card-price{display:block; font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon); font-size:.85rem;}
@@ -303,8 +305,8 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 }
 .product-modal-close:hover{background:#fff;}
 .product-modal-close svg{width:18px; height:18px;}
-.product-modal-img{aspect-ratio:4/3; overflow:hidden;}
-.product-modal-img img{width:100%; height:100%; object-fit:cover;}
+.product-modal-img{aspect-ratio:4/3; overflow:hidden; background:#fff;}
+.product-modal-img img{width:100%; height:100%; object-fit:contain;}
 .product-modal-body{padding:22px 24px 26px;}
 .product-modal-body h3{font-size:1.3rem; margin-bottom:8px;}
 .product-modal-body p{color:var(--body); font-size:.92rem; line-height:1.6; margin-bottom:18px;}
@@ -874,7 +876,7 @@ footer ul li a:hover{color:#F0D9C9;}
 .inventory-row{display:flex; align-items:center; gap:14px; background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:12px 16px; transition:border-color .15s ease, background .15s ease;}
 .inventory-row.selected{border-color:var(--maroon-light); background:var(--cream-alt);}
 .inventory-row-check{width:17px; height:17px; accent-color:var(--maroon); cursor:pointer; flex-shrink:0;}
-.inventory-row img{width:48px; height:48px; border-radius:8px; object-fit:cover; flex-shrink:0;}
+.inventory-row img{width:48px; height:48px; border-radius:8px; object-fit:contain; background:#fff; border:1px solid var(--line); flex-shrink:0;}
 .inventory-row-info{flex:1; min-width:0;}
 .inventory-row-name{font-family:'PT Serif', serif; font-weight:600; font-size:.95rem; color:var(--ink);}
 .inventory-row-price{font-family:'Pretendard', sans-serif; font-size:.8rem; color:var(--body); margin-top:2px;}
@@ -925,7 +927,7 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 .admin-form-panel h3{font-size:1.2rem; margin-bottom:18px;}
 .menu-manager-photo-row{display:flex; align-items:center; gap:16px; margin-bottom:18px;}
-.menu-manager-photo-preview{width:84px; height:84px; border-radius:8px; object-fit:cover; flex-shrink:0;}
+.menu-manager-photo-preview{width:84px; height:84px; border-radius:8px; object-fit:contain; background:#fff; border:1px solid var(--line); flex-shrink:0;}
 .menu-manager-upload-btn{display:inline-flex; cursor:pointer;}
 .menu-manager-active-toggle{display:flex; align-items:center; gap:8px; font-family:'Pretendard', sans-serif; font-size:.85rem; color:var(--ink); margin:4px 0 6px; cursor:pointer;}
 .menu-manager-active-toggle input{width:16px; height:16px; accent-color:var(--maroon); cursor:pointer;}
