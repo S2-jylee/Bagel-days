@@ -1,13 +1,39 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import FoodCard from "../components/FoodCard";
 import { UberEatsButton, DoorDashButton } from "../components/DeliveryButtons";
 import { IcLeaf, IcWhisk, IcBean, IcHeart, IcPin, IcClock, IcPhone } from "../components/Icons";
 import { asset } from "../lib/assetUrl";
+import { supabase } from "../lib/supabase";
+import { useProducts } from "../context/ProductsContext";
 
-// TODO: keep this ordered by actual order/sales volume, highest first — placeholder order for now.
-const BEST_SELLERS = ["bagel-plain", "bagel-blueberry", "salt-bread", "dessert-signature", "bagel-sesame", "bagel-everything"];
+const BEST_SELLERS_COUNT = 6;
+// Used to top up the row when real sales data doesn't have 6 products yet
+// (e.g. a slow day, or a brand-new item with no orders) — not shown unless needed.
+const FALLBACK_BEST_SELLERS = ["bagel-plain", "bagel-blueberry", "salt-bread", "dessert-signature", "bagel-sesame", "bagel-everything"];
 
 export default function Home() {
+  const { products } = useProducts();
+  const [salesIds, setSalesIds] = useState(null); // null = not loaded yet
+
+  useEffect(() => {
+    supabase
+      .rpc("get_product_sales_totals")
+      .then(({ data }) => {
+        const sorted = (data || []).sort((a, b) => b.total_qty - a.total_qty);
+        setSalesIds(sorted.slice(0, BEST_SELLERS_COUNT).map((r) => r.product_id));
+      });
+  }, []);
+
+  const bestSellerIds = useMemo(() => {
+    const ids = [...(salesIds || [])];
+    for (const id of FALLBACK_BEST_SELLERS) {
+      if (ids.length >= BEST_SELLERS_COUNT) break;
+      if (!ids.includes(id) && products[id]?.isActive !== false) ids.push(id);
+    }
+    return ids.slice(0, BEST_SELLERS_COUNT);
+  }, [salesIds, products]);
+
   return (
     <>
       <section className="hero home-hero hero-photo-fit">
@@ -48,7 +74,7 @@ export default function Home() {
               <Link to="/menu" className="widget-link">View Full Menu &rarr;</Link>
             </div>
             <div className="mini-grid">
-              {BEST_SELLERS.map((id) => (
+              {bestSellerIds.map((id) => (
                 <FoodCard key={id} id={id} small />
               ))}
             </div>
