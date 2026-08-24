@@ -112,6 +112,7 @@ export default function MenuManager() {
   const [addonPoolOpen, setAddonPoolOpen] = useState(false);
   const [newAddonName, setNewAddonName] = useState("");
   const [newAddonPrice, setNewAddonPrice] = useState("");
+  const [newAddonCategory, setNewAddonCategory] = useState("");
 
   // ---- stock (merged in from the old Inventory tab) ----
   const [stockMap, setStockMap] = useState({});
@@ -316,9 +317,10 @@ export default function MenuManager() {
 
   async function addPoolAddon() {
     if (!newAddonName.trim() || newAddonPrice === "") return;
-    await supabase.from("addons").insert({ name: newAddonName.trim(), price: Number(newAddonPrice) });
+    await supabase.from("addons").insert({ name: newAddonName.trim(), price: Number(newAddonPrice), category_id: newAddonCategory || null });
     setNewAddonName("");
     setNewAddonPrice("");
+    setNewAddonCategory("");
   }
 
   async function deletePoolAddon(a) {
@@ -347,6 +349,7 @@ export default function MenuManager() {
           <ul className="addon-pool-list">
             {addonList.map((a) => (
               <li key={a.id}>
+                <span className="addon-pool-cat">{CATEGORIES.find((c) => c.id === a.categoryId)?.label || "General"}</span>
                 <span>{a.name}</span>
                 <span className="mono">${a.price.toFixed(2)}</span>
                 <button type="button" className="addon-pool-remove" onClick={() => deletePoolAddon(a)} aria-label={`Remove ${a.name}`}>&times;</button>
@@ -355,6 +358,10 @@ export default function MenuManager() {
             {addonList.length === 0 && <li className="addon-pool-empty">No add-ons yet.</li>}
           </ul>
           <div className="addon-pool-add">
+            <select value={newAddonCategory} onChange={(e) => setNewAddonCategory(e.target.value)}>
+              <option value="">General (all categories)</option>
+              {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+            </select>
             <input type="text" placeholder="Add-on name" value={newAddonName} onChange={(e) => setNewAddonName(e.target.value)} />
             <input type="number" min="0" step="0.01" placeholder="Price" value={newAddonPrice} onChange={(e) => setNewAddonPrice(e.target.value)} />
             <button type="button" className="btn btn-primary btn-sm" onClick={addPoolAddon} disabled={!newAddonName.trim() || newAddonPrice === ""}>Add</button>
@@ -507,11 +514,16 @@ export default function MenuManager() {
                 </div>
               </div>
 
-              {addonList.length > 0 && (
+              {(() => {
+                // Only offer add-ons that make sense for this item's category (e.g. don't
+                // show "Extra Cream Cheese" on a coffee item) — plus anything with no
+                // category set, which counts as a general/universal add-on.
+                const relevantAddons = addonList.filter((a) => !a.categoryId || a.categoryId === form.categoryId);
+                return relevantAddons.length > 0 && (
                 <div className="modal-addons">
                   <h4>Add-ons available for this item</h4>
                   <div className="modal-addon-list">
-                    {addonList.map((a) => {
+                    {relevantAddons.map((a) => {
                       const active = form.addonIds.has(a.id);
                       return (
                         <button key={a.id} type="button" className={`modal-addon-btn${active ? " active" : ""}`} onClick={() => toggleAddon(a.id)}>
@@ -522,7 +534,8 @@ export default function MenuManager() {
                     })}
                   </div>
                 </div>
-              )}
+                );
+              })()}
 
               <label className="menu-manager-active-toggle">
                 <input type="checkbox" checked={form.isActive} onChange={(e) => updateForm({ isActive: e.target.checked })} />

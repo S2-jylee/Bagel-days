@@ -14,7 +14,7 @@ function resolveImg(url) {
 
 function buildState(products, addons, links) {
   const addonById = {};
-  for (const a of addons) addonById[a.id] = { id: a.id, name: a.name, price: Number(a.price) };
+  for (const a of addons) addonById[a.id] = { id: a.id, name: a.name, price: Number(a.price), categoryId: a.category_id };
 
   const addonsByProduct = {};
   for (const l of links) {

@@ -898,13 +898,18 @@ footer ul li a:hover{color:#F0D9C9;}
 .addon-pool-list{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
 .addon-pool-list li{display:flex; align-items:center; gap:10px; font-family:'Pretendard', sans-serif; font-size:.85rem; color:var(--ink); padding:6px 0; border-bottom:1px solid var(--line);}
 .addon-pool-list li:last-child{border-bottom:none;}
-.addon-pool-list li span:first-child{flex:1;}
+.addon-pool-list li span:nth-child(2){flex:1;}
+.addon-pool-cat{
+  font-family:'Pretendard', sans-serif; font-weight:700; font-size:.66rem; letter-spacing:.03em; text-transform:uppercase;
+  color:var(--maroon); background:var(--cream-alt); border-radius:20px; padding:2px 9px; flex-shrink:0;
+}
 .addon-pool-empty{color:var(--body); border-bottom:none !important;}
 .addon-pool-remove{width:22px; height:22px; border-radius:50%; border:1px solid var(--line); background:#fff; color:var(--maroon); cursor:pointer; font-size:1rem; line-height:1; flex-shrink:0;}
 .addon-pool-remove:hover{background:var(--cream-alt);}
 .addon-pool-add{display:flex; gap:8px; flex-wrap:wrap;}
 .addon-pool-add input[type=text]{flex:1; min-width:140px; padding:9px 10px; border:1px solid var(--line); border-radius:6px; font-family:'Pretendard',sans-serif; font-size:.85rem; background:#fff; color:var(--ink);}
 .addon-pool-add input[type=number]{width:90px; padding:9px 10px; border:1px solid var(--line); border-radius:6px; font-family:'Pretendard',sans-serif; font-size:.85rem; background:#fff; color:var(--ink);}
+.addon-pool-add select{padding:9px 10px; border:1px solid var(--line); border-radius:6px; font-family:'Pretendard',sans-serif; font-size:.85rem; background:#fff; color:var(--ink);}
 
 .menu-manager-row{justify-content:space-between;}
 .menu-manager-row.inactive{opacity:.55;}
