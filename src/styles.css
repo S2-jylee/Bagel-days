@@ -404,9 +404,8 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   .menu-cart-panel{display:none;}
 }
 
-/* Make It A Set + Add-ons: side by side on desktop, add-ons hidden below 981px */
-.set-row{margin-top:20px; display:grid; grid-template-columns:1fr 280px; gap:20px; align-items:stretch;}
-.set-row.no-addons{grid-template-columns:1fr;}
+/* Make It A Set: full-width banner below the product grid */
+.set-row{margin-top:20px;}
 .set-banner{
   background:var(--cream-alt); border-radius:var(--radius); padding:24px; display:grid;
   grid-template-columns:210px 1fr; gap:24px; align-items:center; min-width:0;
@@ -415,30 +414,16 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .set-banner-info{min-width:0;}
 .set-banner-row{display:flex; align-items:center; gap:18px; margin-top:10px; flex-wrap:wrap;}
 .set-banner .price{font-family:'PT Serif',serif; font-weight:700; font-size:clamp(1rem, 0.65rem + 0.9vw, 1.5rem); color:var(--maroon); white-space:nowrap;}
-.addons-panel{background:var(--cream-alt); border-radius:var(--radius); padding:22px;}
-.addons-panel h4{font-family:'PT Serif', serif; font-size:1.05rem; color:var(--maroon); margin-bottom:14px;}
-.addons-panel ul{display:flex; flex-direction:column; gap:10px;}
-.addons-panel li{display:flex; justify-content:space-between; gap:10px; font-size:.85rem; color:var(--ink);}
+
+/* Add-ons: a horizontal chip bar under the subcategory pills, above the
+   product grid — scoped to whichever category is active (see Menu.jsx). */
+.addons-panel{background:var(--cream-alt); border-radius:var(--radius); padding:14px 20px; margin:0 0 26px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
+.addons-panel h4{font-family:'PT Serif', serif; font-size:.92rem; color:var(--maroon); white-space:nowrap; flex-shrink:0;}
+.addons-panel ul{display:flex; flex-wrap:wrap; gap:10px; flex:1; min-width:0;}
+.addons-panel li{display:flex; align-items:center; gap:7px; background:#fff; border:1px solid var(--tan-dark); border-radius:20px; padding:6px 12px; font-size:.82rem; color:var(--ink); white-space:nowrap;}
 .addons-panel .p{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon);}
-/* Below 1250px the menu sidebar + cart panel leave very little room for .set-row's
-   1fr banner column, so the price/button row (white-space:nowrap) used to overflow
-   past it and visually disappear behind the Add-ons panel's solid background.
-   Narrowing/stacking the Add-ons column reclaims enough width for both boxes to
-   fit; wrapping is a safety net if still tight. */
-@media (max-width:1249px){
-  .set-row{grid-template-columns:1fr 210px;}
-  .set-banner-row{flex-wrap:wrap; gap:10px;}
-  .set-banner-row .btn{white-space:normal;}
-  .addons-panel{padding:16px;}
-  .addons-panel li{flex-direction:column; align-items:flex-start; gap:2px;}
-}
-/* The banner photo itself only needs to drop out between 1140-1390px: above
-   1390 there's room for it, and below 1139 the cart panel has already been
-   dropped (see the 1139px breakpoint above), freeing enough width to bring
-   it back. */
-@media (min-width:1140px) and (max-width:1390px){
-  .set-banner{grid-template-columns:1fr;}
-  .set-banner img{display:none;}
+@media (max-width:600px){
+  .addons-panel{flex-direction:column; align-items:flex-start; gap:10px;}
 }
 
 /* ---------- Cart drawer ---------- */
@@ -690,15 +675,10 @@ footer ul li a:hover{color:#F0D9C9;}
   .widget-order .delivery-btn span{white-space:nowrap;}
   .loc-card{padding:20px;}
   .getting-here{padding:20px;}
-  /* Make It A Set + Add-ons stay side by side down to 980px now that the menu
-     sidebar/cart panel are gone at that width (full row width to share); they
-     only stack once the row itself gets this narrow. */
-  .set-row{grid-template-columns:1fr;}
   .set-banner{grid-template-columns:90px 1fr; gap:12px; padding:14px;}
   .set-banner img{display:block;}
   .set-banner-row{gap:8px;}
   .set-banner-row .btn{padding:8px 10px; font-size:.7rem; white-space:normal; text-align:center; min-width:0;}
-  .addons-panel li{flex-direction:row; align-items:center;}
 }
 @media (max-width:540px){
   .foot-quicklinks{display:none;}

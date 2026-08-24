@@ -89,13 +89,27 @@ export default function Menu() {
                 </div>
               )}
 
+              {addonList.length > 0 && (
+                <div className="addons-panel">
+                  <h4>{activeCategory.label} Add-ons</h4>
+                  <ul>
+                    {addonList.map((a) => (
+                      <li key={a.id}>
+                        <span>{a.name}</span>
+                        <span className="p">${a.price.toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               <div className="card-grid">
                 {visibleItems.map((id) => (
                   <FoodCard key={id} id={id} />
                 ))}
               </div>
 
-              <div className={`set-row${addonList.length === 0 ? " no-addons" : ""}`}>
+              <div className="set-row">
                 <div className="set-banner">
                   <img src={asset("/assets/images/sandwich-set.jpg")} alt="Bagel set" />
                   <div className="set-banner-info">
@@ -109,20 +123,6 @@ export default function Menu() {
                     </div>
                   </div>
                 </div>
-
-                {addonList.length > 0 && (
-                  <div className="addons-panel">
-                    <h4>{activeCategory.label} Add-ons</h4>
-                    <ul>
-                      {addonList.map((a) => (
-                        <li key={a.id}>
-                          <span>{a.name}</span>
-                          <span className="p">${a.price.toFixed(2)}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
             </div>
           </div>
