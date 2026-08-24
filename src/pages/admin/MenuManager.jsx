@@ -111,9 +111,9 @@ export default function MenuManager() {
   const [uploading, setUploading] = useState(false);
   const [formError, setFormError] = useState("");
   const [addonPoolOpen, setAddonPoolOpen] = useState(false);
+  const [poolTab, setPoolTab] = useState(CATEGORIES[0].id); // which category's add-ons the pool editor shows; "general" = no category
   const [newAddonName, setNewAddonName] = useState("");
   const [newAddonPrice, setNewAddonPrice] = useState("");
-  const [newAddonCategory, setNewAddonCategory] = useState("");
 
   // ---- stock (merged in from the old Inventory tab) ----
   const [stockMap, setStockMap] = useState({});
@@ -142,6 +142,7 @@ export default function MenuManager() {
     .filter((p) => p.categoryId === activeCat && (!activeSubcategory || p.subcategoryId === activeSubcat))
     .sort((a, b) => a.sortOrder - b.sortOrder);
   const addonList = Object.values(addons);
+  const poolAddons = addonList.filter((a) => (poolTab === "general" ? !a.categoryId : a.categoryId === poolTab));
   const allProductIds = Object.keys(products);
   const allVisibleSelected = visibleItems.length > 0 && visibleItems.every((p) => selectedIds.has(p.id));
 
@@ -319,10 +320,10 @@ export default function MenuManager() {
 
   async function addPoolAddon() {
     if (!newAddonName.trim() || newAddonPrice === "") return;
-    await supabase.from("addons").insert({ name: newAddonName.trim(), price: Number(newAddonPrice), category_id: newAddonCategory || null });
+    const category_id = poolTab === "general" ? null : poolTab;
+    await supabase.from("addons").insert({ name: newAddonName.trim(), price: Number(newAddonPrice), category_id });
     setNewAddonName("");
     setNewAddonPrice("");
-    setNewAddonCategory("");
   }
 
   async function deletePoolAddon(a) {
@@ -348,25 +349,28 @@ export default function MenuManager() {
 
       {addonPoolOpen && (
         <div className="addon-pool-editor">
+          <div className="addon-pool-tabs">
+            {CATEGORIES.map((c) => (
+              <button key={c.id} type="button" className={poolTab === c.id ? "active" : ""} onClick={() => setPoolTab(c.id)}>{c.label}</button>
+            ))}
+            <button type="button" className={poolTab === "general" ? "active" : ""} onClick={() => setPoolTab("general")}>General</button>
+          </div>
           <ul className="addon-pool-list">
-            {addonList.map((a) => (
+            {poolAddons.map((a) => (
               <li key={a.id}>
-                <span className="addon-pool-cat">{CATEGORIES.find((c) => c.id === a.categoryId)?.label || "General"}</span>
                 <span>{a.name}</span>
                 <span className="mono">${a.price.toFixed(2)}</span>
                 <button type="button" className="addon-pool-remove" onClick={() => deletePoolAddon(a)} aria-label={`Remove ${a.name}`}>&times;</button>
               </li>
             ))}
-            {addonList.length === 0 && <li className="addon-pool-empty">No add-ons yet.</li>}
+            {poolAddons.length === 0 && <li className="addon-pool-empty">No add-ons in this category yet.</li>}
           </ul>
           <div className="addon-pool-add">
-            <select value={newAddonCategory} onChange={(e) => setNewAddonCategory(e.target.value)}>
-              <option value="">General (all categories)</option>
-              {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
-            </select>
             <input type="text" placeholder="Add-on name" value={newAddonName} onChange={(e) => setNewAddonName(e.target.value)} />
             <input type="number" min="0" step="0.01" placeholder="Price" value={newAddonPrice} onChange={(e) => setNewAddonPrice(e.target.value)} />
-            <button type="button" className="btn btn-primary btn-sm" onClick={addPoolAddon} disabled={!newAddonName.trim() || newAddonPrice === ""}>Add</button>
+            <button type="button" className="btn btn-primary btn-sm" onClick={addPoolAddon} disabled={!newAddonName.trim() || newAddonPrice === ""}>
+              Add to {poolTab === "general" ? "General" : CATEGORIES.find((c) => c.id === poolTab)?.label}
+            </button>
           </div>
         </div>
       )}

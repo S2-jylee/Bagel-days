@@ -406,6 +406,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 
 /* Make It A Set + Add-ons: side by side on desktop, add-ons hidden below 981px */
 .set-row{margin-top:20px; display:grid; grid-template-columns:1fr 280px; gap:20px; align-items:stretch;}
+.set-row.no-addons{grid-template-columns:1fr;}
 .set-banner{
   background:var(--cream-alt); border-radius:var(--radius); padding:24px; display:grid;
   grid-template-columns:210px 1fr; gap:24px; align-items:center; min-width:0;
@@ -895,14 +896,18 @@ footer ul li a:hover{color:#F0D9C9;}
 
 /* ---------- Menu manager (admin) ---------- */
 .addon-pool-editor{background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; margin:-14px 0 24px;}
+.addon-pool-tabs{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--line);}
+.addon-pool-tabs button{
+  font-family:'Pretendard', sans-serif; font-weight:600; font-size:.78rem;
+  padding:7px 14px; border-radius:20px; border:1px solid var(--line); background:#fff; color:var(--body); cursor:pointer;
+  transition:background .15s ease, color .15s ease, border-color .15s ease;
+}
+.addon-pool-tabs button:hover{border-color:var(--maroon-light);}
+.addon-pool-tabs button.active{background:var(--maroon); border-color:var(--maroon); color:#fff;}
 .addon-pool-list{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
 .addon-pool-list li{display:flex; align-items:center; gap:10px; font-family:'Pretendard', sans-serif; font-size:.85rem; color:var(--ink); padding:6px 0; border-bottom:1px solid var(--line);}
 .addon-pool-list li:last-child{border-bottom:none;}
-.addon-pool-list li span:nth-child(2){flex:1;}
-.addon-pool-cat{
-  font-family:'Pretendard', sans-serif; font-weight:700; font-size:.66rem; letter-spacing:.03em; text-transform:uppercase;
-  color:var(--maroon); background:var(--cream-alt); border-radius:20px; padding:2px 9px; flex-shrink:0;
-}
+.addon-pool-list li span:first-child{flex:1;}
 .addon-pool-empty{color:var(--body); border-bottom:none !important;}
 .addon-pool-remove{width:22px; height:22px; border-radius:50%; border:1px solid var(--line); background:#fff; color:var(--maroon); cursor:pointer; font-size:1rem; line-height:1; flex-shrink:0;}
 .addon-pool-remove:hover{background:var(--cream-alt);}

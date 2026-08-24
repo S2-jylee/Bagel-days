@@ -29,7 +29,13 @@ export default function Menu() {
       .sort((a, b) => a.sortOrder - b.sortOrder)
       .map((p) => p.id);
   }, [products, activeCat, activeSubcat, activeSubcategory]);
-  const addonList = useMemo(() => Object.values(addons), [addons]);
+  // Scoped to whichever category tab is active, same as the product grid —
+  // otherwise every add-on ever created (cream cheese swaps, coffee syrups,
+  // etc.) piles up in one long list regardless of what's being browsed.
+  const addonList = useMemo(
+    () => Object.values(addons).filter((a) => !a.categoryId || a.categoryId === activeCat),
+    [addons, activeCat]
+  );
 
   function selectCategory(cat) {
     setActiveCat(cat.id);
@@ -89,7 +95,7 @@ export default function Menu() {
                 ))}
               </div>
 
-              <div className="set-row">
+              <div className={`set-row${addonList.length === 0 ? " no-addons" : ""}`}>
                 <div className="set-banner">
                   <img src={asset("/assets/images/sandwich-set.jpg")} alt="Bagel set" />
                   <div className="set-banner-info">
@@ -104,17 +110,19 @@ export default function Menu() {
                   </div>
                 </div>
 
-                <div className="addons-panel">
-                  <h4>Add-ons</h4>
-                  <ul>
-                    {addonList.map((a) => (
-                      <li key={a.id}>
-                        <span>{a.name}</span>
-                        <span className="p">${a.price.toFixed(2)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {addonList.length > 0 && (
+                  <div className="addons-panel">
+                    <h4>{activeCategory.label} Add-ons</h4>
+                    <ul>
+                      {addonList.map((a) => (
+                        <li key={a.id}>
+                          <span>{a.name}</span>
+                          <span className="p">${a.price.toFixed(2)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
           </div>
