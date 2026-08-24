@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { useProducts } from "../../context/ProductsContext";
 import { CATEGORIES } from "../../data/categories";
+import { productImageUrl } from "../../lib/assetUrl";
 import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcPlus, IcCheck } from "../../components/Icons";
 
 const CATEGORY_ICONS = {
@@ -291,7 +292,8 @@ export default function MenuManager() {
         const { error } = await supabase.from("products").insert(row);
         if (error) throw error;
         // New items start with no stock set (shows as Sold Out until staff fills it in below).
-        await supabase.from("product_stock").insert({ product_id: id, stock_qty: null });
+        const stockInsert = await supabase.from("product_stock").insert({ product_id: id, stock_qty: null });
+        if (stockInsert.error) throw stockInsert.error;
         setStockMap((prev) => ({ ...prev, [id]: null }));
       }
 
@@ -468,7 +470,7 @@ export default function MenuManager() {
             <h3>{form.id ? "Edit Item" : "Add New Item"}</h3>
             <form onSubmit={handleSubmit}>
               <div className="menu-manager-photo-row">
-                {form.imageUrl ? <img src={form.imageUrl} alt="" className="menu-manager-photo-preview" /> : <div className="menu-manager-noimg large" />}
+                {form.imageUrl ? <img src={productImageUrl(form.imageUrl)} alt="" className="menu-manager-photo-preview" /> : <div className="menu-manager-noimg large" />}
                 <div>
                   <label className="btn btn-ghost btn-sm menu-manager-upload-btn">
                     {uploading ? "Uploading…" : "Upload Photo"}

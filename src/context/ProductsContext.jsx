@@ -1,16 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
-import { asset } from "../lib/assetUrl";
+import { productImageUrl } from "../lib/assetUrl";
 
 const ProductsContext = createContext(null);
-
-// Product photos are either a legacy site-relative path ("/assets/images/x.jpg",
-// for the original catalog migrated into the DB) or a full Supabase Storage URL
-// (for anything uploaded via the admin Menu manager) — tell them apart by scheme.
-function resolveImg(url) {
-  if (!url) return "";
-  return /^https?:\/\//.test(url) ? url : asset(url);
-}
 
 function buildState(products, addons, links) {
   const addonById = {};
@@ -27,7 +19,7 @@ function buildState(products, addons, links) {
       id: p.id,
       name: p.name,
       price: Number(p.price),
-      img: resolveImg(p.image_url),
+      img: productImageUrl(p.image_url),
       imageUrl: p.image_url,
       desc: p.description || "",
       categoryId: p.category_id,

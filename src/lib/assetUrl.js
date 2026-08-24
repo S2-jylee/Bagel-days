@@ -7,3 +7,12 @@
 export function asset(path) {
   return `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
 }
+
+// Product photos are either a legacy site-relative path ("/assets/images/x.jpg",
+// for the original catalog migrated into the DB — needs the same base-path
+// treatment as any other asset() call) or a full Supabase Storage URL (for
+// anything uploaded via the admin Menu manager, already absolute).
+export function productImageUrl(url) {
+  if (!url) return "";
+  return /^https?:\/\//.test(url) ? url : asset(url);
+}
