@@ -117,7 +117,14 @@ export default function FoodCard({ id, small }) {
                 ) : (
                   <span className="price">${(p.price + addonsTotal).toFixed(2)}</span>
                 )}
-                <button className={`add-btn${added ? " added" : ""}`} onClick={() => handleAdd(selectedAddons)} disabled={soldOut}>
+                <button
+                  className={`add-btn${added ? " added" : ""}`}
+                  onClick={() => {
+                    handleAdd(selectedAddons);
+                    closeModal();
+                  }}
+                  disabled={soldOut}
+                >
                   {added ? "Added ✓" : "Add to Cart"}
                 </button>
               </div>
