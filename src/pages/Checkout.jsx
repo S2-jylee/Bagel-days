@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart, fmt } from "../context/CartContext";
 import { useProducts } from "../context/ProductsContext";
+import { useSeo } from "../lib/seo";
 
 // ---------------------------------------------------------------
 // TODO: replace with your real Square sandbox/production credentials.
@@ -15,6 +16,13 @@ const SQUARE_SDK_URL = "https://sandbox.web.squarecdn.com/v1/square.js"; // swit
 // ---------------------------------------------------------------
 
 export default function Checkout() {
+  useSeo({
+    title: "Bagel Days | Checkout",
+    description: "Complete your Bagel Days order securely online.",
+    path: "/checkout",
+    noindex: true,
+  });
+
   const { ids, cart, subtotal, lineUnitPrice, clearCart } = useCart();
   const { products } = useProducts();
   const [name, setName] = useState("");

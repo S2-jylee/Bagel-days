@@ -3,8 +3,16 @@ import { useStaffAuth } from "../lib/useStaffAuth";
 import StaffLogin from "../components/StaffLogin";
 import OrderHistory from "./admin/OrderHistory";
 import MenuManager from "./admin/MenuManager";
+import { useSeo } from "../lib/seo";
 
 export default function Admin() {
+  useSeo({
+    title: "Bagel Days | Staff Admin",
+    description: "Staff admin panel for Bagel Days.",
+    path: "/admin",
+    noindex: true,
+  });
+
   const { session, loading, signIn, signOut } = useStaffAuth();
   const [tab, setTab] = useState("menu");
 

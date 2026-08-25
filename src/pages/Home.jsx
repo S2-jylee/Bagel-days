@@ -6,6 +6,7 @@ import { IcLeaf, IcWhisk, IcBean, IcHeart, IcPin, IcClock, IcPhone } from "../co
 import { asset } from "../lib/assetUrl";
 import { supabase } from "../lib/supabase";
 import { useProducts } from "../context/ProductsContext";
+import { useSeo } from "../lib/seo";
 
 const BEST_SELLERS_COUNT = 6;
 // Used to top up the row when real sales data doesn't have 6 products yet
@@ -13,6 +14,12 @@ const BEST_SELLERS_COUNT = 6;
 const FALLBACK_BEST_SELLERS = ["bagel-plain", "bagel-blueberry", "salt-bread", "dessert-signature", "bagel-sesame", "bagel-everything"];
 
 export default function Home() {
+  useSeo({
+    title: "Bagel Days | Fresh Bagels & Coffee, Fortitude Valley Brisbane",
+    description: "Hand-rolled, hand-boiled bagels and Campos Specialty Coffee in Fortitude Valley, Brisbane. Order online for pickup, or get delivery via Uber Eats and DoorDash.",
+    path: "/",
+  });
+
   const { products } = useProducts();
   const [salesIds, setSalesIds] = useState(null); // null = not loaded yet
 

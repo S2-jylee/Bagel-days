@@ -6,6 +6,7 @@ import Pagination from "../components/Pagination";
 import { fmt } from "../context/CartContext";
 import { useProducts } from "../context/ProductsContext";
 import { CATEGORIES } from "../data/categories";
+import { useSeo } from "../lib/seo";
 
 const FETCH_LIMIT = 60;
 const PAGE_SIZE = 10;
@@ -47,6 +48,13 @@ function last4(phone) {
 }
 
 export default function OrderDisplay() {
+  useSeo({
+    title: "Bagel Days | Order Display",
+    description: "Staff order display for Bagel Days.",
+    path: "/order-display",
+    noindex: true,
+  });
+
   const { session, loading, signIn } = useStaffAuth();
   const { products } = useProducts();
   const [orders, setOrders] = useState([]);

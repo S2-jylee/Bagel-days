@@ -6,6 +6,21 @@ import { useCart } from "../context/CartContext";
 import { useProducts } from "../context/ProductsContext";
 import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup } from "../components/Icons";
 import { asset } from "../lib/assetUrl";
+import { useSeo, SITE_URL } from "../lib/seo";
+
+// Category/subcategory names only — actual prices load async from Supabase
+// (see ProductsContext), so a full item-by-item Menu schema isn't reliable here.
+const MENU_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "Menu",
+  name: "Bagel Days Menu",
+  url: `${SITE_URL}menu`,
+  hasMenuSection: CATEGORIES.map((cat) => ({
+    "@type": "MenuSection",
+    name: cat.label,
+    hasMenuSection: cat.subcategories?.map((sub) => ({ "@type": "MenuSection", name: sub.label })),
+  })),
+};
 
 const CATEGORY_ICONS = {
   bagels: IcDonut,
@@ -16,6 +31,13 @@ const CATEGORY_ICONS = {
 };
 
 export default function Menu() {
+  useSeo({
+    title: "Bagel Days | Menu & Order — Bagels, Cream Cheese, Coffee",
+    description: "Browse our full menu of hand-boiled bagels, house-made cream cheese, salt bread, desserts, and Campos Specialty Coffee. Order online for pickup in Fortitude Valley, Brisbane.",
+    path: "/menu",
+    jsonLd: MENU_JSON_LD,
+  });
+
   const [activeCat, setActiveCat] = useState(CATEGORIES[0].id);
   const [activeSubcat, setActiveSubcat] = useState(CATEGORIES[0].subcategories?.[0]?.id ?? null);
   const { addToCart } = useCart();

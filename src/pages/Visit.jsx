@@ -1,11 +1,18 @@
 import { IcPin, IcClock, IcMap, IcCar, IcCheck } from "../components/Icons";
 import { asset } from "../lib/assetUrl";
+import { useSeo } from "../lib/seo";
 
 const MAPS_DIRECTIONS = "https://www.google.com/maps/dir/?api=1&destination=Shop+1%2C+29+Robertson+Street%2C+Fortitude+Valley+QLD+4006";
 const MAPS_VIEW = "https://www.google.com/maps/search/?api=1&query=Shop+1%2C+29+Robertson+Street%2C+Fortitude+Valley+QLD+4006";
 const MAPS_EMBED = "https://www.google.com/maps?q=Shop+1,+29+Robertson+Street,+Fortitude+Valley+QLD+4006&output=embed";
 
 export default function Visit() {
+  useSeo({
+    title: "Bagel Days | Visit Us — Location & Hours, Fortitude Valley",
+    description: "Find Bagel Days at Shop 1, 29 Robertson Street, Fortitude Valley QLD 4006. Open Monday–Sunday, 7:00 AM–4:00 PM. Get directions and view on Google Maps.",
+    path: "/visit",
+  });
+
   return (
     <>
       <section className="hero hero-photo-fit" style={{ paddingBottom: 0 }}>

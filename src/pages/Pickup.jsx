@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { UberEatsButton, DoorDashButton, IcChevron } from "../components/DeliveryButtons";
 import { IcTub, IcCup, IcBag, IcPin } from "../components/Icons";
 import { asset } from "../lib/assetUrl";
+import { useSeo } from "../lib/seo";
 
 const IcBagel = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/></svg>
@@ -15,6 +16,12 @@ const HIGHLIGHTS = [
 ];
 
 export default function Pickup() {
+  useSeo({
+    title: "Bagel Days | Order Online — Pickup & Delivery, Fortitude Valley",
+    description: "Order Bagel Days for pickup, or get delivery via Uber Eats and DoorDash. Freshly made bagels, house-made cream cheese, and Campos Specialty Coffee, ready when you are.",
+    path: "/pickup",
+  });
+
   return (
     <>
       <section className="hero home-hero hero-photo-fit">

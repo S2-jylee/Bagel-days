@@ -1,5 +1,6 @@
 import { IcWheat, IcPot, IcCup } from "../components/Icons";
 import { asset } from "../lib/assetUrl";
+import { useSeo } from "../lib/seo";
 
 const SPECIALS = [
   { num: "1. FRESH DOUGH DAILY", title: "Made from scratch", desc: "Every morning using quality ingredients.", img: asset("/assets/images/dough-rolling.jpg") },
@@ -10,6 +11,12 @@ const SPECIALS = [
 ];
 
 export default function About() {
+  useSeo({
+    title: "Bagel Days | Our Story — Handmade Bagels in Fortitude Valley",
+    description: "Meet Bagel Days: fresh dough made daily, slow cold fermentation, hand-boiled NY-style bagels, house-made cream cheese, and Campos Specialty Coffee in Fortitude Valley, Brisbane.",
+    path: "/about",
+  });
+
   return (
     <>
       <section className="hero" style={{ paddingBottom: 0 }}>

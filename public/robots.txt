@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /order-display
+Disallow: /checkout
+
+Sitemap: https://s2-jylee.github.io/Bagel-days/sitemap.xml

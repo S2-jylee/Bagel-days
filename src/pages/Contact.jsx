@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { IcBag, IcChat, IcMail, IcInsta, IcTikTok, IcFacebook, IcPhone, IcExternal } from "../components/Icons";
 import { asset } from "../lib/assetUrl";
+import { useSeo } from "../lib/seo";
 
 const SOCIAL_LINKS = [
   { ic: IcInsta, label: "Instagram", value: "@bageldays.au", href: "https://www.instagram.com/bageldays.au/" },
@@ -14,6 +15,12 @@ const SOCIAL_LINKS = [
 const FORM_ENDPOINT = "https://formspree.io/f/TODO_FORM_ID";
 
 export default function Contact() {
+  useSeo({
+    title: "Bagel Days | Contact Us — Catering & Enquiries",
+    description: "Get in touch with Bagel Days for catering, bulk orders, or general enquiries. Follow us on Instagram, TikTok, and Facebook.",
+    path: "/contact",
+  });
+
   const [status, setStatus] = useState({ text: "", type: "" });
   const [sending, setSending] = useState(false);
 
