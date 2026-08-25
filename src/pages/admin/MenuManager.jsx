@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../../lib/supabase";
 import { useProducts } from "../../context/ProductsContext";
 import { CATEGORIES } from "../../data/categories";
 import { productImageUrl } from "../../lib/assetUrl";
-import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcPlus, IcCheck } from "../../components/Icons";
+import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcPlus, IcCheck, IcStar, IcGrip } from "../../components/Icons";
 
 const CATEGORY_ICONS = {
   bagels: IcDonut,
@@ -14,6 +14,7 @@ const CATEGORY_ICONS = {
 };
 
 const BUCKET = "product-images";
+const BEST_SELLER_LIMIT = 6;
 
 // Unicode-aware: keeps letters from any script (Korean names included) instead
 // of stripping everything down to "item" the way an ASCII-only [a-z0-9] filter
@@ -37,6 +38,19 @@ function uniqueId(name, existingIds) {
     n++;
   }
   return id;
+}
+
+// Shared drag-reorder math: pulls `draggingId` out of `list` and reinserts it
+// at wherever `overId` currently sits — used by both the per-category product
+// list and the Best Sellers preview below.
+function moveInList(list, draggingId, overId) {
+  const from = list.indexOf(draggingId);
+  const to = list.indexOf(overId);
+  if (from === -1 || to === -1) return list;
+  const next = [...list];
+  next.splice(from, 1);
+  next.splice(to, 0, draggingId);
+  return next;
 }
 
 // Matches the original catalog photos' native 800x600 (4:3) ratio, so legacy
@@ -124,6 +138,27 @@ export default function MenuManager() {
   const [fillAllQty, setFillAllQty] = useState("");
   const [fillingAll, setFillingAll] = useState(false);
 
+  // ---- manual product ordering (drag to reorder, then Save) ----
+  const [reordering, setReordering] = useState(false);
+  const [orderedIds, setOrderedIds] = useState([]);
+  const [savingOrder, setSavingOrder] = useState(false);
+  const [draggingId, setDraggingId] = useState(null);
+
+  // ---- best seller ordering (drag to reorder the Home preview, then Save) ----
+  const [bestSellerReordering, setBestSellerReordering] = useState(false);
+  const [bestSellerOrderedIds, setBestSellerOrderedIds] = useState([]);
+  const [savingBestSellerOrder, setSavingBestSellerOrder] = useState(false);
+  const [draggingBestSellerId, setDraggingBestSellerId] = useState(null);
+  const [bestSellerLimitId, setBestSellerLimitId] = useState(null); // product id currently showing the "max 6" notice
+
+  // Leaving the category/subcategory you were reordering discards the
+  // unsaved drag state rather than trying to carry it somewhere it no
+  // longer applies.
+  useEffect(() => {
+    setReordering(false);
+    setOrderedIds([]);
+  }, [activeCat, activeSubcat]);
+
   useEffect(() => {
     async function load() {
       const { data } = await supabase.from("product_stock").select("product_id, stock_qty");
@@ -145,6 +180,14 @@ export default function MenuManager() {
   const poolAddons = addonList.filter((a) => (poolTab === "general" ? !a.categoryId : a.categoryId === poolTab));
   const allProductIds = Object.keys(products);
   const allVisibleSelected = visibleItems.length > 0 && visibleItems.every((p) => selectedIds.has(p.id));
+  const displayItems = reordering ? orderedIds.map((id) => products[id]).filter(Boolean) : visibleItems;
+  const bestSellerItems = useMemo(
+    () => Object.values(products).filter((p) => p.isBestSeller).sort((a, b) => (a.bestSellerOrder ?? 0) - (b.bestSellerOrder ?? 0)),
+    [products]
+  );
+  const displayBestSellerItems = bestSellerReordering
+    ? bestSellerOrderedIds.map((id) => products[id]).filter(Boolean)
+    : bestSellerItems;
 
   function selectCategory(cat) {
     setActiveCat(cat.id);
@@ -207,6 +250,77 @@ export default function MenuManager() {
     await supabase.from("product_stock").update({ stock_qty: qty }).in("product_id", allProductIds);
     setFillingAll(false);
     setFillAllQty("");
+  }
+
+  // ---- manual ordering ----
+
+  function startReorder() {
+    setOrderedIds(visibleItems.map((p) => p.id));
+    setReordering(true);
+  }
+
+  function cancelReorder() {
+    setReordering(false);
+    setOrderedIds([]);
+  }
+
+  function handleDragOver(e, overId) {
+    e.preventDefault();
+    if (!draggingId || draggingId === overId) return;
+    setOrderedIds((prev) => moveInList(prev, draggingId, overId));
+  }
+
+  async function saveOrder() {
+    setSavingOrder(true);
+    await Promise.all(orderedIds.map((id, i) => supabase.from("products").update({ sort_order: i }).eq("id", id)));
+    setSavingOrder(false);
+    setReordering(false);
+    setOrderedIds([]);
+  }
+
+  // ---- best sellers (shown on Home, in the order they were marked) ----
+
+  async function toggleBestSeller(p) {
+    if (p.isBestSeller) {
+      await supabase.from("products").update({ is_best_seller: false, best_seller_order: null }).eq("id", p.id);
+      return;
+    }
+    if (bestSellerItems.length >= BEST_SELLER_LIMIT) {
+      setBestSellerLimitId(p.id);
+      setTimeout(() => setBestSellerLimitId((cur) => (cur === p.id ? null : cur)), 2200);
+      return;
+    }
+    const nextOrder = Object.values(products).reduce((max, x) => (x.isBestSeller ? Math.max(max, x.bestSellerOrder ?? 0) + 1 : max), 0);
+    await supabase.from("products").update({ is_best_seller: true, best_seller_order: nextOrder }).eq("id", p.id);
+  }
+
+  function startBestSellerReorder() {
+    setBestSellerOrderedIds(bestSellerItems.map((p) => p.id));
+    setBestSellerReordering(true);
+  }
+
+  function cancelBestSellerReorder() {
+    setBestSellerReordering(false);
+    setBestSellerOrderedIds([]);
+  }
+
+  function handleBestSellerDragOver(e, overId) {
+    e.preventDefault();
+    if (!draggingBestSellerId || draggingBestSellerId === overId) return;
+    setBestSellerOrderedIds((prev) => moveInList(prev, draggingBestSellerId, overId));
+  }
+
+  async function saveBestSellerOrder() {
+    setSavingBestSellerOrder(true);
+    await Promise.all(bestSellerOrderedIds.map((id, i) => supabase.from("products").update({ best_seller_order: i }).eq("id", id)));
+    setSavingBestSellerOrder(false);
+    setBestSellerReordering(false);
+    setBestSellerOrderedIds([]);
+  }
+
+  async function removeBestSeller(id) {
+    setBestSellerOrderedIds((prev) => prev.filter((x) => x !== id));
+    await supabase.from("products").update({ is_best_seller: false, best_seller_order: null }).eq("id", id);
   }
 
   // ---- product CRUD ----
@@ -375,16 +489,57 @@ export default function MenuManager() {
         </div>
       )}
 
-      <div className="inventory-fillall-bar">
-        <div className="inventory-fillall-text">
-          <strong>Fill every product</strong>
-          <span>Sets stock for all {allProductIds.length} products at once, across every category &mdash; no need to select items first.</span>
+      <div className="bestseller-panel">
+        <div className="bestseller-panel-head">
+          <div className="inventory-fillall-text">
+            <strong>Best Sellers on Home</strong>
+            <span>The items shown in the "Best Sellers" section on the homepage, in this order &mdash; star an item below to add or remove it.</span>
+          </div>
+          <div className="menu-manager-toolbar-actions">
+            {bestSellerReordering ? (
+              <>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={cancelBestSellerReorder} disabled={savingBestSellerOrder}>Cancel</button>
+                <button type="button" className="btn btn-primary btn-sm" onClick={saveBestSellerOrder} disabled={savingBestSellerOrder}>
+                  {savingBestSellerOrder ? "Saving…" : "Save Order"}
+                </button>
+              </>
+            ) : (
+              <button type="button" className="btn btn-ghost btn-sm" onClick={startBestSellerReorder} disabled={bestSellerItems.length < 2}>Reorder</button>
+            )}
+          </div>
         </div>
-        <div className="inventory-bulk-apply">
-          <input type="number" min="0" placeholder="Qty" value={fillAllQty} onChange={(e) => setFillAllQty(e.target.value)} />
-          <button type="button" className="btn btn-primary btn-sm" onClick={fillAllStock} disabled={fillAllQty === "" || fillingAll}>
-            {fillingAll ? "Filling…" : "Fill All Products"}
-          </button>
+
+        <div className="bestseller-grid">
+          {displayBestSellerItems.map((p) => (
+            <div
+              className={`bestseller-card${bestSellerReordering ? " reordering" : ""}${draggingBestSellerId === p.id ? " dragging" : ""}`}
+              key={p.id}
+              draggable={bestSellerReordering}
+              onDragStart={(e) => {
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("text/plain", p.id);
+                setDraggingBestSellerId(p.id);
+              }}
+              onDragOver={(e) => handleBestSellerDragOver(e, p.id)}
+              onDrop={(e) => e.preventDefault()}
+              onDragEnd={() => setDraggingBestSellerId(null)}
+            >
+              {bestSellerReordering && <span className="menu-manager-drag-handle" aria-hidden="true"><IcGrip /></span>}
+              {bestSellerReordering && (
+                <button
+                  type="button"
+                  className="bestseller-card-remove"
+                  onClick={() => removeBestSeller(p.id)}
+                  aria-label={`Remove ${p.name} from Best Sellers`}
+                >
+                  &times;
+                </button>
+              )}
+              {p.img ? <img src={p.img} alt={p.name} /> : <div className="menu-manager-noimg" />}
+              <span className="bestseller-card-name">{p.name}</span>
+            </div>
+          ))}
+          {bestSellerItems.length === 0 && <p className="inventory-hint">No items marked as Best Seller yet &mdash; star one below to add it here.</p>}
         </div>
       </div>
 
@@ -417,26 +572,75 @@ export default function MenuManager() {
                 ))}
               </div>
             )}
-            <button type="button" className="btn btn-primary btn-sm" onClick={openCreate}>+ Add New Item</button>
-          </div>
-
-          <div className="inventory-bulk-bar">
-            <label className="inventory-select-all">
-              <input type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} />
-              Select all shown ({visibleItems.length})
-            </label>
-            <div className="inventory-bulk-apply">
-              <input type="number" min="0" placeholder="Qty" value={bulkQty} onChange={(e) => setBulkQty(e.target.value)} />
-              <button type="button" className="btn btn-primary btn-sm" onClick={applyBulk} disabled={selectedIds.size === 0 || applying}>
-                {applying ? "Applying…" : `Apply to ${selectedIds.size} selected`}
-              </button>
+            <div className="menu-manager-toolbar-actions">
+              {reordering ? (
+                <>
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={cancelReorder} disabled={savingOrder}>Cancel</button>
+                  <button type="button" className="btn btn-primary btn-sm" onClick={saveOrder} disabled={savingOrder}>
+                    {savingOrder ? "Saving…" : "Save Order"}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={startReorder} disabled={visibleItems.length < 2}>Reorder</button>
+                  <button type="button" className="btn btn-primary btn-sm" onClick={openCreate}>+ Add New Item</button>
+                </>
+              )}
             </div>
           </div>
 
+          {!reordering && (
+            <>
+              <div className="inventory-fillall-bar">
+                <div className="inventory-fillall-text">
+                  <strong>Fill every product</strong>
+                  <span>Sets stock for all {allProductIds.length} products at once, across every category &mdash; no need to select items first.</span>
+                </div>
+                <div className="inventory-bulk-apply">
+                  <input type="number" min="0" placeholder="Qty" value={fillAllQty} onChange={(e) => setFillAllQty(e.target.value)} />
+                  <button type="button" className="btn btn-primary btn-sm" onClick={fillAllStock} disabled={fillAllQty === "" || fillingAll}>
+                    {fillingAll ? "Filling…" : "Fill All Products"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="inventory-bulk-bar">
+                <label className="inventory-select-all">
+                  <input type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} />
+                  Select all shown ({visibleItems.length})
+                </label>
+                <div className="inventory-bulk-apply">
+                  <input type="number" min="0" placeholder="Qty" value={bulkQty} onChange={(e) => setBulkQty(e.target.value)} />
+                  <button type="button" className="btn btn-primary btn-sm" onClick={applyBulk} disabled={selectedIds.size === 0 || applying}>
+                    {applying ? "Applying…" : `Apply to ${selectedIds.size} selected`}
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {reordering && <p className="inventory-hint">Drag items by the handle to reorder, then Save Order.</p>}
+
           <div className="inventory-list">
-            {visibleItems.map((p) => (
-              <div className={`inventory-row menu-manager-row${p.isActive === false ? " inactive" : ""}${selectedIds.has(p.id) ? " selected" : ""}`} key={p.id}>
-                <input type="checkbox" className="inventory-row-check" checked={selectedIds.has(p.id)} onChange={() => toggleOne(p.id)} />
+            {displayItems.map((p) => (
+              <div
+                className={`inventory-row menu-manager-row${p.isActive === false ? " inactive" : ""}${selectedIds.has(p.id) ? " selected" : ""}${reordering ? " reordering" : ""}${draggingId === p.id ? " dragging" : ""}`}
+                key={p.id}
+                draggable={reordering}
+                onDragStart={(e) => {
+                  e.dataTransfer.effectAllowed = "move";
+                  e.dataTransfer.setData("text/plain", p.id);
+                  setDraggingId(p.id);
+                }}
+                onDragOver={(e) => handleDragOver(e, p.id)}
+                onDrop={(e) => e.preventDefault()}
+                onDragEnd={() => setDraggingId(null)}
+              >
+                {reordering ? (
+                  <span className="menu-manager-drag-handle" aria-hidden="true"><IcGrip /></span>
+                ) : (
+                  <input type="checkbox" className="inventory-row-check" checked={selectedIds.has(p.id)} onChange={() => toggleOne(p.id)} />
+                )}
                 {p.img ? <img src={p.img} alt={p.name} /> : <div className="menu-manager-noimg" />}
                 <div className="inventory-row-info">
                   <div className="inventory-row-name">
@@ -445,25 +649,43 @@ export default function MenuManager() {
                   </div>
                   <div className="inventory-row-price">${p.price.toFixed(2)}</div>
                 </div>
-                <div className="inventory-row-stock">
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="Sold out"
-                    defaultValue={stockMap[p.id] ?? ""}
-                    key={stockMap[p.id]}
-                    onBlur={(e) => saveStock(p.id, e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && e.target.blur()}
-                  />
-                  {saved === p.id && <IcCheck />}
-                </div>
-                <div className="menu-manager-row-actions">
-                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => openEdit(p)}>Edit</button>
-                  <button type="button" className="btn btn-ghost btn-sm menu-manager-delete" onClick={() => handleDelete(p)}>Delete</button>
-                </div>
+                {!reordering && (
+                  <>
+                    <div className="menu-manager-star-wrap">
+                      <button
+                        type="button"
+                        className={`menu-manager-star${p.isBestSeller ? " active" : ""}`}
+                        onClick={() => toggleBestSeller(p)}
+                        aria-label={p.isBestSeller ? "Remove from Best Sellers" : "Mark as Best Seller"}
+                        title={p.isBestSeller ? "Best Seller — shown on Home" : "Mark as Best Seller"}
+                      >
+                        <IcStar filled={p.isBestSeller} />
+                      </button>
+                      {bestSellerLimitId === p.id && (
+                        <span className="menu-manager-star-notice">Best Sellers is full — remove one to add another (max 6).</span>
+                      )}
+                    </div>
+                    <div className="inventory-row-stock">
+                      <input
+                        type="number"
+                        min="0"
+                        placeholder="Sold out"
+                        defaultValue={stockMap[p.id] ?? ""}
+                        key={stockMap[p.id]}
+                        onBlur={(e) => saveStock(p.id, e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && e.target.blur()}
+                      />
+                      {saved === p.id && <IcCheck />}
+                    </div>
+                    <div className="menu-manager-row-actions">
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => openEdit(p)}>Edit</button>
+                      <button type="button" className="btn btn-ghost btn-sm menu-manager-delete" onClick={() => handleDelete(p)}>Delete</button>
+                    </div>
+                  </>
+                )}
               </div>
             ))}
-            {visibleItems.length === 0 && <p className="inventory-hint">No items in this category yet.</p>}
+            {displayItems.length === 0 && <p className="inventory-hint">No items in this category yet.</p>}
           </div>
         </div>
       </div>

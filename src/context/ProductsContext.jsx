@@ -26,6 +26,8 @@ function buildState(products, addons, links) {
       subcategoryId: p.subcategory_id,
       isActive: p.is_active,
       sortOrder: p.sort_order,
+      isBestSeller: p.is_best_seller,
+      bestSellerOrder: p.best_seller_order,
       addons: (addonsByProduct[p.id] || []).filter(Boolean),
     };
   }
