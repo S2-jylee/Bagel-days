@@ -9,10 +9,7 @@ const SOCIAL_LINKS = [
   { ic: IcFacebook, label: "Facebook", value: "Bagel Days (@bageldaysau)", href: "https://www.facebook.com/bageldays.au/" },
 ];
 
-// TODO: replace with your real Formspree (or similar) endpoint — sign up free at
-// https://formspree.io, create a form connected to bageldays.au@gmail.com,
-// and paste the form ID below in place of "TODO_FORM_ID".
-const FORM_ENDPOINT = "https://formspree.io/f/TODO_FORM_ID";
+const FORM_ENDPOINT = "https://formspree.io/f/xrpznrnz";
 
 export default function Contact() {
   useSeo({
@@ -93,10 +90,6 @@ export default function Contact() {
                   {sending ? "Sending..." : "Send Message"}
                 </button>
                 {status.text && <p className={`form-status ${status.type}`}>{status.text}</p>}
-                <p className="todo-note">
-                  TODO: this form posts to Formspree (or a similar form-to-email service). Create a free account, connect a form to{" "}
-                  <strong>bagledays.au@gmail.com</strong>, then replace <code>TODO_FORM_ID</code> in <code>src/pages/Contact.jsx</code> with your real form ID so submissions land in your inbox automatically.
-                </p>
               </form>
             </div>
 
