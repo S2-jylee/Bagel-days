@@ -1,5 +1,4 @@
 import { NavLink, Link } from "react-router-dom";
-import { useCart } from "../context/CartContext";
 import { IcInsta, IcTikTok } from "./Icons";
 import { asset } from "../lib/assetUrl";
 
@@ -16,7 +15,7 @@ const NAV_ITEMS = [
   { to: "/contact", label: "Contact" },
 ];
 
-export default function Header({ onOpenCart, onOpenMobileNav }) {
+export default function Header({ onOpenMobileNav }) {
   return (
     <header className="site">
       <div className="nav">
@@ -43,26 +42,12 @@ export default function Header({ onOpenCart, onOpenMobileNav }) {
             <a href="https://www.facebook.com/bageldays.au/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><IcFacebook /></a>
           </div>
           <Link to="/pickup" className="btn btn-primary btn-sm">Order Online</Link>
-          <CartIcon onClick={onOpenCart} />
           <button className="menu-toggle" onClick={onOpenMobileNav} aria-label="Open menu">
             <BurgerIcon />
           </button>
         </div>
       </div>
     </header>
-  );
-}
-
-function CartIcon({ onClick }) {
-  const { count } = useCart();
-  return (
-    <span className="icon-btn" onClick={onClick} role="button" aria-label="Open cart">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-      </svg>
-      {count > 0 && <span className="cart-count">{count}</span>}
-    </span>
   );
 }
 

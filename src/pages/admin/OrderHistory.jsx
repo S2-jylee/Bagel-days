@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import Pagination from "../../components/Pagination";
-import { fmt } from "../../context/CartContext";
+import { fmt } from "../../lib/format";
+import { useAdminLang } from "../../lib/adminI18n";
 
 const PAGE_SIZE = 15;
 
@@ -35,13 +36,16 @@ function toCsvRow(fields) {
 }
 
 const QUICK_RANGES = [
-  { label: "Today", from: () => todayStr(), to: () => todayStr() },
-  { label: "7 Days", from: () => daysAgoStr(6), to: () => todayStr() },
-  { label: "30 Days", from: () => daysAgoStr(29), to: () => todayStr() },
-  { label: "This Month", from: () => firstOfMonthStr(), to: () => todayStr() },
+  { key: "today", from: () => todayStr(), to: () => todayStr() },
+  { key: "days7", from: () => daysAgoStr(6), to: () => todayStr() },
+  { key: "days30", from: () => daysAgoStr(29), to: () => todayStr() },
+  { key: "thisMonth", from: () => firstOfMonthStr(), to: () => todayStr() },
 ];
 
+const STATUS_KEY = { pending: "statusPending", accepted: "statusAccepted", rejected: "statusRejected" };
+
 export default function OrderHistory() {
+  const { t } = useAdminLang();
   const [from, setFrom] = useState(todayStr());
   const [to, setTo] = useState(todayStr());
   const [orders, setOrders] = useState([]);
@@ -102,28 +106,28 @@ export default function OrderHistory() {
   return (
     <div>
       <div className="admin-section-header">
-        <h2>Order History</h2>
+        <h2>{t("orderHistoryTab")}</h2>
         {orders.length > 0 && (
-          <button className="btn btn-ghost btn-sm" onClick={exportCsv}>Export CSV</button>
+          <button className="btn btn-ghost btn-sm" onClick={exportCsv}>{t("exportCsv")}</button>
         )}
       </div>
 
       <div className="admin-filters">
         <div className="field">
-          <label>From</label>
+          <label>{t("from")}</label>
           <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
         </div>
         <div className="field">
-          <label>To</label>
+          <label>{t("to")}</label>
           <input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
         </div>
         <button className="btn btn-primary" onClick={() => runSearch()} disabled={fetching}>
-          {fetching ? "Loading…" : "Search"}
+          {fetching ? t("loading") : t("search")}
         </button>
         <div className="admin-quick-ranges">
           {QUICK_RANGES.map((r) => (
-            <button key={r.label} type="button" className="btn-quick" onClick={() => applyQuickRange(r)}>
-              {r.label}
+            <button key={r.key} type="button" className="btn-quick" onClick={() => applyQuickRange(r)}>
+              {t(r.key)}
             </button>
           ))}
         </div>
@@ -132,18 +136,18 @@ export default function OrderHistory() {
       {searched && (
         <>
           <div className="admin-summary">
-            {orders.length} orders &middot; Total {fmt(total)}
+            {t("ordersCount", orders.length, fmt(total))}
           </div>
           <div className="admin-table-wrap">
             <table className="admin-table">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Name</th>
-                  <th>Phone</th>
-                  <th>Items</th>
-                  <th>Total</th>
-                  <th>Status</th>
+                  <th>{t("date")}</th>
+                  <th>{t("nameCol")}</th>
+                  <th>{t("phone")}</th>
+                  <th>{t("items")}</th>
+                  <th>{t("total")}</th>
+                  <th>{t("status")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -158,11 +162,11 @@ export default function OrderHistory() {
                       ))}
                     </td>
                     <td>{fmt(Number(o.total))}</td>
-                    <td><span className={`order-status-pill status-${o.status}`}>{o.status}</span></td>
+                    <td><span className={`order-status-pill status-${o.status}`}>{t(STATUS_KEY[o.status] ?? o.status)}</span></td>
                   </tr>
                 ))}
                 {orders.length === 0 && (
-                  <tr><td colSpan={6} className="admin-empty">No orders in this range.</td></tr>
+                  <tr><td colSpan={6} className="admin-empty">{t("noOrdersInRange")}</td></tr>
                 )}
               </tbody>
             </table>

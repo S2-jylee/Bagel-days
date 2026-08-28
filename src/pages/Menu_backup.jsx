@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { CATEGORIES } from "../data/categories";
 import FoodCard from "../components/FoodCard";
+import CartList from "../components/CartList";
+import { useCart } from "../context/CartContext";
 import { useProducts } from "../context/ProductsContext";
 import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup } from "../components/Icons";
 import { asset } from "../lib/assetUrl";
@@ -28,18 +30,6 @@ const CATEGORY_ICONS = {
   coffee: IcCup,
 };
 
-// TODO: replace with the store's real OrderNow link (order-now.app/home/list/shop/<id>/)
-// once it's issued — orders are placed entirely on OrderNow, not on this site.
-const ORDER_NOW_URL = "https://order-now.app/home/list/shop/TODO";
-
-function OrderNowButton({ className = "btn btn-primary" }) {
-  return (
-    <a href={ORDER_NOW_URL} target="_blank" rel="noopener noreferrer" className={className}>
-      Order Now
-    </a>
-  );
-}
-
 export default function Menu() {
   useSeo({
     title: "Bagel Days | Menu & Order — Bagels, Cream Cheese, Coffee",
@@ -50,6 +40,7 @@ export default function Menu() {
 
   const [activeCat, setActiveCat] = useState(CATEGORIES[0].id);
   const [activeSubcat, setActiveSubcat] = useState(CATEGORIES[0].subcategories?.[0]?.id ?? null);
+  const { addToCart } = useCart();
   const { products, addons } = useProducts();
 
   const activeCategory = CATEGORIES.find((c) => c.id === activeCat);
@@ -80,11 +71,8 @@ export default function Menu() {
           <h1 style={{ fontSize: "clamp(2.2rem,4vw,3.2rem)" }}>Menu &amp; Order</h1>
           <p style={{ maxWidth: "56ch", color: "var(--body)", margin: "8px auto 0" }}>
             Freshly baked every morning using quality ingredients and our signature slow fermentation process.
-            Browse the menu below, then place your order online.
+            Tap <strong>Add to Cart</strong> on any item &mdash; your order builds in the cart on the right.
           </p>
-          <div style={{ marginTop: 18 }}>
-            <OrderNowButton className="btn btn-primary btn-lg" />
-          </div>
         </div>
 
         <div className="menu-order-layout">
@@ -123,6 +111,21 @@ export default function Menu() {
                 </div>
               )}
 
+              {addonList.length > 0 && (
+                <div className="addons-panel">
+                  <h4>{activeCategory.label} Add-ons</h4>
+                  <p className="addons-panel-hint">Options you can add &mdash; tap a menu photo to add them to your order.</p>
+                  <ul>
+                    {addonList.map((a) => (
+                      <li key={a.id}>
+                        <span>{a.name}</span>
+                        <span className="p">${a.price.toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               <div className="card-grid">
                 {visibleItems.map((id) => (
                   <FoodCard key={id} id={id} />
@@ -137,6 +140,9 @@ export default function Menu() {
                     <p style={{ color: "var(--body)", fontSize: ".9rem" }}>Any Bagel + Cream Cheese + Coffee</p>
                     <div className="set-banner-row">
                       <div className="price">From $12.50</div>
+                      <button className="btn btn-primary" onClick={() => addToCart("set-classic", 1)}>
+                        Add Set to Cart
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -144,27 +150,11 @@ export default function Menu() {
             </div>
           </div>
 
-          <aside className="menu-order-panel">
-            <div className="menu-order-cta">
-              <h3 style={{ fontSize: "1.05rem" }}>Ready to Order?</h3>
-              <p>Place your order online for pickup through our ordering partner.</p>
-              <OrderNowButton className="btn btn-primary btn-block" />
+          <aside className="menu-cart-panel">
+            <div className="cart-head">
+              <h3 style={{ fontSize: "1.05rem" }}>Your Order</h3>
             </div>
-
-            {addonList.length > 0 && (
-              <div className="addons-panel">
-                <h4>{activeCategory.label} Add-ons</h4>
-                <p className="addons-panel-hint">Available to add when you order.</p>
-                <ul>
-                  {addonList.map((a) => (
-                    <li key={a.id}>
-                      <span>{a.name}</span>
-                      <span className="p">${a.price.toFixed(2)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            <CartList />
           </aside>
         </div>
       </div>

@@ -4,7 +4,6 @@ import { useProducts } from "../../context/ProductsContext";
 import { CATEGORIES } from "../../data/categories";
 import { productImageUrl } from "../../lib/assetUrl";
 import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcPlus, IcCheck, IcStar, IcGrip } from "../../components/Icons";
-import { useAdminLang } from "../../lib/adminI18n";
 
 const CATEGORY_ICONS = {
   bagels: IcDonut,
@@ -118,7 +117,6 @@ function emptyForm(category, subcategory) {
 }
 
 export default function MenuManager() {
-  const { t } = useAdminLang();
   const { products, addons } = useProducts();
   const [activeCat, setActiveCat] = useState(CATEGORIES[0].id);
   const [activeSubcat, setActiveSubcat] = useState(CATEGORIES[0].subcategories?.[0]?.id ?? null);
@@ -130,6 +128,15 @@ export default function MenuManager() {
   const [poolTab, setPoolTab] = useState(CATEGORIES[0].id); // which category's add-ons the pool editor shows; "general" = no category
   const [newAddonName, setNewAddonName] = useState("");
   const [newAddonPrice, setNewAddonPrice] = useState("");
+
+  // ---- stock (merged in from the old Inventory tab) ----
+  const [stockMap, setStockMap] = useState({});
+  const [saved, setSaved] = useState(null);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [bulkQty, setBulkQty] = useState("");
+  const [applying, setApplying] = useState(false);
+  const [fillAllQty, setFillAllQty] = useState("");
+  const [fillingAll, setFillingAll] = useState(false);
 
   // ---- manual product ordering (drag to reorder, then Save) ----
   const [reordering, setReordering] = useState(false);
@@ -152,6 +159,18 @@ export default function MenuManager() {
     setOrderedIds([]);
   }, [activeCat, activeSubcat]);
 
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase.from("product_stock").select("product_id, stock_qty");
+      if (data) {
+        const map = {};
+        for (const row of data) map[row.product_id] = row.stock_qty;
+        setStockMap(map);
+      }
+    }
+    load();
+  }, []);
+
   const activeCategory = CATEGORIES.find((c) => c.id === activeCat);
   const activeSubcategory = activeCategory.subcategories?.find((s) => s.id === activeSubcat) ?? null;
   const visibleItems = Object.values(products)
@@ -160,6 +179,7 @@ export default function MenuManager() {
   const addonList = Object.values(addons);
   const poolAddons = addonList.filter((a) => (poolTab === "general" ? !a.categoryId : a.categoryId === poolTab));
   const allProductIds = Object.keys(products);
+  const allVisibleSelected = visibleItems.length > 0 && visibleItems.every((p) => selectedIds.has(p.id));
   const displayItems = reordering ? orderedIds.map((id) => products[id]).filter(Boolean) : visibleItems;
   const bestSellerItems = useMemo(
     () => Object.values(products).filter((p) => p.isBestSeller).sort((a, b) => (a.bestSellerOrder ?? 0) - (b.bestSellerOrder ?? 0)),
@@ -172,6 +192,64 @@ export default function MenuManager() {
   function selectCategory(cat) {
     setActiveCat(cat.id);
     setActiveSubcat(cat.subcategories?.[0]?.id ?? null);
+  }
+
+  function toggleOne(id) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAllVisible() {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allVisibleSelected) visibleItems.forEach((p) => next.delete(p.id));
+      else visibleItems.forEach((p) => next.add(p.id));
+      return next;
+    });
+  }
+
+  async function saveStock(id, value) {
+    const qty = value === "" ? null : Math.max(0, parseInt(value, 10) || 0);
+    setStockMap((prev) => ({ ...prev, [id]: qty }));
+    const { error } = await supabase.from("product_stock").update({ stock_qty: qty }).eq("product_id", id);
+    if (!error) {
+      setSaved(id);
+      setTimeout(() => setSaved((s) => (s === id ? null : s)), 1200);
+    }
+  }
+
+  async function applyBulk() {
+    const qty = bulkQty === "" ? null : Math.max(0, parseInt(bulkQty, 10) || 0);
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+    setApplying(true);
+    setStockMap((prev) => {
+      const next = { ...prev };
+      ids.forEach((id) => (next[id] = qty));
+      return next;
+    });
+    await supabase.from("product_stock").update({ stock_qty: qty }).in("product_id", ids);
+    setApplying(false);
+    setSelectedIds(new Set());
+    setBulkQty("");
+  }
+
+  async function fillAllStock() {
+    if (fillAllQty === "") return;
+    const qty = Math.max(0, parseInt(fillAllQty, 10) || 0);
+    setFillingAll(true);
+    setStockMap((prev) => {
+      const next = { ...prev };
+      allProductIds.forEach((id) => (next[id] = qty));
+      return next;
+    });
+    await supabase.from("product_stock").update({ stock_qty: qty }).in("product_id", allProductIds);
+    setFillingAll(false);
+    setFillAllQty("");
   }
 
   // ---- manual ordering ----
@@ -294,7 +372,7 @@ export default function MenuManager() {
       const url = await uploadProductImage(file);
       updateForm({ imageUrl: url });
     } catch (err) {
-      setFormError(err.message || t("photoUploadFailed"));
+      setFormError(err.message || "Photo upload failed.");
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -304,7 +382,7 @@ export default function MenuManager() {
   async function handleSubmit(e) {
     e.preventDefault();
     if (!form.name.trim() || form.price === "" || !form.categoryId) {
-      setFormError(t("nameRequired"));
+      setFormError("Name, category, and price are required.");
       return;
     }
     setSaving(true);
@@ -328,6 +406,10 @@ export default function MenuManager() {
       } else {
         const { error } = await supabase.from("products").insert(row);
         if (error) throw error;
+        // New items start with no stock set (shows as Sold Out until staff fills it in below).
+        const stockInsert = await supabase.from("product_stock").insert({ product_id: id, stock_qty: null });
+        if (stockInsert.error) throw stockInsert.error;
+        setStockMap((prev) => ({ ...prev, [id]: null }));
       }
 
       await supabase.from("product_addons").delete().eq("product_id", id);
@@ -339,14 +421,14 @@ export default function MenuManager() {
 
       setForm(null);
     } catch (err) {
-      setFormError(err.message || t("saveFailed"));
+      setFormError(err.message || "Save failed.");
     } finally {
       setSaving(false);
     }
   }
 
   async function handleDelete(p) {
-    if (!window.confirm(t("deleteConfirm", p.name))) return;
+    if (!window.confirm(`Delete "${p.name}"? This can't be undone.`)) return;
     await supabase.from("products").delete().eq("id", p.id);
   }
 
@@ -359,23 +441,23 @@ export default function MenuManager() {
   }
 
   async function deletePoolAddon(a) {
-    if (!window.confirm(t("removeAddonConfirm", a.name))) return;
+    if (!window.confirm(`Remove "${a.name}" from the add-on pool? It'll be removed from every item that uses it.`)) return;
     await supabase.from("addons").delete().eq("id", a.id);
   }
 
   return (
     <div>
       <div className="admin-section-header">
-        <h2>{t("menuItems")}</h2>
+        <h2>Menu Items</h2>
       </div>
 
       <div className="inventory-fillall-bar">
         <div className="inventory-fillall-text">
-          <strong>{t("addonPool")}</strong>
-          <span>{t("addonPoolDesc")}</span>
+          <strong>Add-on pool</strong>
+          <span>Shared add-ons any item can offer (e.g. Extra Cream Cheese) &mdash; manage the list here, then pick which apply per item.</span>
         </div>
         <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAddonPoolOpen((v) => !v)}>
-          {addonPoolOpen ? t("hide") : t("manage", addonList.length)}
+          {addonPoolOpen ? "Hide" : `Manage (${addonList.length})`}
         </button>
       </div>
 
@@ -385,7 +467,7 @@ export default function MenuManager() {
             {CATEGORIES.map((c) => (
               <button key={c.id} type="button" className={poolTab === c.id ? "active" : ""} onClick={() => setPoolTab(c.id)}>{c.label}</button>
             ))}
-            <button type="button" className={poolTab === "general" ? "active" : ""} onClick={() => setPoolTab("general")}>{t("general")}</button>
+            <button type="button" className={poolTab === "general" ? "active" : ""} onClick={() => setPoolTab("general")}>General</button>
           </div>
           <ul className="addon-pool-list">
             {poolAddons.map((a) => (
@@ -395,13 +477,13 @@ export default function MenuManager() {
                 <button type="button" className="addon-pool-remove" onClick={() => deletePoolAddon(a)} aria-label={`Remove ${a.name}`}>&times;</button>
               </li>
             ))}
-            {poolAddons.length === 0 && <li className="addon-pool-empty">{t("noAddonsYet")}</li>}
+            {poolAddons.length === 0 && <li className="addon-pool-empty">No add-ons in this category yet.</li>}
           </ul>
           <div className="addon-pool-add">
-            <input type="text" placeholder={t("addonName")} value={newAddonName} onChange={(e) => setNewAddonName(e.target.value)} />
-            <input type="number" min="0" step="0.01" placeholder={t("price")} value={newAddonPrice} onChange={(e) => setNewAddonPrice(e.target.value)} />
+            <input type="text" placeholder="Add-on name" value={newAddonName} onChange={(e) => setNewAddonName(e.target.value)} />
+            <input type="number" min="0" step="0.01" placeholder="Price" value={newAddonPrice} onChange={(e) => setNewAddonPrice(e.target.value)} />
             <button type="button" className="btn btn-primary btn-sm" onClick={addPoolAddon} disabled={!newAddonName.trim() || newAddonPrice === ""}>
-              {t("addToLabel", poolTab === "general" ? t("general") : CATEGORIES.find((c) => c.id === poolTab)?.label)}
+              Add to {poolTab === "general" ? "General" : CATEGORIES.find((c) => c.id === poolTab)?.label}
             </button>
           </div>
         </div>
@@ -410,19 +492,19 @@ export default function MenuManager() {
       <div className="bestseller-panel">
         <div className="bestseller-panel-head">
           <div className="inventory-fillall-text">
-            <strong>{t("bestSellersHeading")}</strong>
-            <span>{t("bestSellersDesc")}</span>
+            <strong>Best Sellers on Home</strong>
+            <span>The items shown in the "Best Sellers" section on the homepage, in this order &mdash; star an item below to add or remove it.</span>
           </div>
           <div className="menu-manager-toolbar-actions">
             {bestSellerReordering ? (
               <>
-                <button type="button" className="btn btn-ghost btn-sm" onClick={cancelBestSellerReorder} disabled={savingBestSellerOrder}>{t("cancel")}</button>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={cancelBestSellerReorder} disabled={savingBestSellerOrder}>Cancel</button>
                 <button type="button" className="btn btn-primary btn-sm" onClick={saveBestSellerOrder} disabled={savingBestSellerOrder}>
-                  {savingBestSellerOrder ? t("saving") : t("saveOrder")}
+                  {savingBestSellerOrder ? "Saving…" : "Save Order"}
                 </button>
               </>
             ) : (
-              <button type="button" className="btn btn-ghost btn-sm" onClick={startBestSellerReorder} disabled={bestSellerItems.length < 2}>{t("reorder")}</button>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={startBestSellerReorder} disabled={bestSellerItems.length < 2}>Reorder</button>
             )}
           </div>
         </div>
@@ -457,15 +539,15 @@ export default function MenuManager() {
               <span className="bestseller-card-name">{p.name}</span>
             </div>
           ))}
-          {bestSellerItems.length === 0 && <p className="inventory-hint">{t("noBestSellersYet")}</p>}
+          {bestSellerItems.length === 0 && <p className="inventory-hint">No items marked as Best Seller yet &mdash; star one below to add it here.</p>}
         </div>
       </div>
 
-      <p className="inventory-hint">{t("editHint")}</p>
+      <p className="inventory-hint">Edit an item's details or photo, or enter today's available quantity &mdash; anything left blank shows as Sold Out on the menu.</p>
 
       <div className="inventory-layout">
         <nav className="menu-maincats" aria-label="Menu categories">
-          <h3 className="menu-maincats-label">{t("menu")}</h3>
+          <h3 className="menu-maincats-label">Menu</h3>
           {CATEGORIES.map((cat) => {
             const Ic = CATEGORY_ICONS[cat.id];
             return (
@@ -493,26 +575,56 @@ export default function MenuManager() {
             <div className="menu-manager-toolbar-actions">
               {reordering ? (
                 <>
-                  <button type="button" className="btn btn-ghost btn-sm" onClick={cancelReorder} disabled={savingOrder}>{t("cancel")}</button>
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={cancelReorder} disabled={savingOrder}>Cancel</button>
                   <button type="button" className="btn btn-primary btn-sm" onClick={saveOrder} disabled={savingOrder}>
-                    {savingOrder ? t("saving") : t("saveOrder")}
+                    {savingOrder ? "Saving…" : "Save Order"}
                   </button>
                 </>
               ) : (
                 <>
-                  <button type="button" className="btn btn-ghost btn-sm" onClick={startReorder} disabled={visibleItems.length < 2}>{t("reorder")}</button>
-                  <button type="button" className="btn btn-primary btn-sm" onClick={openCreate}>{t("addNewItem")}</button>
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={startReorder} disabled={visibleItems.length < 2}>Reorder</button>
+                  <button type="button" className="btn btn-primary btn-sm" onClick={openCreate}>+ Add New Item</button>
                 </>
               )}
             </div>
           </div>
 
-          {reordering && <p className="inventory-hint">{t("dragHint")}</p>}
+          {!reordering && (
+            <>
+              <div className="inventory-fillall-bar">
+                <div className="inventory-fillall-text">
+                  <strong>Fill every product</strong>
+                  <span>Sets stock for all {allProductIds.length} products at once, across every category &mdash; no need to select items first.</span>
+                </div>
+                <div className="inventory-bulk-apply">
+                  <input type="number" min="0" placeholder="Qty" value={fillAllQty} onChange={(e) => setFillAllQty(e.target.value)} />
+                  <button type="button" className="btn btn-primary btn-sm" onClick={fillAllStock} disabled={fillAllQty === "" || fillingAll}>
+                    {fillingAll ? "Filling…" : "Fill All Products"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="inventory-bulk-bar">
+                <label className="inventory-select-all">
+                  <input type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} />
+                  Select all shown ({visibleItems.length})
+                </label>
+                <div className="inventory-bulk-apply">
+                  <input type="number" min="0" placeholder="Qty" value={bulkQty} onChange={(e) => setBulkQty(e.target.value)} />
+                  <button type="button" className="btn btn-primary btn-sm" onClick={applyBulk} disabled={selectedIds.size === 0 || applying}>
+                    {applying ? "Applying…" : `Apply to ${selectedIds.size} selected`}
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {reordering && <p className="inventory-hint">Drag items by the handle to reorder, then Save Order.</p>}
 
           <div className="inventory-list">
             {displayItems.map((p) => (
               <div
-                className={`inventory-row menu-manager-row${p.isActive === false ? " inactive" : ""}${reordering ? " reordering" : ""}${draggingId === p.id ? " dragging" : ""}`}
+                className={`inventory-row menu-manager-row${p.isActive === false ? " inactive" : ""}${selectedIds.has(p.id) ? " selected" : ""}${reordering ? " reordering" : ""}${draggingId === p.id ? " dragging" : ""}`}
                 key={p.id}
                 draggable={reordering}
                 onDragStart={(e) => {
@@ -524,12 +636,16 @@ export default function MenuManager() {
                 onDrop={(e) => e.preventDefault()}
                 onDragEnd={() => setDraggingId(null)}
               >
-                {reordering && <span className="menu-manager-drag-handle" aria-hidden="true"><IcGrip /></span>}
+                {reordering ? (
+                  <span className="menu-manager-drag-handle" aria-hidden="true"><IcGrip /></span>
+                ) : (
+                  <input type="checkbox" className="inventory-row-check" checked={selectedIds.has(p.id)} onChange={() => toggleOne(p.id)} />
+                )}
                 {p.img ? <img src={p.img} alt={p.name} /> : <div className="menu-manager-noimg" />}
                 <div className="inventory-row-info">
                   <div className="inventory-row-name">
                     {p.name}
-                    {p.isActive === false && <span className="menu-manager-hidden-badge">{t("hidden")}</span>}
+                    {p.isActive === false && <span className="menu-manager-hidden-badge">Hidden</span>}
                   </div>
                   <div className="inventory-row-price">${p.price.toFixed(2)}</div>
                 </div>
@@ -540,24 +656,36 @@ export default function MenuManager() {
                         type="button"
                         className={`menu-manager-star${p.isBestSeller ? " active" : ""}`}
                         onClick={() => toggleBestSeller(p)}
-                        aria-label={p.isBestSeller ? t("removeFromBestSellers") : t("markAsBestSeller")}
-                        title={p.isBestSeller ? t("bestSellerShownOnHome") : t("markAsBestSeller")}
+                        aria-label={p.isBestSeller ? "Remove from Best Sellers" : "Mark as Best Seller"}
+                        title={p.isBestSeller ? "Best Seller — shown on Home" : "Mark as Best Seller"}
                       >
                         <IcStar filled={p.isBestSeller} />
                       </button>
                       {bestSellerLimitId === p.id && (
-                        <span className="menu-manager-star-notice">{t("bestSellersFull")}</span>
+                        <span className="menu-manager-star-notice">Best Sellers is full — remove one to add another (max 6).</span>
                       )}
                     </div>
+                    <div className="inventory-row-stock">
+                      <input
+                        type="number"
+                        min="0"
+                        placeholder="Sold out"
+                        defaultValue={stockMap[p.id] ?? ""}
+                        key={stockMap[p.id]}
+                        onBlur={(e) => saveStock(p.id, e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && e.target.blur()}
+                      />
+                      {saved === p.id && <IcCheck />}
+                    </div>
                     <div className="menu-manager-row-actions">
-                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => openEdit(p)}>{t("edit")}</button>
-                      <button type="button" className="btn btn-ghost btn-sm menu-manager-delete" onClick={() => handleDelete(p)}>{t("delete")}</button>
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => openEdit(p)}>Edit</button>
+                      <button type="button" className="btn btn-ghost btn-sm menu-manager-delete" onClick={() => handleDelete(p)}>Delete</button>
                     </div>
                   </>
                 )}
               </div>
             ))}
-            {displayItems.length === 0 && <p className="inventory-hint">{t("noItemsYet")}</p>}
+            {displayItems.length === 0 && <p className="inventory-hint">No items in this category yet.</p>}
           </div>
         </div>
       </div>
@@ -565,13 +693,13 @@ export default function MenuManager() {
       {form && (
         <div className="admin-form-overlay" onClick={closeForm}>
           <div className="admin-form-panel" onClick={(e) => e.stopPropagation()}>
-            <h3>{form.id ? t("editItemTitle") : t("addNewItemTitle")}</h3>
+            <h3>{form.id ? "Edit Item" : "Add New Item"}</h3>
             <form onSubmit={handleSubmit}>
               <div className="menu-manager-photo-row">
                 {form.imageUrl ? <img src={productImageUrl(form.imageUrl)} alt="" className="menu-manager-photo-preview" /> : <div className="menu-manager-noimg large" />}
                 <div>
                   <label className="btn btn-ghost btn-sm menu-manager-upload-btn">
-                    {uploading ? t("uploading") : t("uploadPhoto")}
+                    {uploading ? "Uploading…" : "Upload Photo"}
                     <input type="file" accept="image/*" onChange={handlePhotoChange} disabled={uploading} hidden />
                   </label>
                 </div>
@@ -579,11 +707,11 @@ export default function MenuManager() {
 
               <div className="form-grid">
                 <div className="field full">
-                  <label>{t("name")}</label>
+                  <label>Name</label>
                   <input type="text" value={form.name} onChange={(e) => updateForm({ name: e.target.value })} required />
                 </div>
                 <div className="field">
-                  <label>{t("category")}</label>
+                  <label>Category</label>
                   <select
                     value={form.categoryId}
                     onChange={(e) => {
@@ -596,7 +724,7 @@ export default function MenuManager() {
                 </div>
                 {CATEGORIES.find((c) => c.id === form.categoryId)?.subcategories && (
                   <div className="field">
-                    <label>{t("subcategory")}</label>
+                    <label>Subcategory</label>
                     <select value={form.subcategoryId ?? ""} onChange={(e) => updateForm({ subcategoryId: e.target.value })}>
                       {CATEGORIES.find((c) => c.id === form.categoryId).subcategories.map((s) => (
                         <option key={s.id} value={s.id}>{s.label}</option>
@@ -605,11 +733,11 @@ export default function MenuManager() {
                   </div>
                 )}
                 <div className="field">
-                  <label>{t("price")}</label>
+                  <label>Price</label>
                   <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
                 </div>
                 <div className="field full">
-                  <label>{t("description")}</label>
+                  <label>Description</label>
                   <textarea value={form.description} onChange={(e) => updateForm({ description: e.target.value })} />
                 </div>
               </div>
@@ -621,7 +749,7 @@ export default function MenuManager() {
                 const relevantAddons = addonList.filter((a) => !a.categoryId || a.categoryId === form.categoryId);
                 return relevantAddons.length > 0 && (
                 <div className="modal-addons">
-                  <h4>{t("addonsAvailable")}</h4>
+                  <h4>Add-ons available for this item</h4>
                   <div className="modal-addon-list">
                     {relevantAddons.map((a) => {
                       const active = form.addonIds.has(a.id);
@@ -639,15 +767,15 @@ export default function MenuManager() {
 
               <label className="menu-manager-active-toggle">
                 <input type="checkbox" checked={form.isActive} onChange={(e) => updateForm({ isActive: e.target.checked })} />
-                {t("showOnMenuSite")}
+                Show on menu site
               </label>
 
               {formError && <p className="form-status err">{formError}</p>}
 
               <div className="menu-manager-form-actions">
-                <button type="button" className="btn btn-ghost" onClick={closeForm} disabled={saving}>{t("cancel")}</button>
+                <button type="button" className="btn btn-ghost" onClick={closeForm} disabled={saving}>Cancel</button>
                 <button type="submit" className="btn btn-primary" disabled={saving || uploading}>
-                  {saving ? t("saving") : form.id ? t("saveChanges") : t("register")}
+                  {saving ? "Saving…" : form.id ? "Save Changes" : "Register"}
                 </button>
               </div>
             </form>

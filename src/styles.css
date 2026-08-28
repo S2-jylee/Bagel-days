@@ -308,7 +308,9 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .product-modal-img{aspect-ratio:4/3; overflow:hidden; background:#fff;}
 .product-modal-img img{width:100%; height:100%; object-fit:contain;}
 .product-modal-body{padding:22px 24px 26px;}
-.product-modal-body h3{font-size:1.3rem; margin-bottom:8px;}
+.product-modal-body h3{font-size:1.3rem;}
+.product-modal-title-row{display:flex; align-items:baseline; justify-content:space-between; gap:14px; margin-bottom:8px;}
+.product-modal-price{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon); font-size:1.1rem; flex-shrink:0;}
 .product-modal-body p{color:var(--body); font-size:.92rem; line-height:1.6; margin-bottom:18px;}
 .product-modal-body .row{display:flex; align-items:center; justify-content:space-between; gap:14px;}
 .product-modal-body .price{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon); font-size:1.1rem;}
@@ -327,6 +329,10 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .modal-addon-btn svg{width:14px; height:14px; color:var(--maroon); flex-shrink:0;}
 .modal-addon-btn .p{font-weight:600; color:var(--maroon); flex-shrink:0;}
 .modal-addon-btn.active{border-color:var(--maroon); background:var(--cream-alt);}
+.modal-addon-list-plain{display:flex; flex-direction:column; gap:8px;}
+.modal-addon-list-plain li{display:flex; justify-content:space-between; gap:10px; font-size:.85rem; color:var(--ink); padding:6px 0; border-bottom:1px solid var(--line);}
+.modal-addon-list-plain li:last-child{border-bottom:none;}
+.modal-addon-list-plain .p{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon);}
 
 /* ---------- About / story split ---------- */
 .split-section{padding-top:32px;}
@@ -396,12 +402,16 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .menu-cart-panel .cart-head{padding:18px 20px;}
 .menu-cart-panel .cart-items{padding:6px 20px; overflow-y:auto;}
 .menu-cart-panel .cart-foot{padding:16px 20px 20px;}
-/* The persistent cart column is the first thing to go once the page gets tight —
+.menu-order-panel{position:sticky; top:96px; display:flex; flex-direction:column; gap:20px; min-width:0;}
+.menu-order-cta{background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px;}
+.menu-order-cta h3{margin-bottom:6px;}
+.menu-order-cta p{color:var(--body); font-size:.85rem; margin-bottom:16px;}
+/* The persistent right column is the first thing to go once the page gets tight —
    drop it a bit before the sidebar/products layout itself has to stack, so the
    product grid gets breathing room instead of both fighting over less space. */
 @media (max-width:1139px){
   .menu-order-layout{grid-template-columns:200px 1fr;}
-  .menu-cart-panel{display:none;}
+  .menu-cart-panel, .menu-order-panel{display:none;}
 }
 
 /* Make It A Set: full-width banner below the product grid */
@@ -612,7 +622,7 @@ footer ul li a:hover{color:#F0D9C9;}
   .special-grid{grid-template-columns:repeat(2,1fr);}
   .menu-order-layout{grid-template-columns:1fr; gap:14px;}
   .menu-products{padding-top:0;}
-  .menu-cart-panel{display:none;}
+  .menu-cart-panel, .menu-order-panel{display:none;}
   .menu-maincats{
     flex-direction:row; flex-wrap:wrap; justify-content:center; overflow-x:auto; position:static;
     gap:8px; padding-top:0;
@@ -800,6 +810,14 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 .admin-tabs button:hover{border-color:var(--maroon-light);}
 .admin-tabs button.active{background:var(--maroon); border-color:var(--maroon); color:#fff;}
+.admin-shell-actions{display:flex; align-items:center; gap:14px;}
+.admin-lang-toggle{display:flex; gap:4px; background:var(--cream-alt); border-radius:20px; padding:3px;}
+.admin-lang-toggle button{
+  font-family:'Pretendard', sans-serif; font-weight:600; font-size:.78rem;
+  padding:6px 12px; border-radius:16px; border:none; background:none; color:var(--body); cursor:pointer;
+  transition:background .15s ease, color .15s ease;
+}
+.admin-lang-toggle button.active{background:var(--maroon); color:#fff;}
 .admin-section-header{display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:20px; flex-wrap:wrap;}
 .admin-section-header h2{font-size:1.5rem;}
 .admin-filters{display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap; margin-bottom:20px;}

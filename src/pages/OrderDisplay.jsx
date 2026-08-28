@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabase";
 import { useStaffAuth } from "../lib/useStaffAuth";
 import StaffLogin from "../components/StaffLogin";
 import Pagination from "../components/Pagination";
-import { fmt } from "../context/CartContext";
+import { fmt } from "../lib/format";
 import { useProducts } from "../context/ProductsContext";
 import { CATEGORIES } from "../data/categories";
 import { useSeo } from "../lib/seo";
