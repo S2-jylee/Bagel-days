@@ -803,7 +803,7 @@ footer ul li a:hover{color:#F0D9C9;}
 .admin-page[data-lang="ko"] .script{
   font-family:'Pretendard', sans-serif;
 }
-.admin-shell-bar{display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; padding-bottom:16px; border-bottom:1px solid var(--line);}
+.admin-shell-bar{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:28px; padding-bottom:16px; border-bottom:1px solid var(--line);}
 .admin-tabs{display:flex; gap:6px;}
 .admin-tabs button{
   font-family:'Pretendard', sans-serif; font-weight:600; font-size:.85rem;
@@ -812,7 +812,7 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 .admin-tabs button:hover{border-color:var(--maroon-light);}
 .admin-tabs button.active{background:var(--maroon); border-color:var(--maroon); color:#fff;}
-.admin-shell-actions{display:flex; align-items:center; gap:14px;}
+.admin-shell-actions{display:flex; align-items:center; gap:14px; margin-left:auto;}
 .admin-lang-toggle{display:flex; gap:4px; background:var(--cream-alt); border-radius:20px; padding:3px;}
 .admin-lang-toggle button{
   font-family:'Pretendard', sans-serif; font-weight:600; font-size:.78rem;
@@ -920,7 +920,6 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 @media (max-width:600px){
   .admin-page{padding:24px 16px;}
-  .admin-shell-bar{flex-wrap:wrap; gap:12px;}
   .admin-section-header h2{font-size:1.3rem;}
   .inventory-row{flex-wrap:wrap;}
 }
