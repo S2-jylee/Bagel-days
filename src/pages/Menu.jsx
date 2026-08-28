@@ -2,7 +2,8 @@ import { useState, useMemo } from "react";
 import { CATEGORIES } from "../data/categories";
 import FoodCard from "../components/FoodCard";
 import { useProducts } from "../context/ProductsContext";
-import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup } from "../components/Icons";
+import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcBag } from "../components/Icons";
+import { IcChevron } from "../components/DeliveryButtons";
 import { asset } from "../lib/assetUrl";
 import { useSeo, SITE_URL } from "../lib/seo";
 
@@ -32,10 +33,12 @@ const CATEGORY_ICONS = {
 // once it's issued — orders are placed entirely on OrderNow, not on this site.
 const ORDER_NOW_URL = "https://order-now.app/home/list/shop/TODO";
 
-function OrderNowButton({ className = "btn btn-primary" }) {
+function OrderNowButton({ className = "delivery-btn delivery-btn-direct" }) {
   return (
     <a href={ORDER_NOW_URL} target="_blank" rel="noopener noreferrer" className={className}>
-      Order Now
+      <IcBag />
+      <span>Order Now</span>
+      <IcChevron />
     </a>
   );
 }
@@ -82,8 +85,8 @@ export default function Menu() {
             Freshly baked every morning using quality ingredients and our signature slow fermentation process.
             Browse the menu below, then place your order online.
           </p>
-          <div style={{ marginTop: 18 }}>
-            <OrderNowButton className="btn btn-primary btn-xl" />
+          <div style={{ marginTop: 18, display: "flex", justifyContent: "center" }}>
+            <OrderNowButton />
           </div>
         </div>
 
@@ -109,18 +112,33 @@ export default function Menu() {
             <div className="menu-category active">
               <h2>{activeCategory.label}</h2>
 
-              <div className="menu-pills-row">
-                {activeCategory.subcategories && (
-                  <div className="menu-subcat-pills">
-                    {activeCategory.subcategories.map((sub) => (
-                      <button
-                        key={sub.id}
-                        className={activeSubcat === sub.id ? "active" : ""}
-                        onClick={() => setActiveSubcat(sub.id)}
-                      >
-                        {sub.label}
-                      </button>
-                    ))}
+              {activeCategory.subcategories && (
+                <div className="menu-subcat-pills">
+                  {activeCategory.subcategories.map((sub) => (
+                    <button
+                      key={sub.id}
+                      className={activeSubcat === sub.id ? "active" : ""}
+                      onClick={() => setActiveSubcat(sub.id)}
+                    >
+                      {sub.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="menu-promo-row">
+                {addonList.length > 0 && (
+                  <div className="addons-panel">
+                    <h4>{activeCategory.label} Add-ons</h4>
+                    <p className="addons-panel-hint">Available to add when you order.</p>
+                    <ul>
+                      {addonList.map((a) => (
+                        <li key={a.id}>
+                          <span>{a.name}</span>
+                          <span className="p">${a.price.toFixed(2)}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
 
@@ -133,21 +151,6 @@ export default function Menu() {
                   </div>
                 </div>
               </div>
-
-              {addonList.length > 0 && (
-                <div className="addons-panel">
-                  <h4>{activeCategory.label} Add-ons</h4>
-                  <p className="addons-panel-hint">Available to add when you order.</p>
-                  <ul>
-                    {addonList.map((a) => (
-                      <li key={a.id}>
-                        <span>{a.name}</span>
-                        <span className="p">${a.price.toFixed(2)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
 
               <div className="card-grid">
                 {visibleItems.map((id) => (

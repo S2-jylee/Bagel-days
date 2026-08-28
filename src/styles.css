@@ -259,7 +259,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .feature p{font-size:.85rem; color:var(--body);}
 
 /* ---------- Card grid (best sellers / general) ---------- */
-.card-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:24px;}
+.card-grid{display:grid; grid-template-columns:repeat(8,1fr); gap:24px;}
 .food-card{background:#fff; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; min-width:0; display:flex; flex-direction:column; transition:transform .15s ease, box-shadow .15s ease;}
 .food-card:hover{transform:translateY(-4px); }
 /* aspect-ratio + object-fit:contain (not cover) so every card is the same
@@ -396,11 +396,11 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .menu-category.active{display:block;}
 .menu-category h2{font-size:1.5rem; margin-bottom:14px;}
 .menu-category > p{color:var(--body); max-width:52ch; margin-bottom:26px;}
-/* Sub-category pills sit alongside a compact "Make It A Set" promo on the
-   same row — pills take up whatever space they need, the promo takes the
-   rest on the right. */
-.menu-pills-row{display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; margin:14px 0 26px;}
-.menu-pills-row .menu-subcat-pills{margin:0; flex:1;}
+/* Add-ons info sits alongside a compact "Make It A Set" promo on the same
+   row, below the subcategory pills — Add-ons takes up whatever space it
+   needs, the promo takes the rest on the right. */
+.menu-promo-row{display:flex; align-items:stretch; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:26px;}
+.menu-promo-row .addons-panel{margin:0; flex:1; min-width:240px;}
 .set-banner-mini{
   display:flex; align-items:center; gap:12px; background:var(--cream-alt); border-radius:var(--radius);
   padding:10px 16px; flex-shrink:0;
@@ -410,7 +410,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .set-banner-mini p{font-family:'Pretendard', sans-serif; font-size:.7rem; color:var(--body); margin-bottom:2px;}
 .set-banner-mini .price{font-family:'PT Serif',serif; font-weight:700; font-size:.85rem; color:var(--maroon); white-space:nowrap;}
 @media (max-width:600px){
-  .menu-pills-row{flex-direction:column; align-items:stretch;}
+  .menu-promo-row{flex-direction:column; align-items:stretch;}
   .set-banner-mini{width:100%;}
 }
 

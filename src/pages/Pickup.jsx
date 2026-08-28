@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { UberEatsButton, DoorDashButton, IcChevron } from "../components/DeliveryButtons";
+import { UberEatsButton, DoorDashButton } from "../components/DeliveryButtons";
 import { IcTub, IcCup, IcBag, IcPin } from "../components/Icons";
 import { asset } from "../lib/assetUrl";
 import { useSeo } from "../lib/seo";
@@ -52,11 +52,6 @@ export default function Pickup() {
           <div className="delivery-buttons">
             <UberEatsButton />
             <DoorDashButton />
-            <Link to="/menu" className="delivery-btn delivery-btn-direct">
-              <IcBag />
-              <span>Order Direct &amp; Pay Online</span>
-              <IcChevron />
-            </Link>
           </div>
 
           <div className="pickup-highlights">
