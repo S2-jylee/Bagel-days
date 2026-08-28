@@ -16,12 +16,19 @@ export default function FoodCard({ id, small }) {
 
   return (
     <>
-      <div className={`food-card${small ? " food-card-small" : ""}`}>
-        <button type="button" className="thumb" onClick={() => setOpen(true)} aria-label={`View ${p.name} details`}>
+      <div
+        className={`food-card${small ? " food-card-small" : ""}`}
+        role="button"
+        tabIndex={0}
+        onClick={() => setOpen(true)}
+        onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setOpen(true))}
+        aria-label={`View ${p.name} details`}
+      >
+        <div className="thumb">
           <img src={p.img} alt={p.name} />
-        </button>
+        </div>
         <div className="body">
-          <h4 className="card-name-trigger" onClick={() => setOpen(true)}>{p.name}</h4>
+          <h4 className="card-name-trigger">{p.name}</h4>
           {!small && (
             <div className="card-quick-row">
               <span className="card-price">${p.price.toFixed(2)}</span>

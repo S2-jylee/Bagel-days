@@ -260,7 +260,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 
 /* ---------- Card grid (best sellers / general) ---------- */
 .card-grid{display:grid; grid-template-columns:repeat(8,1fr); gap:24px;}
-.food-card{background:#fff; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; min-width:0; display:flex; flex-direction:column; transition:transform .15s ease, box-shadow .15s ease;}
+.food-card{background:#fff; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; min-width:0; display:flex; flex-direction:column; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;}
 .food-card:hover{transform:translateY(-4px); }
 /* aspect-ratio + object-fit:contain (not cover) so every card is the same
    height regardless of a photo's native proportions, and the photo is
