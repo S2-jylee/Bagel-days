@@ -40,7 +40,7 @@ export default function Home() {
             </p>
             <div className="cta-row hero-overlay-sub">
               <Link to="/menu" className="btn btn-primary btn-lg">View Menu</Link>
-              <Link to="/pickup" className="btn btn-ghost btn-lg">Order Online</Link>
+              <Link to="/menu" className="btn btn-ghost btn-lg">Order Online</Link>
             </div>
             <span className="sr-only">Bagel Days signature everything bagel and coffee</span>
           </div>
@@ -53,7 +53,7 @@ export default function Home() {
         </p>
         <div className="cta-row">
           <Link to="/menu" className="btn btn-primary btn-lg">View Menu</Link>
-          <Link to="/pickup" className="btn btn-ghost btn-lg">Order Online</Link>
+          <Link to="/menu" className="btn btn-ghost btn-lg">Order Online</Link>
         </div>
       </div>
 

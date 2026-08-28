@@ -28,7 +28,7 @@ export default function Pickup() {
         <div className="wrap hero-fit-wrap">
           <img className="hero-fit-img" src={asset("/assets/images/hero-main.jpg")} alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1470px)" }} />
           <div className="hero-content">
-            <h1>Order Online</h1>
+            <h1>Pickup Order</h1>
             <p className="script" style={{ fontSize: "1.15rem", marginTop: 8 }}>Fresh bagels, ready when you are.</p>
             <p className="lede hero-overlay-sub">
               Order your favourite bagels and drinks for pickup or delivery. Freshly made, carefully packed, ready for you.
