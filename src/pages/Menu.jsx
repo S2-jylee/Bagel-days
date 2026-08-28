@@ -143,8 +143,8 @@ export default function Menu() {
                 )}
 
                 <div className="set-banner-mini">
-                  <img src={asset("/assets/images/sandwich-set.jpg")} alt="Bagel set" />
-                  <div>
+                  <img src={asset("/assets/images/sandwich-set.jpg")} alt="Bagel set" className="set-banner-mini-img" />
+                  <div className="set-banner-mini-text">
                     <h4>Make It A Set</h4>
                     <p>Any Bagel + Cream Cheese + Coffee</p>
                     <div className="price">From $12.50</div>
