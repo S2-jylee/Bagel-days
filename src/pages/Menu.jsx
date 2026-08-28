@@ -83,7 +83,7 @@ export default function Menu() {
             Browse the menu below, then place your order online.
           </p>
           <div style={{ marginTop: 18 }}>
-            <OrderNowButton className="btn btn-primary btn-lg" />
+            <OrderNowButton className="btn btn-primary btn-xl" />
           </div>
         </div>
 
@@ -109,17 +109,43 @@ export default function Menu() {
             <div className="menu-category active">
               <h2>{activeCategory.label}</h2>
 
-              {activeCategory.subcategories && (
-                <div className="menu-subcat-pills">
-                  {activeCategory.subcategories.map((sub) => (
-                    <button
-                      key={sub.id}
-                      className={activeSubcat === sub.id ? "active" : ""}
-                      onClick={() => setActiveSubcat(sub.id)}
-                    >
-                      {sub.label}
-                    </button>
-                  ))}
+              <div className="menu-pills-row">
+                {activeCategory.subcategories && (
+                  <div className="menu-subcat-pills">
+                    {activeCategory.subcategories.map((sub) => (
+                      <button
+                        key={sub.id}
+                        className={activeSubcat === sub.id ? "active" : ""}
+                        onClick={() => setActiveSubcat(sub.id)}
+                      >
+                        {sub.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div className="set-banner-mini">
+                  <img src={asset("/assets/images/sandwich-set.jpg")} alt="Bagel set" />
+                  <div>
+                    <h4>Make It A Set</h4>
+                    <p>Any Bagel + Cream Cheese + Coffee</p>
+                    <div className="price">From $12.50</div>
+                  </div>
+                </div>
+              </div>
+
+              {addonList.length > 0 && (
+                <div className="addons-panel">
+                  <h4>{activeCategory.label} Add-ons</h4>
+                  <p className="addons-panel-hint">Available to add when you order.</p>
+                  <ul>
+                    {addonList.map((a) => (
+                      <li key={a.id}>
+                        <span>{a.name}</span>
+                        <span className="p">${a.price.toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
 
@@ -128,44 +154,8 @@ export default function Menu() {
                   <FoodCard key={id} id={id} />
                 ))}
               </div>
-
-              <div className="set-row">
-                <div className="set-banner">
-                  <img src={asset("/assets/images/sandwich-set.jpg")} alt="Bagel set" />
-                  <div className="set-banner-info">
-                    <h3 style={{ fontSize: "1.2rem" }}>Make It A Set</h3>
-                    <p style={{ color: "var(--body)", fontSize: ".9rem" }}>Any Bagel + Cream Cheese + Coffee</p>
-                    <div className="set-banner-row">
-                      <div className="price">From $12.50</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
-
-          <aside className="menu-order-panel">
-            <div className="menu-order-cta">
-              <h3 style={{ fontSize: "1.05rem" }}>Ready to Order?</h3>
-              <p>Place your order online for pickup through our ordering partner.</p>
-              <OrderNowButton className="btn btn-primary btn-block" />
-            </div>
-
-            {addonList.length > 0 && (
-              <div className="addons-panel">
-                <h4>{activeCategory.label} Add-ons</h4>
-                <p className="addons-panel-hint">Available to add when you order.</p>
-                <ul>
-                  {addonList.map((a) => (
-                    <li key={a.id}>
-                      <span>{a.name}</span>
-                      <span className="p">${a.price.toFixed(2)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </aside>
         </div>
       </div>
     </section>
