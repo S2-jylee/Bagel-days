@@ -411,7 +411,8 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    product grid gets breathing room instead of both fighting over less space. */
 @media (max-width:1139px){
   .menu-order-layout{grid-template-columns:200px 1fr;}
-  .menu-cart-panel, .menu-order-panel{display:none;}
+  .menu-cart-panel{display:none;}
+  .menu-order-panel{position:static; grid-column:1 / -1;}
 }
 
 /* Make It A Set: full-width banner below the product grid */
@@ -622,7 +623,7 @@ footer ul li a:hover{color:#F0D9C9;}
   .special-grid{grid-template-columns:repeat(2,1fr);}
   .menu-order-layout{grid-template-columns:1fr; gap:14px;}
   .menu-products{padding-top:0;}
-  .menu-cart-panel, .menu-order-panel{display:none;}
+  .menu-cart-panel{display:none;}
   .menu-maincats{
     flex-direction:row; flex-wrap:wrap; justify-content:center; overflow-x:auto; position:static;
     gap:8px; padding-top:0;
