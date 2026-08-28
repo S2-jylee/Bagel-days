@@ -470,6 +470,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 }
 .delivery-hero{text-align:center; max-width:640px; margin:0 auto 40px;}
 .delivery-buttons{display:flex; gap:18px; justify-content:center; flex-wrap:wrap; margin:36px 0;}
+.menu-order-now-row{display:flex; justify-content:center; margin-top:18px;}
 .delivery-buttons .delivery-btn{padding:17px 28px; font-size:1rem;}
 .pickup-highlights{display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin:44px 0;}
 .pickup-highlight{background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:26px 22px; text-align:center;}
@@ -659,6 +660,7 @@ footer ul li a:hover{color:#F0D9C9;}
   .foot-links{flex-wrap:wrap; gap:20px 24px;}
   .delivery-buttons{flex-direction:column;}
   .delivery-buttons .btn{padding:16px 20px;}
+  .menu-order-now-row{flex-direction:column;}
   .mini-find{flex-direction:column; align-items:flex-start; gap:16px;}
   /* .home-hero's own bottom padding (28px, from the base rule above) was set
      for the old full-overlay layout; now that .hero-fit-subtext sits right
@@ -790,12 +792,15 @@ footer ul li a:hover{color:#F0D9C9;}
 .admin-pagination button:hover{background:var(--cream-alt);}
 .admin-pagination button.active{background:var(--maroon); border-color:var(--maroon); color:#fff;}
 
-.admin-page{max-width:1100px; margin:0 auto; padding:40px 20px; font-family:'Pretendard', sans-serif;}
-/* A few shared classes (the "Menu" sidebar label, Add-ons headings, etc.) are
-   also used on the customer-facing site in 'PT Serif' — scope the Pretendard
-   override to .admin-page so only the admin's copies of them change. */
-.admin-page h1, .admin-page h2, .admin-page h3, .admin-page h4,
-.admin-page .script{
+.admin-page{max-width:1100px; margin:0 auto; padding:40px 20px;}
+/* PT Serif has no real Korean glyph coverage, so the Korean admin UI swaps
+   headings to Pretendard; English admin keeps the original PT Serif to
+   match the rest of the site's heading style. Scoped to .admin-page so
+   shared classes (the "Menu" sidebar label, Add-ons headings, etc.) don't
+   affect their customer-facing copies. */
+.admin-page[data-lang="ko"] h1, .admin-page[data-lang="ko"] h2,
+.admin-page[data-lang="ko"] h3, .admin-page[data-lang="ko"] h4,
+.admin-page[data-lang="ko"] .script{
   font-family:'Pretendard', sans-serif;
 }
 .admin-shell-bar{display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; padding-bottom:16px; border-bottom:1px solid var(--line);}
@@ -904,7 +909,8 @@ footer ul li a:hover{color:#F0D9C9;}
 .inventory-row-check{width:17px; height:17px; accent-color:var(--maroon); cursor:pointer; flex-shrink:0;}
 .inventory-row img{width:64px; aspect-ratio:4/3; border-radius:8px; object-fit:contain; background:#fff; border:1px solid var(--line); flex-shrink:0;}
 .inventory-row-info{flex:1; min-width:0;}
-.inventory-row-name{font-family:'Pretendard', sans-serif; font-weight:600; font-size:.95rem; color:var(--ink);}
+.inventory-row-name{font-family:'PT Serif', serif; font-weight:600; font-size:.95rem; color:var(--ink);}
+[data-lang="ko"] .inventory-row-name{font-family:'Pretendard', sans-serif;}
 .inventory-row-price{font-family:'Pretendard', sans-serif; font-size:.8rem; color:var(--body); margin-top:2px;}
 .inventory-row-stock{display:flex; align-items:center; gap:8px; flex-shrink:0;}
 .inventory-row-stock input{width:100px; padding:9px 10px; border:1px solid var(--line); border-radius:6px; font-family:'Pretendard',sans-serif; font-size:.85rem; text-align:right; background:#fff; color:var(--ink);}

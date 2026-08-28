@@ -85,7 +85,7 @@ export default function Menu() {
             Freshly baked every morning using quality ingredients and our signature slow fermentation process.
             Browse the menu below, then place your order online.
           </p>
-          <div style={{ marginTop: 18, display: "flex", justifyContent: "center" }}>
+          <div className="menu-order-now-row">
             <OrderNowButton />
           </div>
         </div>

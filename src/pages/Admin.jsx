@@ -11,7 +11,7 @@ function AdminShell({ signOut }) {
   const [tab, setTab] = useState("menu");
 
   return (
-    <div className="admin-page">
+    <div className="admin-page" data-lang={lang}>
       <div className="admin-shell-bar">
         <div className="admin-tabs">
           <button className={tab === "menu" ? "active" : ""} onClick={() => setTab("menu")}>{t("menuTab")}</button>
