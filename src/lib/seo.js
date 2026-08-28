@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 
-// GitHub Pages serves this site from https://s2-jylee.github.io/Bagel-days/ —
-// keep in sync with the `base` in vite.config.js if the repo/host ever changes.
-export const SITE_ORIGIN = "https://s2-jylee.github.io";
+// Vercel serves this site from its assigned domain — update if a custom
+// domain is connected, or the project/team is ever renamed.
+export const SITE_ORIGIN = "https://bagel-days.vercel.app";
 export const SITE_URL = `${SITE_ORIGIN}${import.meta.env.BASE_URL}`;
 
 function upsertMeta(attr, key, content) {

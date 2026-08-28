@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://s2-jylee.github.io/Bagel-days/</loc>
-    <lastmod>2026-08-25</lastmod>
+    <loc>https://bagel-days.vercel.app/</loc>
+    <lastmod>2026-08-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://s2-jylee.github.io/Bagel-days/menu</loc>
-    <lastmod>2026-08-25</lastmod>
+    <loc>https://bagel-days.vercel.app/menu</loc>
+    <lastmod>2026-08-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://s2-jylee.github.io/Bagel-days/pickup</loc>
-    <lastmod>2026-08-25</lastmod>
+    <loc>https://bagel-days.vercel.app/pickup</loc>
+    <lastmod>2026-08-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://s2-jylee.github.io/Bagel-days/about</loc>
-    <lastmod>2026-08-25</lastmod>
+    <loc>https://bagel-days.vercel.app/about</loc>
+    <lastmod>2026-08-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://s2-jylee.github.io/Bagel-days/visit</loc>
-    <lastmod>2026-08-25</lastmod>
+    <loc>https://bagel-days.vercel.app/visit</loc>
+    <lastmod>2026-08-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://s2-jylee.github.io/Bagel-days/contact</loc>
-    <lastmod>2026-08-25</lastmod>
+    <loc>https://bagel-days.vercel.app/contact</loc>
+    <lastmod>2026-08-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

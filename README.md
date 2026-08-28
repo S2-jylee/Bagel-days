@@ -26,16 +26,14 @@ npm run preview
 
 ## Deploying
 
-This is a client-side routed single-page app (React Router). When you deploy
-it, your host needs to serve `index.html` for every route (so refreshing
-`/menu` or `/about` doesn't 404). Two ready-made configs are included:
+Live on **Vercel**, connected to this repo's `master` branch — every push
+triggers an automatic production deployment, no manual deploy step needed.
+`vercel.json` at the project root handles serving `index.html` for every
+route (so refreshing `/menu` or `/about` doesn't 404).
 
-- **Netlify**: `public/_redirects` is already set up — just deploy the repo
-  or the `dist/` folder.
-- **Vercel**: `vercel.json` at the project root handles the rewrite.
-
-Any other static host (S3+CloudFront, your own server, etc.) needs an
-equivalent "serve index.html for unknown paths" rule.
+`public/_redirects` is also included for Netlify, if this ever moves there
+instead. Any other static host (S3+CloudFront, your own server, etc.) needs
+an equivalent "serve index.html for unknown paths" rule.
 
 ## Where things live
 
