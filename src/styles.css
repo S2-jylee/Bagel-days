@@ -174,6 +174,27 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 }
 .hero-fit-wrap .hero-content{position:absolute; top:50%; left:20px; transform:translateY(-50%); z-index:2;}
 
+.hero-carousel-arrow{
+  position:absolute; top:50%; transform:translateY(-50%); z-index:3;
+  width:38px; height:38px; display:flex; align-items:center; justify-content:center;
+  border:none; border-radius:50%; background:rgba(255,255,255,.85); color:var(--maroon);
+  cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.18); transition:background .15s ease;
+}
+.hero-carousel-arrow:hover{background:#fff;}
+.hero-carousel-arrow svg{width:20px; height:20px;}
+.hero-carousel-arrow-prev{right:76px;}
+.hero-carousel-arrow-next{right:20px;}
+.hero-carousel-dots{position:absolute; bottom:16px; right:20px; z-index:3; display:flex; gap:6px;}
+.hero-carousel-dot{width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.6); box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.hero-carousel-dot.active{background:var(--maroon);}
+@media (max-width:600px){
+  .hero-carousel-arrow{width:32px; height:32px;}
+  .hero-carousel-arrow svg{width:16px; height:16px;}
+  .hero-carousel-arrow-prev{right:60px;}
+  .hero-carousel-arrow-next{right:12px;}
+  .hero-carousel-dots{bottom:10px; right:12px;}
+}
+
 /* Mobile-only: on Visit/Contact/Pickup the tagline+description move out of the
    photo overlay into their own block below the hero (see .hero-overlay-sub /
    .hero-fit-subtext below) — only the h1 stays on the image. Desktop is
@@ -996,3 +1017,28 @@ footer ul li a:hover{color:#F0D9C9;}
 @media (max-width:600px){
   .menu-manager-row-actions{width:100%; justify-content:flex-end;}
 }
+
+.homepage-section{
+  background:var(--tan); border:1px solid var(--tan-dark); border-radius:var(--radius); padding:20px 22px 22px; margin-bottom:24px;
+}
+.homepage-section h3{font-size:1.1rem; margin-bottom:16px;}
+.homepage-section textarea{min-height:70px;}
+.homepage-photo-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:12px; margin-top:8px;}
+.homepage-photo-thumb{position:relative; border-radius:8px; overflow:hidden; border:1px solid var(--line); background:#fff;}
+.homepage-photo-thumb img{width:100%; aspect-ratio:16/9; object-fit:cover; display:block;}
+.homepage-photo-thumb-actions{
+  position:absolute; inset:auto 0 0 0; display:flex; justify-content:center; gap:4px; padding:4px;
+  background:linear-gradient(0deg, rgba(0,0,0,.55), transparent);
+}
+.homepage-photo-thumb-actions button{
+  width:26px; height:26px; display:flex; align-items:center; justify-content:center;
+  border:none; border-radius:50%; background:rgba(255,255,255,.9); color:var(--maroon); cursor:pointer;
+}
+.homepage-photo-thumb-actions button:disabled{opacity:.35; cursor:default;}
+.homepage-photo-thumb-actions button svg{width:14px; height:14px;}
+.homepage-photo-add{
+  aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; text-align:center; padding:8px;
+  border:1px dashed var(--maroon-light); border-radius:8px; cursor:pointer;
+  font-family:'Pretendard', sans-serif; font-weight:600; font-size:.82rem; color:var(--maroon);
+}
+.homepage-photo-add:hover{background:var(--cream-alt);}

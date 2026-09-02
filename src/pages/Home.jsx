@@ -1,11 +1,20 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import FoodCard from "../components/FoodCard";
+import HeroCarousel from "../components/HeroCarousel";
 import { UberEatsButton, DoorDashButton } from "../components/DeliveryButtons";
 import { IcLeaf, IcWhisk, IcBean, IcHeart, IcPin, IcClock, IcPhone } from "../components/Icons";
 import { asset } from "../lib/assetUrl";
 import { useProducts } from "../context/ProductsContext";
+import { usePageContent } from "../context/PageContentContext";
 import { useSeo } from "../lib/seo";
+
+const DEFAULT_CONTENT = {
+  title: "Bagel Days",
+  tagline: "Freshly Baked, Every Morning.",
+  description: "Fresh bagles, house-made cream cheese & Campos Specialty Coffee.",
+  images: ["/assets/images/hero-main.jpg"],
+};
 
 export default function Home() {
   useSeo({
@@ -15,6 +24,8 @@ export default function Home() {
   });
 
   const { products } = useProducts();
+  const { pages } = usePageContent();
+  const content = pages.home || DEFAULT_CONTENT;
 
   // Which items show here (and in what order) is set by staff in Admin →
   // Menu Items, not derived automatically — see MenuManager's star toggle.
@@ -29,15 +40,13 @@ export default function Home() {
     <>
       <section className="hero home-hero hero-photo-fit">
         <div className="wrap hero-fit-wrap">
-          <img className="hero-fit-img" src={asset("/assets/images/hero-main.jpg")} alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1470px)" }} />
+          <HeroCarousel images={content.images} imgClassName="hero-fit-img" imgStyle={{ maxWidth: "min(100%, 1470px)" }} />
           <div className="hero-content">
-            <h1>Bagel Days</h1>
+            <h1>{content.title}</h1>
             <p className="script" style={{ fontSize: "1.2rem", display: "block", marginTop: 6 }}>
-              Freshly Baked, Every Morning.
+              {content.tagline}
             </p>
-            <p className="lede hero-overlay-sub">
-              Fresh bagles, house-made cream cheese<br /> & Campos Specialty Coffee.
-            </p>
+            <p className="lede hero-overlay-sub">{content.description}</p>
             <div className="cta-row hero-overlay-sub">
               <Link to="/menu" className="btn btn-primary btn-lg">View Menu</Link>
               <Link to="/menu" className="btn btn-ghost btn-lg">Order Online</Link>
@@ -48,9 +57,7 @@ export default function Home() {
       </section>
 
       <div className="hero-fit-subtext wrap">
-        <p className="lede">
-          Fresh bagles, house-made cream cheese<br /> & Campos Specialty Coffee.
-        </p>
+        <p className="lede">{content.description}</p>
         <div className="cta-row">
           <Link to="/menu" className="btn btn-primary btn-lg">View Menu</Link>
           <Link to="/menu" className="btn btn-ghost btn-lg">Order Online</Link>

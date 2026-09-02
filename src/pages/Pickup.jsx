@@ -1,8 +1,16 @@
 import { Link } from "react-router-dom";
 import { UberEatsButton, DoorDashButton } from "../components/DeliveryButtons";
+import HeroCarousel from "../components/HeroCarousel";
 import { IcTub, IcCup, IcBag, IcPin } from "../components/Icons";
-import { asset } from "../lib/assetUrl";
+import { usePageContent } from "../context/PageContentContext";
 import { useSeo } from "../lib/seo";
+
+const DEFAULT_CONTENT = {
+  title: "Pickup Order",
+  tagline: "Fresh bagels, ready when you are.",
+  description: "Order your favourite bagels and drinks for pickup or delivery. Freshly made, carefully packed, ready for you.",
+  images: ["/assets/images/hero-main.jpg"],
+};
 
 const IcBagel = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/></svg>
@@ -22,26 +30,25 @@ export default function Pickup() {
     path: "/pickup",
   });
 
+  const { pages } = usePageContent();
+  const content = pages.pickup || DEFAULT_CONTENT;
+
   return (
     <>
       <section className="hero home-hero hero-photo-fit">
         <div className="wrap hero-fit-wrap">
-          <img className="hero-fit-img" src={asset("/assets/images/hero-main.jpg")} alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1470px)" }} />
+          <HeroCarousel images={content.images} imgClassName="hero-fit-img" imgStyle={{ maxWidth: "min(100%, 1470px)" }} />
           <div className="hero-content">
-            <h1>Pickup Order</h1>
-            <p className="script" style={{ fontSize: "1.15rem", marginTop: 8 }}>Fresh bagels, ready when you are.</p>
-            <p className="lede hero-overlay-sub">
-              Order your favourite bagels and drinks for pickup or delivery. Freshly made, carefully packed, ready for you.
-            </p>
+            <h1>{content.title}</h1>
+            <p className="script" style={{ fontSize: "1.15rem", marginTop: 8 }}>{content.tagline}</p>
+            <p className="lede hero-overlay-sub">{content.description}</p>
             <span className="sr-only">Bagel and coffee ready for order</span>
           </div>
         </div>
       </section>
 
       <div className="hero-fit-subtext wrap">
-        <p className="lede">
-          Order your favourite bagels and drinks for pickup or delivery. Freshly made, carefully packed, ready for you.
-        </p>
+        <p className="lede">{content.description}</p>
       </div>
 
       <section className="pickup-order-section">
