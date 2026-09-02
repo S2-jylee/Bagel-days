@@ -161,7 +161,7 @@ function PageSection({ pageId, content, showTagline = true, footerNoteKey, t }) 
         t={t}
       />
 
-      {footerNoteKey && <p className="inventory-hint">{t(footerNoteKey)}</p>}
+      {footerNoteKey && <p className="homepage-hint">{t(footerNoteKey)}</p>}
 
       {error && <p className="form-status err">{error}</p>}
 
@@ -222,30 +222,35 @@ function BusinessInfoSection({ settings, t }) {
 
   return (
     <div className="homepage-section">
-      <p className="inventory-hint">{t("businessInfoIntro")}</p>
+      <p className="homepage-hint">{t("businessInfoIntro")}</p>
 
       <h4 className="homepage-subheading">{t("addressLabel")}</h4>
+      <p className="homepage-affects">{t("addressAffects")}</p>
       <div className="form-grid">
         <div className="field"><label>{t("addressLine1Label")}</label><input type="text" {...field("addressLine1")} /></div>
         <div className="field"><label>{t("addressLine2Label")}</label><input type="text" {...field("addressLine2")} /></div>
       </div>
 
       <h4 className="homepage-subheading">{t("openingHoursLabel")}</h4>
+      <p className="homepage-affects">{t("hoursAffects")}</p>
       <div className="form-grid">
         <div className="field"><label>{t("hoursDaysLabel")}</label><input type="text" {...field("hoursDays")} /></div>
         <div className="field"><label>{t("hoursTimeLabel")}</label><input type="text" {...field("hoursTime")} /></div>
       </div>
 
       <h4 className="homepage-subheading">{t("findUsLabel")}</h4>
+      <p className="homepage-affects">{t("findUsAffects")}</p>
       <div className="field full"><textarea rows={2} {...field("findUsText")} /></div>
 
       <h4 className="homepage-subheading">{t("contactLabel")}</h4>
+      <p className="homepage-affects">{t("contactAffects")}</p>
       <div className="form-grid">
         <div className="field"><label>{t("phoneLabel")}</label><input type="text" {...field("phone")} /></div>
         <div className="field"><label>{t("emailLabel")}</label><input type="email" {...field("email")} /></div>
       </div>
 
       <h4 className="homepage-subheading">{t("socialLinksLabel")}</h4>
+      <p className="homepage-affects">{t("socialAffects")}</p>
       <div className="form-grid">
         <div className="field"><label>Instagram URL</label><input type="text" {...field("instagramUrl")} /></div>
         <div className="field"><label>Instagram {t("handleLabel")}</label><input type="text" {...field("instagramHandle")} /></div>
@@ -288,7 +293,7 @@ export default function HomepageManager() {
       <div className="admin-section-header">
         <h2>{t("homepageTab")}</h2>
       </div>
-      <p className="inventory-hint">{t("homepageIntro")}</p>
+      <p className="homepage-hint">{t("homepageIntro")}</p>
 
       <div className="homepage-subtabs">
         {SUB_TABS.map((tab) => (
