@@ -1,15 +1,19 @@
 import { useState } from "react";
 import { IcBag, IcChat, IcMail, IcInsta, IcTikTok, IcFacebook, IcPhone, IcExternal } from "../components/Icons";
 import { asset } from "../lib/assetUrl";
+import { usePageContent } from "../context/PageContentContext";
+import { useSiteSettings } from "../context/SiteSettingsContext";
+import HeroCarousel from "../components/HeroCarousel";
 import { useSeo } from "../lib/seo";
 
-const SOCIAL_LINKS = [
-  { ic: IcInsta, label: "Instagram", value: "@bageldays.au", href: "https://www.instagram.com/bageldays.au/" },
-  { ic: IcTikTok, label: "TikTok", value: "@bageldays.au", href: "https://www.tiktok.com/@bageldays.au" },
-  { ic: IcFacebook, label: "Facebook", value: "Bagel Days (@bageldaysau)", href: "https://www.facebook.com/bageldays.au/" },
-];
-
 const FORM_ENDPOINT = "https://formspree.io/f/xrpznrnz";
+
+const DEFAULT_CONTENT = {
+  title: "Contact Us",
+  tagline: "We'd love to hear from you.",
+  description: "Have a question, catering enquiry, or collaboration idea? Send us a message and we'll get back to you as soon as possible.",
+  images: ["/assets/images/hero-main-contact.png"],
+};
 
 export default function Contact() {
   useSeo({
@@ -17,6 +21,15 @@ export default function Contact() {
     description: "Get in touch with Bagel Days for catering, bulk orders, or general enquiries. Follow us on Instagram, TikTok, and Facebook.",
     path: "/contact",
   });
+
+  const { pages } = usePageContent();
+  const content = pages.contact || DEFAULT_CONTENT;
+  const { settings } = useSiteSettings();
+  const socialLinks = [
+    { ic: IcInsta, label: "Instagram", value: settings.instagramHandle, href: settings.instagramUrl },
+    { ic: IcTikTok, label: "TikTok", value: settings.tiktokHandle, href: settings.tiktokUrl },
+    { ic: IcFacebook, label: "Facebook", value: settings.facebookHandle, href: settings.facebookUrl },
+  ];
 
   const [status, setStatus] = useState({ text: "", type: "" });
   const [sending, setSending] = useState(false);
@@ -36,10 +49,10 @@ export default function Contact() {
         setStatus({ text: "Thanks! Your message has been sent — we'll be in touch soon.", type: "ok" });
         form.reset();
       } else {
-        setStatus({ text: "Something went wrong. Please email us directly at bagledays.au@gmail.com.", type: "err" });
+        setStatus({ text: `Something went wrong. Please email us directly at ${settings.email}.`, type: "err" });
       }
     } catch {
-      setStatus({ text: "Something went wrong. Please email us directly at bagledays.au@gmail.com.", type: "err" });
+      setStatus({ text: `Something went wrong. Please email us directly at ${settings.email}.`, type: "err" });
     } finally {
       setSending(false);
     }
@@ -49,22 +62,18 @@ export default function Contact() {
     <>
       <section className="hero hero-photo-fit" style={{ paddingBottom: 0 }}>
         <div className="wrap hero-fit-wrap">
-          <img className="hero-fit-img" src={asset("/assets/images/hero-main-contact.png")} alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1000px)" }} />
+          <HeroCarousel images={content.images} imgClassName="hero-fit-img" imgStyle={{ maxWidth: "min(100%, 1000px)" }} />
           <div className="hero-content">
-            <h1>Contact Us</h1>
-            <p className="script" style={{ fontSize: "1.2rem" }}>We'd love to hear from you.</p>
-            <p className="lede hero-overlay-sub" style={{ marginTop: 14 }}>
-              Have a question, catering enquiry, or collaboration idea? Send us a message and we'll get back to you as soon as possible.
-            </p>
+            <h1>{content.title}</h1>
+            <p className="script" style={{ fontSize: "1.2rem" }}>{content.tagline}</p>
+            <p className="lede hero-overlay-sub" style={{ marginTop: 14 }}>{content.description}</p>
             <span className="sr-only">Bagel Days coffee and bagel to go</span>
           </div>
         </div>
       </section>
 
       <div className="hero-fit-subtext wrap">
-        <p className="lede">
-          Have a question, catering enquiry, or collaboration idea? Send us a message and we'll get back to you as soon as possible.
-        </p>
+        <p className="lede">{content.description}</p>
       </div>
 
       <section style={{ paddingTop: 24 }}>
@@ -100,10 +109,10 @@ export default function Contact() {
                   <span className="ic"><IcMail /></span>
                   <div className="git-text">
                     <span className="git-label">Email</span>
-                    <a href="mailto:bageldays.au@gmail.com" className="git-value">bageldays.au@gmail.com</a>
+                    <a href={`mailto:${settings.email}`} className="git-value">{settings.email}</a>
                   </div>
                 </li>
-                {SOCIAL_LINKS.map(({ ic: Ic, label, value, href }) => (
+                {socialLinks.map(({ ic: Ic, label, value, href }) => (
                   <li key={label}>
                     <span className="ic"><Ic /></span>
                     <div className="git-text">

@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import { IcMail, IcPhone, IcInsta, IcTikTok, IcFacebook, IcDonut } from "./Icons";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 
 export default function Footer() {
+  const { settings } = useSiteSettings();
+
   return (
     <footer>
       <div className="wrap foot-main">
@@ -24,22 +27,22 @@ export default function Footer() {
           <div className="foot-col">
             <h4>INFO</h4>
             <ul>
-              <li>Shop 1, 29 Robertson Street</li>
-              <li>Fortitude Valley QLD 4006</li>
-              <li>Mon &ndash; Sun, 7:00AM &ndash; 4:00PM</li>
+              <li>{settings.addressLine1}</li>
+              <li>{settings.addressLine2}</li>
+              <li>{settings.hoursDays}, {settings.hoursTime}</li>
             </ul>
           </div>
 
           <div className="foot-col foot-contact">
             <h4>Contact</h4>
             <ul>
-              <li><IcMail /><a href="mailto:bagledays.au@gmail.com">bagledays.au@gmail.com</a></li>
-              <li><IcPhone /><span>(07) 1234 5678</span></li>
+              <li><IcMail /><a href={`mailto:${settings.email}`}>{settings.email}</a></li>
+              <li><IcPhone /><span>{settings.phone}</span></li>
             </ul>
             <div className="foot-social">
-              <a href="https://www.instagram.com/bageldays.au/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><IcInsta /></a>
-              <a href="https://www.tiktok.com/@bageldays.au" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><IcTikTok /></a>
-              <a href="https://www.facebook.com/bageldays.au/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><IcFacebook /></a>
+              <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><IcInsta /></a>
+              <a href={settings.tiktokUrl} target="_blank" rel="noopener noreferrer" aria-label="TikTok"><IcTikTok /></a>
+              <a href={settings.facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook"><IcFacebook /></a>
             </div>
           </div>
         </div>

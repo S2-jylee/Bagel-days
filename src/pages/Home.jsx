@@ -7,6 +7,8 @@ import { IcLeaf, IcWhisk, IcBean, IcHeart, IcPin, IcClock, IcPhone } from "../co
 import { asset } from "../lib/assetUrl";
 import { useProducts } from "../context/ProductsContext";
 import { usePageContent } from "../context/PageContentContext";
+import { useSiteSettings } from "../context/SiteSettingsContext";
+import { telHref } from "../lib/siteSettings";
 import { useSeo } from "../lib/seo";
 
 const DEFAULT_CONTENT = {
@@ -26,6 +28,7 @@ export default function Home() {
   const { products } = useProducts();
   const { pages } = usePageContent();
   const content = pages.home || DEFAULT_CONTENT;
+  const { settings } = useSiteSettings();
 
   // Which items show here (and in what order) is set by staff in Admin →
   // Menu Items, not derived automatically — see MenuManager's star toggle.
@@ -104,12 +107,12 @@ export default function Home() {
           <div className="widget-card">
             <h3>Visit Us</h3>
             <ul className="widget-info-list">
-              <li><IcPin /><span>Shop 1, 29 Robertson Street, Fortitude Valley QLD 4006</span></li>
-              <li><IcClock /><span>Mon &ndash; Sun, 7:00 AM &ndash; 4:00 PM</span></li>
+              <li><IcPin /><span>{settings.addressLine1}, {settings.addressLine2}</span></li>
+              <li><IcClock /><span>{settings.hoursDays}, {settings.hoursTime}</span></li>
               <li>
                 <IcPhone />
-                <a href="tel:+61712345678" className="widget-phone-link">
-                  <span>(07) 1234-5678</span>
+                <a href={telHref(settings.phone)} className="widget-phone-link">
+                  <span>{settings.phone}</span>
                   <span className="call-us-badge">Call Us</span>
                 </a>
               </li>

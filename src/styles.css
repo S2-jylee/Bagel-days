@@ -1021,8 +1021,16 @@ footer ul li a:hover{color:#F0D9C9;}
 .homepage-section{
   background:var(--tan); border:1px solid var(--tan-dark); border-radius:var(--radius); padding:20px 22px 22px; margin-bottom:24px;
 }
-.homepage-section h3{font-size:1.1rem; margin-bottom:16px;}
 .homepage-section textarea{min-height:70px;}
+.homepage-subheading{font-size:.95rem; margin:20px 0 10px; color:var(--maroon);}
+.homepage-subheading:first-child{margin-top:0;}
+.homepage-subtabs{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:20px;}
+.homepage-subtabs button{
+  font-family:'Pretendard', sans-serif; font-weight:600; font-size:.82rem; color:var(--body);
+  background:#fff; border:1px solid var(--line); border-radius:20px; padding:8px 16px; cursor:pointer; transition:border-color .15s ease, color .15s ease;
+}
+.homepage-subtabs button:hover{border-color:var(--maroon-light);}
+.homepage-subtabs button.active{background:var(--maroon); border-color:var(--maroon); color:#fff;}
 .homepage-photo-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:12px; margin-top:8px;}
 .homepage-photo-thumb{position:relative; border-radius:8px; overflow:hidden; border:1px solid var(--line); background:#fff;}
 .homepage-photo-thumb img{width:100%; aspect-ratio:16/9; object-fit:cover; display:block;}

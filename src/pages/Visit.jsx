@@ -1,10 +1,16 @@
 import { IcPin, IcClock, IcMap, IcCar, IcCheck } from "../components/Icons";
+import { usePageContent } from "../context/PageContentContext";
+import { useSiteSettings } from "../context/SiteSettingsContext";
+import { mapsDirectionsUrl, mapsViewUrl } from "../lib/siteSettings";
 import { asset } from "../lib/assetUrl";
+import HeroCarousel from "../components/HeroCarousel";
 import { useSeo } from "../lib/seo";
 
-const MAPS_DIRECTIONS = "https://www.google.com/maps/dir/?api=1&destination=Shop+1%2C+29+Robertson+Street%2C+Fortitude+Valley+QLD+4006";
-const MAPS_VIEW = "https://www.google.com/maps/search/?api=1&query=Shop+1%2C+29+Robertson+Street%2C+Fortitude+Valley+QLD+4006";
-const MAPS_EMBED = "https://www.google.com/maps?q=Shop+1,+29+Robertson+Street,+Fortitude+Valley+QLD+4006&output=embed";
+const DEFAULT_CONTENT = {
+  title: "We Can't Wait to Welcome You!",
+  description: "We look forward to welcoming you to Bagel Days. Stop by for freshly baked bagels, house-made cream cheese, and Campos Specialty Coffee.",
+  images: ["/assets/images/storefront.jpg"],
+};
 
 export default function Visit() {
   useSeo({
@@ -13,21 +19,25 @@ export default function Visit() {
     path: "/visit",
   });
 
+  const { pages } = usePageContent();
+  const content = pages.visit || DEFAULT_CONTENT;
+  const { settings } = useSiteSettings();
+
   return (
     <>
       <section className="hero hero-photo-fit" style={{ paddingBottom: 0 }}>
         <div className="wrap hero-fit-wrap">
-          <img className="hero-fit-img" src={asset("/assets/images/storefront.jpg")} alt="" aria-hidden="true" style={{ maxWidth: "min(100%, 1600px)" }} />
+          <HeroCarousel images={content.images} imgClassName="hero-fit-img" imgStyle={{ maxWidth: "min(100%, 1600px)" }} />
           <div className="hero-content">
-            <h1>We Can't Wait to Welcome You!</h1>
-            <p className="lede hero-overlay-sub">We look forward to welcoming you to Bagel Days. Stop by for freshly baked bagels, house-made cream cheese, and Campos Specialty Coffee.</p>
+            <h1>{content.title}</h1>
+            <p className="lede hero-overlay-sub">{content.description}</p>
             <span className="sr-only">Bagel Days storefront in Fortitude Valley</span>
           </div>
         </div>
       </section>
 
       <div className="hero-fit-subtext wrap">
-        <p className="lede">We look forward to welcoming you to Bagel Days. Stop by for freshly baked bagels, house-made cream cheese, and Campos Specialty Coffee.</p>
+        <p className="lede">{content.description}</p>
       </div>
 
       <section className="visit-loc-section">
@@ -38,9 +48,9 @@ export default function Visit() {
                 <div className="ic"><IcPin /></div>
                 <div className="loc-card-text">
                   <h4>Address</h4>
-                  <p>Shop 1, 29 Robertson Street</p>
-                  <p>Fortitude Valley QLD 4006</p>
-                  <a href={MAPS_DIRECTIONS} target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm" style={{ marginTop: 12 }}>Get Directions</a>
+                  <p>{settings.addressLine1}</p>
+                  <p>{settings.addressLine2}</p>
+                  <a href={mapsDirectionsUrl(settings)} target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm" style={{ marginTop: 12 }}>Get Directions</a>
                 </div>
               </div>
             </div>
@@ -49,8 +59,8 @@ export default function Visit() {
                 <div className="ic"><IcClock /></div>
                 <div className="loc-card-text">
                   <h4>Opening Hours</h4>
-                  <p>Monday &ndash; Sunday</p>
-                  <p>7:00 AM &ndash; 4:00 PM</p>
+                  <p>{settings.hoursDays}</p>
+                  <p>{settings.hoursTime}</p>
                 </div>
               </div>
             </div>
@@ -59,8 +69,8 @@ export default function Visit() {
                 <div className="ic"><IcMap /></div>
                 <div className="loc-card-text">
                   <h4>Find Us</h4>
-                  <p>In the heart of Fortitude Valley, just a short walk from Fortitude Valley Station.</p>
-                  <a href={MAPS_VIEW} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm" style={{ marginTop: 12 }}>View on Google Maps</a>
+                  <p>{settings.findUsText}</p>
+                  <a href={mapsViewUrl(settings)} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm" style={{ marginTop: 12 }}>View on Google Maps</a>
                 </div>
               </div>
             </div>

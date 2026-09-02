@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { ProductsProvider } from "./context/ProductsContext";
 import { PageContentProvider } from "./context/PageContentContext";
+import { SiteSettingsProvider } from "./context/SiteSettingsContext";
 import "./styles.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -11,7 +12,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter basename={import.meta.env.BASE_URL} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ProductsProvider>
         <PageContentProvider>
-          <App />
+          <SiteSettingsProvider>
+            <App />
+          </SiteSettingsProvider>
         </PageContentProvider>
       </ProductsProvider>
     </BrowserRouter>
