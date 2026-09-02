@@ -570,6 +570,7 @@ export default function MenuManager() {
               <div className="menu-manager-photo-row">
                 {form.imageUrl ? <img src={productImageUrl(form.imageUrl)} alt="" className="menu-manager-photo-preview" /> : <div className="menu-manager-noimg large" />}
                 <div>
+                  <p className="menu-manager-photo-hint">{t("recommendedSize")}</p>
                   <label className="btn btn-ghost btn-sm menu-manager-upload-btn">
                     {uploading ? t("uploading") : t("uploadPhoto")}
                     <input type="file" accept="image/*" onChange={handlePhotoChange} disabled={uploading} hidden />

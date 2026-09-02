@@ -988,6 +988,7 @@ footer ul li a:hover{color:#F0D9C9;}
 .menu-manager-photo-preview{width:140px; aspect-ratio:4/3; border-radius:8px; object-fit:contain; background:#fff; border:1px solid var(--line); flex-shrink:0;}
 .menu-manager-toolbar{display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-top:4px;}
 .menu-manager-toolbar .menu-subcat-pills{margin:0;}
+.menu-manager-photo-hint{font-family:'Pretendard', sans-serif; font-size:.78rem; color:#8a8a8a; margin:0 0 6px;}
 .menu-manager-upload-btn{display:inline-flex; cursor:pointer;}
 .menu-manager-active-toggle{display:flex; align-items:center; gap:8px; font-family:'Pretendard', sans-serif; font-size:.85rem; color:var(--ink); margin:4px 0 6px; cursor:pointer;}
 .menu-manager-active-toggle input{width:16px; height:16px; accent-color:var(--maroon); cursor:pointer;}
