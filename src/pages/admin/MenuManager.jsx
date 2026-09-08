@@ -154,8 +154,9 @@ function TaxonomyEditor({
       {items.map((item, i) => {
         if (!managing) {
           const Ic = icons && (icons[item.id] || icons.__fallback);
+          const cls = [variant === "pills" ? "taxonomy-pill-btn" : null, selectedId === item.id ? "active" : ""].filter(Boolean).join(" ");
           return (
-            <button key={item.id} className={selectedId === item.id ? "active" : ""} onClick={() => onSelect(item)}>
+            <button key={item.id} className={cls} onClick={() => onSelect(item)}>
               {Ic && <Ic />}
               <span>{item.label}</span>
             </button>

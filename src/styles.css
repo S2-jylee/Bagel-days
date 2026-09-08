@@ -1011,12 +1011,21 @@ footer ul li a:hover{color:#F0D9C9;}
 .menu-manager-toolbar .menu-subcat-pills{margin:0;}
 .menu-manager-toolbar .taxonomy-editor-pills{margin:0;}
 
-/* Category/subcategory manager (admin Menu tab) — outside manage mode this
-   wraps the same buttons .menu-maincats/.menu-subcat-pills already style, so
-   it looks identical to the old hardcoded lists; manage mode swaps each
-   button for an edit row. */
+/* Category/subcategory manager (admin Menu tab). Outside manage mode, the nav
+   variant's buttons are still descendants of .menu-maincats so they pick up
+   its existing button styling for free; the pills variant has no such
+   ancestor once .menu-subcat-pills is gone from the DOM, so .taxonomy-pill-btn
+   below re-creates .menu-subcat-pills button's look explicitly. Manage mode
+   swaps each button for an edit row either way. */
 .taxonomy-editor-nav{display:flex; flex-direction:column; gap:4px;}
 .taxonomy-editor-pills{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:14px 0 26px;}
+.taxonomy-pill-btn{
+  font-family:'Pretendard', sans-serif; font-weight:600; font-size:.82rem;
+  padding:8px 16px; border-radius:20px; border:1px solid var(--line); background:#fff; color:var(--body); cursor:pointer;
+  transition:background .15s ease, color .15s ease, border-color .15s ease;
+}
+.taxonomy-pill-btn:hover{border-color:var(--maroon-light);}
+.taxonomy-pill-btn.active{background:var(--maroon); color:#fff; border-color:var(--maroon);}
 .taxonomy-manage-toggle{
   font-family:'Pretendard', sans-serif; font-weight:600; font-size:.72rem; color:var(--maroon);
   background:none; border:none; text-decoration:underline; cursor:pointer; padding:0; margin-bottom:8px;
