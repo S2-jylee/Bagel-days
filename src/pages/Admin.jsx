@@ -9,14 +9,14 @@ import { AdminLangProvider, useAdminLang } from "../lib/adminI18n";
 
 function AdminShell({ signOut }) {
   const { lang, setLang, t } = useAdminLang();
-  const [tab, setTab] = useState("homepage");
+  const [tab, setTab] = useState("menu");
 
   return (
     <div className="admin-page" data-lang={lang}>
       <div className="admin-shell-bar">
         <div className="admin-tabs">
-          <button className={tab === "homepage" ? "active" : ""} onClick={() => setTab("homepage")}>{t("homepageTab")}</button>
           <button className={tab === "menu" ? "active" : ""} onClick={() => setTab("menu")}>{t("menuTab")}</button>
+          <button className={tab === "homepage" ? "active" : ""} onClick={() => setTab("homepage")}>{t("homepageTab")}</button>
           <button className={tab === "orders" ? "active" : ""} onClick={() => setTab("orders")}>{t("orderHistoryTab")}</button>
         </div>
         <div className="admin-shell-actions">
@@ -28,8 +28,8 @@ function AdminShell({ signOut }) {
         </div>
       </div>
 
-      {tab === "homepage" && <HomepageManager />}
       {tab === "menu" && <MenuManager />}
+      {tab === "homepage" && <HomepageManager />}
       {tab === "orders" && <OrderHistory />}
     </div>
   );
