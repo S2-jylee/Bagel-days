@@ -690,7 +690,11 @@ footer ul li a:hover{color:#F0D9C9;}
   .nav-actions{gap:8px;}
   .nav-actions > .btn{display:none;}
   .card-grid{gap:8px;}
-  .menu-promo-col{width:100%;}
+  /* Below 600px, back to the original stacked composition (addons-panel
+     above set-banner-mini, both full width) — the side-by-side split
+     from the 980px breakpoint needs more room than a phone screen has. */
+  .menu-promo-col{width:100%; flex-direction:column;}
+  .menu-promo-col .addons-panel, .menu-promo-col .set-banner-mini{flex:none; width:100%;}
   .card-grid .food-card h4{font-size:.68rem; line-height:1.25;}
   .card-grid .food-card .body{padding:8px 6px;}
   .card-grid .card-price{font-size:.7rem;}
