@@ -1019,6 +1019,14 @@ footer ul li a:hover{color:#F0D9C9;}
    below re-creates .menu-subcat-pills button's look explicitly. Manage mode
    swaps each button for an edit row either way. */
 .taxonomy-editor-nav{display:flex; flex-direction:column; gap:4px;}
+@media (max-width:980px){
+  /* .menu-maincats switches to a horizontal scrollable pill row at this width
+     (see the shared rule above) — .taxonomy-editor-nav sits one level deeper
+     now than the plain buttons used to, so without matching its row/wrap here
+     too, its column layout wins and the whole category list (plus the manage
+     toggle) collapses into a single centered vertical stack instead. */
+  .taxonomy-editor-nav{flex-direction:row; flex-wrap:wrap; justify-content:center; gap:8px;}
+}
 .taxonomy-editor-pills{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:14px 0 26px;}
 .taxonomy-pill-btn{
   font-family:'Pretendard', sans-serif; font-weight:600; font-size:.82rem;
