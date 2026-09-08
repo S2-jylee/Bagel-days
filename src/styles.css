@@ -280,7 +280,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .feature p{font-size:.85rem; color:var(--body);}
 
 /* ---------- Card grid (best sellers / general) ---------- */
-.card-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:24px;}
+.card-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:24px;}
 .food-card{background:#fff; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; min-width:0; display:flex; flex-direction:column; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;}
 .food-card:hover{transform:translateY(-4px); }
 /* aspect-ratio + object-fit:contain (not cover) so every card is the same
@@ -420,9 +420,13 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .menu-category > p{color:var(--body); max-width:52ch; margin-bottom:26px;}
 /* Product grid on the left, a promo column (add-ons info above a compact
    "Make It A Set" banner) on the right — when a category has no add-ons,
-   the banner sits alone at the top of that column instead of leaving a gap. */
-.menu-promo-row{display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start; margin-bottom:26px;}
-.menu-promo-col{display:flex; flex-direction:column; gap:20px;}
+   the banner sits alone at the top of that column instead of leaving a gap.
+   One shared 6-track grid (rather than the product grid and the promo
+   column each sizing independently) so the promo column always measures
+   out to exactly 2 product-card columns, gap included, at any width. */
+.menu-promo-row{display:grid; grid-template-columns:repeat(6,1fr); gap:24px; align-items:start; margin-bottom:26px;}
+.menu-promo-row .card-grid{grid-column:span 4;}
+.menu-promo-col{grid-column:span 2; display:flex; flex-direction:column; gap:20px;}
 .menu-promo-col .addons-panel{margin:0;}
 /* Text on top, image below (image keeps its own native ratio — a wide
    landscape photo — and sits flush left; any extra width in the box is
@@ -632,7 +636,7 @@ footer ul li a:hover{color:#F0D9C9;}
   .menu-toggle{display:block;}
 }
 @media (max-width:980px){
-  .card-grid{grid-template-columns:repeat(4,1fr); gap:14px;}
+  .card-grid{gap:14px;}
   .features .wrap{grid-template-columns:repeat(2,1fr);}
   .pickup-highlights{grid-template-columns:repeat(2,1fr);}
   .split, .split.reverse{grid-template-columns:1fr;}
