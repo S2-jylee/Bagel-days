@@ -652,9 +652,16 @@ footer ul li a:hover{color:#F0D9C9;}
   .menu-promo-row .card-grid{grid-column:span 1;}
   /* menu-promo-col takes the full row width here (there's no card-grid
      sharing the row anymore) so its two children — addons-panel and
-     set-banner-mini — can sit side by side instead of stacked. */
-  .menu-promo-col{grid-column:span 1; width:100%; flex-direction:row;}
-  .menu-promo-col .addons-panel, .menu-promo-col .set-banner-mini{flex:1;}
+     set-banner-mini — can sit side by side instead of stacked. Each one
+     gets an explicit width:calc(50% - 12px) (2 card-grid columns + the
+     24px gap between them, same math as the desktop 6-track grid) and
+     the row's own gap matches that 24px — flex:1 would size them off
+     menu-promo-col's own 20px gap instead, drifting a few px out of line
+     with the actual card-grid column boundary above. Explicit width
+     (not flex:1) also means a lone set-banner-mini (no add-ons) stays
+     at that same fixed size instead of stretching to fill the row. */
+  .menu-promo-col{grid-column:span 1; width:100%; flex-direction:row; gap:24px;}
+  .menu-promo-col .addons-panel, .menu-promo-col .set-banner-mini{flex:0 0 calc(50% - 12px);}
   .menu-maincats{
     flex-direction:row; flex-wrap:wrap; justify-content:center; overflow-x:auto; position:static;
     gap:8px; padding-top:0;
