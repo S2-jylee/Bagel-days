@@ -1008,17 +1008,12 @@ footer ul li a:hover{color:#F0D9C9;}
 .admin-form-panel h3{font-size:1.2rem; margin-bottom:18px;}
 .menu-manager-photo-row{display:flex; align-items:center; gap:16px; margin-bottom:18px;}
 .menu-manager-photo-preview{width:140px; aspect-ratio:4/3; border-radius:8px; object-fit:contain; background:#fff; border:1px solid var(--line); flex-shrink:0;}
-/* padding-top, not margin-top — a margin here would collapse with the h2's
-   own margin-bottom (14px) above it and be silently absorbed whenever it's
-   under that, which is exactly why an earlier margin-top:4px here had no
-   effect at all. */
-.menu-manager-toolbar{display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-top:0; padding-top:4px;}
+.menu-manager-toolbar{display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-top:0;}
 /* Tightened from the base 14px specifically when the list sits directly
    under the toolbar (i.e. not reordering, which inserts a hint paragraph
-   between them) — brings the first product row's top edge in line with the
-   sidebar's first category button now that both sides' "manage" toggles are
-   the same compact height. */
-.menu-manager-toolbar + .inventory-list{margin-top:0;}
+   between them) — brings the first product row's top edge closer to the
+   sidebar's first category button ("Bagels"). */
+.menu-manager-toolbar + .inventory-list{margin-top:-7px;}
 .menu-manager-toolbar .menu-subcat-pills{margin:0;}
 .menu-manager-toolbar .taxonomy-editor-pills{margin:0;}
 
@@ -1037,7 +1032,7 @@ footer ul li a:hover{color:#F0D9C9;}
      toggle) collapses into a single centered vertical stack instead. */
   .taxonomy-editor-nav{flex-direction:row; flex-wrap:wrap; justify-content:center; gap:8px;}
 }
-.taxonomy-editor-pills{display:flex; flex-wrap:wrap; align-items:flex-start; row-gap:0; column-gap:8px; margin:14px 0 26px;}
+.taxonomy-editor-pills{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:14px 0 26px;}
 .taxonomy-pill-btn{
   font-family:'Pretendard', sans-serif; font-weight:600; font-size:.82rem;
   padding:8px 16px; border-radius:20px; border:1px solid var(--line); background:#fff; color:var(--body); cursor:pointer;
@@ -1060,15 +1055,10 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 .taxonomy-editor .taxonomy-manage-toggle:hover{background:var(--cream-alt);}
 /* .menu-maincats button has 12px of left padding before its icon — matching
-   it here (above) aligns "카테고리 관리" with the icon column below it.
-   flex:1 0 100% forces this onto its own line in the wrapping pills row
-   (a flex "line break") so "서브카테고리 관리" sits on its own row above
-   the pills — same shape as the nav variant's toggle-row-then-item-row —
-   so "카테고리 관리"/"서브카테고리 관리" land on one shared row and
-   "Bagels"/"Classic & Savoury" land on the next, forming a grid instead of
-   the pills (one row, toggle included) landing higher than "Bagels" ever
-   could while stacked separately. */
-.taxonomy-editor.taxonomy-editor-pills .taxonomy-manage-toggle{flex:1 0 100%; margin:0 0 4px; padding:2px 8px; align-self:flex-start;}
+   it here (above) aligns "카테고리 관리" with the icon column below it. The
+   pills variant sits inline before its row instead of stacked above it, so
+   it keeps even padding on both sides rather than that left-aligned indent. */
+.taxonomy-editor.taxonomy-editor-pills .taxonomy-manage-toggle{margin:0 4px 0 0; padding:4px 8px;}
 .taxonomy-manage-hint{margin:0 0 8px;}
 .taxonomy-edit-row{display:flex; align-items:center; gap:6px; padding:6px 8px; border-radius:8px; background:var(--cream-alt); cursor:grab;}
 .taxonomy-edit-row.dragging{opacity:.4;}
