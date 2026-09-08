@@ -436,7 +436,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   display:flex; flex-direction:column-reverse; align-items:flex-start; gap:6px;
   background:var(--cream-alt); border-radius:var(--radius); padding:12px;
 }
-.set-banner-mini-img{width:150px; max-width:100%; aspect-ratio:1347/784; object-fit:contain; border-radius:6px; display:block;}
+.set-banner-mini-img{width:205px; max-width:100%; aspect-ratio:1347/784; object-fit:contain; border-radius:6px; display:block;}
 .set-banner-mini-text h4{font-family:'PT Serif', serif; font-size:.9rem; color:var(--maroon); margin-bottom:2px;}
 .set-banner-mini-text p{font-family:'Pretendard', sans-serif; font-size:.75rem; color:var(--body); margin-bottom:4px;}
 .set-banner-mini .price{font-family:'PT Serif',serif; font-weight:700; font-size:.9rem; color:var(--maroon); white-space:nowrap;}
@@ -452,10 +452,10 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    Plain rows, not pill/button-shaped — these aren't clickable here, they're
    only added via a menu item's own photo/modal, so they shouldn't look
    like an interactive control. */
-.addons-panel{background:var(--cream-alt); border-radius:var(--radius); padding:12px 16px; margin:0 0 26px;}
+.addons-panel{background:var(--cream-alt); border-radius:var(--radius); padding:14px 16px; margin:0 0 26px;}
 .addons-panel h4{font-family:'PT Serif', serif; font-size:1rem; color:var(--maroon); margin-bottom:2px;}
-.addons-panel-hint{font-family:'Pretendard', sans-serif; font-size:.78rem; color:var(--body); margin-bottom:6px;}
-.addons-panel ul{display:flex; flex-direction:column; gap:4px;}
+.addons-panel-hint{font-family:'Pretendard', sans-serif; font-size:.78rem; color:var(--body); margin-bottom:8px;}
+.addons-panel ul{display:flex; flex-direction:column; gap:6px;}
 .addons-panel li{display:flex; justify-content:space-between; gap:10px; font-size:.85rem; color:var(--ink); padding:4px 0; border-bottom:1px solid var(--line);}
 .addons-panel li:last-child{border-bottom:none;}
 .addons-panel .p{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon);}
