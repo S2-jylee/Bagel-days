@@ -440,7 +440,6 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .set-banner-mini-text p{font-family:'Pretendard', sans-serif; font-size:.75rem; color:var(--body); margin-bottom:4px;}
 .set-banner-mini .price{font-family:'PT Serif',serif; font-weight:700; font-size:.9rem; color:var(--maroon); white-space:nowrap;}
 @media (max-width:600px){
-  .menu-promo-col{max-width:none;}
   /* Mobile keeps the original side-by-side composition (image left, text
      right) instead of stacking — only the desktop layout stacks them —
      but the image itself stays the same size as desktop's. */
@@ -645,8 +644,16 @@ footer ul li a:hover{color:#F0D9C9;}
   .special-grid{grid-template-columns:repeat(2,1fr);}
   .menu-order-layout{grid-template-columns:1fr; gap:14px;}
   .menu-products{padding-top:0;}
+  /* card-grid and menu-promo-col land on separate lines (each un-spanned
+     back down to the row's one explicit column, so a leftover span:4/2
+     can't make the grid grow implicit tracks and put them side by side
+     again) — but menu-promo-col still measures out to exactly 2 of
+     card-grid's now-full-width columns, same 50%-minus-half-gap math as
+     the desktop 6-track grid, just applied to the full row width instead
+     of splitting it with card-grid. */
   .menu-promo-row{grid-template-columns:1fr;}
-  .menu-promo-col{max-width:320px;}
+  .menu-promo-row .card-grid{grid-column:span 1;}
+  .menu-promo-col{grid-column:span 1; width:calc(50% - 12px);}
   .menu-maincats{
     flex-direction:row; flex-wrap:wrap; justify-content:center; overflow-x:auto; position:static;
     gap:8px; padding-top:0;
@@ -675,6 +682,7 @@ footer ul li a:hover{color:#F0D9C9;}
   .nav-actions{gap:8px;}
   .nav-actions > .btn{display:none;}
   .card-grid{gap:8px;}
+  .menu-promo-col{width:100%;}
   .card-grid .food-card h4{font-size:.68rem; line-height:1.25;}
   .card-grid .food-card .body{padding:8px 6px;}
   .card-grid .card-price{font-size:.7rem;}
