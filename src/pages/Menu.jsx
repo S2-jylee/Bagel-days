@@ -1,25 +1,11 @@
 import { useState, useMemo } from "react";
-import { CATEGORIES } from "../data/categories";
+import { useCategories } from "../context/CategoriesContext";
 import FoodCard from "../components/FoodCard";
 import { useProducts } from "../context/ProductsContext";
-import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcBag } from "../components/Icons";
+import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcBag, IcTag } from "../components/Icons";
 import { IcChevron } from "../components/DeliveryButtons";
 import { asset } from "../lib/assetUrl";
 import { useSeo, SITE_URL } from "../lib/seo";
-
-// Category/subcategory names only — actual prices load async from Supabase
-// (see ProductsContext), so a full item-by-item Menu schema isn't reliable here.
-const MENU_JSON_LD = {
-  "@context": "https://schema.org",
-  "@type": "Menu",
-  name: "Bagel Days Menu",
-  url: `${SITE_URL}menu`,
-  hasMenuSection: CATEGORIES.map((cat) => ({
-    "@type": "MenuSection",
-    name: cat.label,
-    hasMenuSection: cat.subcategories?.map((sub) => ({ "@type": "MenuSection", name: sub.label })),
-  })),
-};
 
 const CATEGORY_ICONS = {
   bagels: IcDonut,
@@ -44,18 +30,37 @@ function OrderNowButton({ className = "delivery-btn delivery-btn-direct" }) {
 }
 
 export default function Menu() {
+  const { categories } = useCategories();
+
+  // Category/subcategory names only — actual prices load async from Supabase
+  // (see ProductsContext), so a full item-by-item Menu schema isn't reliable here.
+  const menuJsonLd = useMemo(
+    () => ({
+      "@context": "https://schema.org",
+      "@type": "Menu",
+      name: "Bagel Days Menu",
+      url: `${SITE_URL}menu`,
+      hasMenuSection: categories.map((cat) => ({
+        "@type": "MenuSection",
+        name: cat.label,
+        hasMenuSection: cat.subcategories?.map((sub) => ({ "@type": "MenuSection", name: sub.label })),
+      })),
+    }),
+    [categories]
+  );
+
   useSeo({
     title: "Bagel Days | Menu & Order — Bagels, Cream Cheese, Coffee",
     description: "Browse our full menu of hand-boiled bagels, house-made cream cheese, salt bread, desserts, and Campos Specialty Coffee. Order online for pickup in Fortitude Valley, Brisbane.",
     path: "/menu",
-    jsonLd: MENU_JSON_LD,
+    jsonLd: menuJsonLd,
   });
 
-  const [activeCat, setActiveCat] = useState(CATEGORIES[0].id);
-  const [activeSubcat, setActiveSubcat] = useState(CATEGORIES[0].subcategories?.[0]?.id ?? null);
+  const [activeCat, setActiveCat] = useState(categories[0].id);
+  const [activeSubcat, setActiveSubcat] = useState(categories[0].subcategories?.[0]?.id ?? null);
   const { products, addons } = useProducts();
 
-  const activeCategory = CATEGORIES.find((c) => c.id === activeCat);
+  const activeCategory = categories.find((c) => c.id === activeCat) ?? categories[0];
   const activeSubcategory = activeCategory.subcategories?.find((s) => s.id === activeSubcat) ?? null;
   const visibleItems = useMemo(() => {
     return Object.values(products)
@@ -93,15 +98,15 @@ export default function Menu() {
         <div className="menu-order-layout">
           <nav className="menu-maincats" aria-label="Menu categories">
             <h3 className="menu-maincats-label">Menu</h3>
-            {CATEGORIES.map((cat) => {
-              const Ic = CATEGORY_ICONS[cat.id];
+            {categories.map((cat) => {
+              const Ic = CATEGORY_ICONS[cat.id] || IcTag;
               return (
                 <button
                   key={cat.id}
                   className={activeCat === cat.id ? "active" : ""}
                   onClick={() => selectCategory(cat)}
                 >
-                  {Ic && <Ic />}
+                  <Ic />
                   <span>{cat.label}</span>
                 </button>
               );
@@ -112,7 +117,7 @@ export default function Menu() {
             <div className="menu-category active">
               <h2>{activeCategory.label}</h2>
 
-              {activeCategory.subcategories && (
+              {activeCategory.subcategories.length > 0 && (
                 <div className="menu-subcat-pills">
                   {activeCategory.subcategories.map((sub) => (
                     <button

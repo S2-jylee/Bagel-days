@@ -1,9 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "../../lib/supabase";
 import { useProducts } from "../../context/ProductsContext";
-import { CATEGORIES } from "../../data/categories";
+import { useCategories } from "../../context/CategoriesContext";
 import { productImageUrl } from "../../lib/assetUrl";
-import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcPlus, IcCheck, IcStar, IcGrip } from "../../components/Icons";
+import {
+  IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcTag, IcPlus, IcCheck, IcStar, IcGrip,
+  IcChevronUp, IcChevronDown, IcPencil, IcTrash,
+} from "../../components/Icons";
 import { useAdminLang } from "../../lib/adminI18n";
 
 const CATEGORY_ICONS = {
@@ -103,6 +106,121 @@ async function uploadProductImage(file) {
   return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
+// Shared category/subcategory list editor — used both for the top-level
+// category nav (variant="nav") and a category's subcategory pills
+// (variant="pills"). Outside of manage mode it renders as a plain selectable
+// list identical to the old hardcoded CATEGORIES nav/pills, so toggling
+// "Manage" is the only visible change for staff who don't need it.
+function TaxonomyEditor({
+  items, selectedId, onSelect, onAdd, onRename, onDelete, onMove, canDelete, deleteBlockedTitle,
+  manageLabel, doneLabel, addPlaceholder, icons, variant = "nav",
+}) {
+  const [managing, setManaging] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [draft, setDraft] = useState("");
+  const [newLabel, setNewLabel] = useState("");
+
+  function startEdit(item) {
+    setEditingId(item.id);
+    setDraft(item.label);
+  }
+
+  function commitEdit() {
+    const label = draft.trim();
+    if (label) onRename(editingId, label);
+    setEditingId(null);
+  }
+
+  function handleAdd() {
+    const label = newLabel.trim();
+    if (!label) return;
+    onAdd(label);
+    setNewLabel("");
+  }
+
+  return (
+    <div className={`taxonomy-editor taxonomy-editor-${variant}`}>
+      <button
+        type="button"
+        className="taxonomy-manage-toggle"
+        onClick={() => {
+          setManaging((m) => !m);
+          setEditingId(null);
+        }}
+      >
+        {managing ? doneLabel : manageLabel}
+      </button>
+
+      {items.map((item, i) => {
+        if (!managing) {
+          const Ic = icons && (icons[item.id] || icons.__fallback);
+          return (
+            <button key={item.id} className={selectedId === item.id ? "active" : ""} onClick={() => onSelect(item)}>
+              {Ic && <Ic />}
+              <span>{item.label}</span>
+            </button>
+          );
+        }
+        const deletable = canDelete(item.id);
+        return (
+          <div className="taxonomy-edit-row" key={item.id}>
+            <div className="taxonomy-move-btns">
+              <button type="button" onClick={() => onMove(item.id, -1)} disabled={i === 0} aria-label="Move up"><IcChevronUp /></button>
+              <button type="button" onClick={() => onMove(item.id, 1)} disabled={i === items.length - 1} aria-label="Move down"><IcChevronDown /></button>
+            </div>
+            {editingId === item.id ? (
+              <>
+                <input
+                  type="text"
+                  className="taxonomy-edit-input"
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") commitEdit();
+                    if (e.key === "Escape") setEditingId(null);
+                  }}
+                  autoFocus
+                />
+                <button type="button" onClick={commitEdit} aria-label="Save"><IcCheck /></button>
+              </>
+            ) : (
+              <>
+                <span className="taxonomy-edit-label">{item.label}</span>
+                <button type="button" onClick={() => startEdit(item)} aria-label="Rename"><IcPencil /></button>
+              </>
+            )}
+            <button
+              type="button"
+              className="taxonomy-delete-btn"
+              onClick={() => onDelete(item)}
+              disabled={!deletable}
+              title={deletable ? undefined : deleteBlockedTitle}
+              aria-label="Delete"
+            >
+              <IcTrash />
+            </button>
+          </div>
+        );
+      })}
+
+      {managing && (
+        <div className="taxonomy-add-row">
+          <input
+            type="text"
+            placeholder={addPlaceholder}
+            value={newLabel}
+            onChange={(e) => setNewLabel(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleAdd();
+            }}
+          />
+          <button type="button" onClick={handleAdd} disabled={!newLabel.trim()} aria-label={addPlaceholder}><IcPlus /></button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function emptyForm(category, subcategory) {
   return {
     id: null,
@@ -120,14 +238,15 @@ function emptyForm(category, subcategory) {
 export default function MenuManager() {
   const { t } = useAdminLang();
   const { products, addons } = useProducts();
-  const [activeCat, setActiveCat] = useState(CATEGORIES[0].id);
-  const [activeSubcat, setActiveSubcat] = useState(CATEGORIES[0].subcategories?.[0]?.id ?? null);
+  const { categories } = useCategories();
+  const [activeCat, setActiveCat] = useState(categories[0].id);
+  const [activeSubcat, setActiveSubcat] = useState(categories[0].subcategories?.[0]?.id ?? null);
   const [form, setForm] = useState(null); // null = closed, object = open (create or edit)
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [formError, setFormError] = useState("");
   const [addonPoolOpen, setAddonPoolOpen] = useState(false);
-  const [poolTab, setPoolTab] = useState(CATEGORIES[0].id); // which category's add-ons the pool editor shows; "general" = no category
+  const [poolTab, setPoolTab] = useState(categories[0].id); // which category's add-ons the pool editor shows; "general" = no category
   const [newAddonName, setNewAddonName] = useState("");
   const [newAddonPrice, setNewAddonPrice] = useState("");
 
@@ -152,7 +271,7 @@ export default function MenuManager() {
     setOrderedIds([]);
   }, [activeCat, activeSubcat]);
 
-  const activeCategory = CATEGORIES.find((c) => c.id === activeCat);
+  const activeCategory = categories.find((c) => c.id === activeCat) ?? categories[0];
   const activeSubcategory = activeCategory.subcategories?.find((s) => s.id === activeSubcat) ?? null;
   const visibleItems = Object.values(products)
     .filter((p) => p.categoryId === activeCat && (!activeSubcategory || p.subcategoryId === activeSubcat))
@@ -172,6 +291,66 @@ export default function MenuManager() {
   function selectCategory(cat) {
     setActiveCat(cat.id);
     setActiveSubcat(cat.subcategories?.[0]?.id ?? null);
+  }
+
+  // ---- category / subcategory management ----
+
+  const categoryHasProducts = (id) => Object.values(products).some((p) => p.categoryId === id);
+  const subcategoryHasProducts = (id) =>
+    Object.values(products).some((p) => p.categoryId === activeCat && p.subcategoryId === id);
+
+  async function handleAddCategory(label) {
+    const id = uniqueId(label, new Set(categories.map((c) => c.id)));
+    await supabase.from("menu_categories").insert({ id, label, sort_order: categories.length });
+  }
+
+  async function handleRenameCategory(id, label) {
+    await supabase.from("menu_categories").update({ label }).eq("id", id);
+  }
+
+  async function handleDeleteCategory(item) {
+    if (!window.confirm(t("deleteCategoryConfirm", item.label))) return;
+    await supabase.from("menu_categories").delete().eq("id", item.id);
+    if (activeCat === item.id) {
+      const next = categories.find((c) => c.id !== item.id);
+      setActiveCat(next?.id ?? null);
+      setActiveSubcat(next?.subcategories?.[0]?.id ?? null);
+    }
+  }
+
+  async function handleMoveCategory(id, dir) {
+    const idx = categories.findIndex((c) => c.id === id);
+    const j = idx + dir;
+    if (j < 0 || j >= categories.length) return;
+    const next = [...categories];
+    [next[idx], next[j]] = [next[j], next[idx]];
+    await Promise.all(next.map((c, i) => supabase.from("menu_categories").update({ sort_order: i }).eq("id", c.id)));
+  }
+
+  async function handleAddSubcategory(label) {
+    const existing = new Set(activeCategory.subcategories.map((s) => s.id));
+    const id = uniqueId(label, existing);
+    await supabase.from("menu_subcategories").insert({ category_id: activeCat, id, label, sort_order: activeCategory.subcategories.length });
+  }
+
+  async function handleRenameSubcategory(id, label) {
+    await supabase.from("menu_subcategories").update({ label }).eq("category_id", activeCat).eq("id", id);
+  }
+
+  async function handleDeleteSubcategory(item) {
+    if (!window.confirm(t("deleteSubcategoryConfirm", item.label))) return;
+    await supabase.from("menu_subcategories").delete().eq("category_id", activeCat).eq("id", item.id);
+    if (activeSubcat === item.id) setActiveSubcat(null);
+  }
+
+  async function handleMoveSubcategory(id, dir) {
+    const list = activeCategory.subcategories;
+    const idx = list.findIndex((s) => s.id === id);
+    const j = idx + dir;
+    if (j < 0 || j >= list.length) return;
+    const next = [...list];
+    [next[idx], next[j]] = [next[j], next[idx]];
+    await Promise.all(next.map((s, i) => supabase.from("menu_subcategories").update({ sort_order: i }).eq("category_id", activeCat).eq("id", s.id)));
   }
 
   // ---- manual ordering ----
@@ -382,7 +561,7 @@ export default function MenuManager() {
       {addonPoolOpen && (
         <div className="addon-pool-editor">
           <div className="addon-pool-tabs">
-            {CATEGORIES.map((c) => (
+            {categories.map((c) => (
               <button key={c.id} type="button" className={poolTab === c.id ? "active" : ""} onClick={() => setPoolTab(c.id)}>{c.label}</button>
             ))}
             <button type="button" className={poolTab === "general" ? "active" : ""} onClick={() => setPoolTab("general")}>{t("general")}</button>
@@ -401,7 +580,7 @@ export default function MenuManager() {
             <input type="text" placeholder={t("addonName")} value={newAddonName} onChange={(e) => setNewAddonName(e.target.value)} />
             <input type="number" min="0" step="0.01" placeholder={t("price")} value={newAddonPrice} onChange={(e) => setNewAddonPrice(e.target.value)} />
             <button type="button" className="btn btn-primary btn-sm" onClick={addPoolAddon} disabled={!newAddonName.trim() || newAddonPrice === ""}>
-              {t("addToLabel", poolTab === "general" ? t("general") : CATEGORIES.find((c) => c.id === poolTab)?.label)}
+              {t("addToLabel", poolTab === "general" ? t("general") : categories.find((c) => c.id === poolTab)?.label)}
             </button>
           </div>
         </div>
@@ -466,30 +645,43 @@ export default function MenuManager() {
       <div className="inventory-layout">
         <nav className="menu-maincats" aria-label="Menu categories">
           <h3 className="menu-maincats-label">{t("menu")}</h3>
-          {CATEGORIES.map((cat) => {
-            const Ic = CATEGORY_ICONS[cat.id];
-            return (
-              <button key={cat.id} className={activeCat === cat.id ? "active" : ""} onClick={() => selectCategory(cat)}>
-                {Ic && <Ic />}
-                <span>{cat.label}</span>
-              </button>
-            );
-          })}
+          <TaxonomyEditor
+            items={categories}
+            selectedId={activeCat}
+            onSelect={selectCategory}
+            onAdd={handleAddCategory}
+            onRename={handleRenameCategory}
+            onDelete={handleDeleteCategory}
+            onMove={handleMoveCategory}
+            canDelete={(id) => !categoryHasProducts(id)}
+            deleteBlockedTitle={t("categoryHasProducts")}
+            manageLabel={t("manageCategories")}
+            doneLabel={t("done")}
+            addPlaceholder={t("newCategoryPlaceholder")}
+            icons={{ ...CATEGORY_ICONS, __fallback: IcTag }}
+            variant="nav"
+          />
         </nav>
 
         <div className="inventory-products">
           <h2>{activeCategory.label}</h2>
 
           <div className="menu-manager-toolbar">
-            {activeCategory.subcategories && (
-              <div className="menu-subcat-pills">
-                {activeCategory.subcategories.map((sub) => (
-                  <button key={sub.id} className={activeSubcat === sub.id ? "active" : ""} onClick={() => setActiveSubcat(sub.id)}>
-                    {sub.label}
-                  </button>
-                ))}
-              </div>
-            )}
+            <TaxonomyEditor
+              items={activeCategory.subcategories}
+              selectedId={activeSubcat}
+              onSelect={(sub) => setActiveSubcat(sub.id)}
+              onAdd={handleAddSubcategory}
+              onRename={handleRenameSubcategory}
+              onDelete={handleDeleteSubcategory}
+              onMove={handleMoveSubcategory}
+              canDelete={(id) => !subcategoryHasProducts(id)}
+              deleteBlockedTitle={t("subcategoryHasProducts")}
+              manageLabel={t("manageSubcategories")}
+              doneLabel={t("done")}
+              addPlaceholder={t("newSubcategoryPlaceholder")}
+              variant="pills"
+            />
             <div className="menu-manager-toolbar-actions">
               {reordering ? (
                 <>
@@ -588,18 +780,18 @@ export default function MenuManager() {
                   <select
                     value={form.categoryId}
                     onChange={(e) => {
-                      const cat = CATEGORIES.find((c) => c.id === e.target.value);
+                      const cat = categories.find((c) => c.id === e.target.value);
                       updateForm({ categoryId: e.target.value, subcategoryId: cat.subcategories?.[0]?.id ?? null });
                     }}
                   >
-                    {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+                    {categories.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
                   </select>
                 </div>
-                {CATEGORIES.find((c) => c.id === form.categoryId)?.subcategories && (
+                {categories.find((c) => c.id === form.categoryId)?.subcategories.length > 0 && (
                   <div className="field">
                     <label>{t("subcategory")}</label>
                     <select value={form.subcategoryId ?? ""} onChange={(e) => updateForm({ subcategoryId: e.target.value })}>
-                      {CATEGORIES.find((c) => c.id === form.categoryId).subcategories.map((s) => (
+                      {categories.find((c) => c.id === form.categoryId).subcategories.map((s) => (
                         <option key={s.id} value={s.id}>{s.label}</option>
                       ))}
                     </select>

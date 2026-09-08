@@ -5,7 +5,7 @@ import StaffLogin from "../components/StaffLogin";
 import Pagination from "../components/Pagination";
 import { fmt } from "../lib/format";
 import { useProducts } from "../context/ProductsContext";
-import { CATEGORIES } from "../data/categories";
+import { useCategories } from "../context/CategoriesContext";
 import { useSeo } from "../lib/seo";
 
 const FETCH_LIMIT = 60;
@@ -57,6 +57,7 @@ export default function OrderDisplay() {
 
   const { session, loading, signIn } = useStaffAuth();
   const { products } = useProducts();
+  const { categories } = useCategories();
   const [orders, setOrders] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [page, setPage] = useState(1);
@@ -75,13 +76,13 @@ export default function OrderDisplay() {
     const byProduct = {};
     const byName = {};
     for (const p of Object.values(products)) {
-      const cat = CATEGORIES.find((c) => c.id === p.categoryId);
+      const cat = categories.find((c) => c.id === p.categoryId);
       if (!cat) continue;
       byProduct[p.id] = cat;
       byName[p.name] = cat;
     }
     return { byProduct, byName };
-  }, [products]);
+  }, [products, categories]);
 
   function itemCategory(it) {
     return categoryLookup.byProduct[it.id] || categoryLookup.byName[it.name];

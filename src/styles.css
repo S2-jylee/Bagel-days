@@ -1009,6 +1009,54 @@ footer ul li a:hover{color:#F0D9C9;}
 .menu-manager-photo-preview{width:140px; aspect-ratio:4/3; border-radius:8px; object-fit:contain; background:#fff; border:1px solid var(--line); flex-shrink:0;}
 .menu-manager-toolbar{display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-top:4px;}
 .menu-manager-toolbar .menu-subcat-pills{margin:0;}
+.menu-manager-toolbar .taxonomy-editor-pills{margin:0;}
+
+/* Category/subcategory manager (admin Menu tab) — outside manage mode this
+   wraps the same buttons .menu-maincats/.menu-subcat-pills already style, so
+   it looks identical to the old hardcoded lists; manage mode swaps each
+   button for an edit row. */
+.taxonomy-editor-nav{display:flex; flex-direction:column; gap:4px;}
+.taxonomy-editor-pills{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:14px 0 26px;}
+.taxonomy-manage-toggle{
+  font-family:'Pretendard', sans-serif; font-weight:600; font-size:.72rem; color:var(--maroon);
+  background:none; border:none; text-decoration:underline; cursor:pointer; padding:0; margin-bottom:8px;
+}
+.taxonomy-editor-pills .taxonomy-manage-toggle{margin:0 4px 0 0;}
+.taxonomy-edit-row{display:flex; align-items:center; gap:6px; padding:6px 8px; border-radius:8px; background:var(--cream-alt);}
+.taxonomy-editor-pills .taxonomy-edit-row{padding:5px 10px; border-radius:20px; border:1px solid var(--line); background:#fff;}
+.taxonomy-move-btns{display:flex; flex-direction:column;}
+.taxonomy-editor-pills .taxonomy-move-btns{flex-direction:row;}
+.taxonomy-move-btns button{
+  width:18px; height:14px; display:flex; align-items:center; justify-content:center;
+  border:none; background:none; color:var(--body); cursor:pointer; padding:0;
+}
+.taxonomy-move-btns button:disabled{opacity:.3; cursor:default;}
+.taxonomy-move-btns button svg{width:12px; height:12px;}
+.taxonomy-edit-label{flex:1; font-family:'Pretendard', sans-serif; font-weight:600; font-size:.85rem; color:var(--ink);}
+.taxonomy-editor-pills .taxonomy-edit-label{flex:none; font-size:.8rem;}
+.taxonomy-edit-input{
+  flex:1; min-width:80px; padding:4px 8px; font-family:'Pretendard', sans-serif; font-size:.85rem;
+  border:1px solid var(--line); border-radius:6px;
+}
+.taxonomy-edit-row > button{
+  width:22px; height:22px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  border:none; border-radius:50%; background:#fff; color:var(--maroon); cursor:pointer;
+}
+.taxonomy-edit-row > button svg{width:13px; height:13px;}
+.taxonomy-delete-btn{color:var(--maroon-light) !important;}
+.taxonomy-delete-btn:disabled{opacity:.3; cursor:not-allowed;}
+.taxonomy-add-row{display:flex; align-items:center; gap:6px; margin-top:6px;}
+.taxonomy-editor-pills .taxonomy-add-row{margin-top:0;}
+.taxonomy-add-row input{
+  flex:1; min-width:100px; padding:6px 10px; font-family:'Pretendard', sans-serif; font-size:.82rem;
+  border:1px solid var(--line); border-radius:20px;
+}
+.taxonomy-add-row button{
+  width:26px; height:26px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  border:none; border-radius:50%; background:var(--maroon); color:#fff; cursor:pointer;
+}
+.taxonomy-add-row button:disabled{opacity:.4; cursor:default;}
+.taxonomy-add-row button svg{width:14px; height:14px;}
 .menu-manager-photo-hint{font-family:'Pretendard', sans-serif; font-size:.78rem; color:#8a8a8a; margin:0 0 6px;}
 .menu-manager-upload-btn{display:inline-flex; cursor:pointer;}
 .menu-manager-active-toggle{display:flex; align-items:center; gap:8px; font-family:'Pretendard', sans-serif; font-size:.85rem; color:var(--ink); margin:4px 0 6px; cursor:pointer;}
