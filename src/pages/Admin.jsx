@@ -4,6 +4,7 @@ import StaffLogin from "../components/StaffLogin";
 import OrderHistory from "./admin/OrderHistory";
 import MenuManager from "./admin/MenuManager";
 import HomepageManager from "./admin/HomepageManager";
+import HistoryTab from "./admin/HistoryTab";
 import { useSeo } from "../lib/seo";
 import { AdminLangProvider, useAdminLang } from "../lib/adminI18n";
 
@@ -18,6 +19,7 @@ function AdminShell({ signOut }) {
           <button className={tab === "menu" ? "active" : ""} onClick={() => setTab("menu")}>{t("menuTab")}</button>
           <button className={tab === "homepage" ? "active" : ""} onClick={() => setTab("homepage")}>{t("homepageTab")}</button>
           <button className={tab === "orders" ? "active" : ""} onClick={() => setTab("orders")}>{t("orderHistoryTab")}</button>
+          <button className={tab === "history" ? "active" : ""} onClick={() => setTab("history")}>{t("historyTab")}</button>
         </div>
         <div className="admin-shell-actions">
           <div className="admin-lang-toggle">
@@ -31,6 +33,7 @@ function AdminShell({ signOut }) {
       {tab === "menu" && <MenuManager />}
       {tab === "homepage" && <HomepageManager />}
       {tab === "orders" && <OrderHistory />}
+      {tab === "history" && <HistoryTab />}
     </div>
   );
 }

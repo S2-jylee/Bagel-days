@@ -9,6 +9,7 @@ import {
   IcPencil, IcTrash,
 } from "../../components/Icons";
 import { useAdminLang } from "../../lib/adminI18n";
+import { logActivity } from "../../lib/activityLog";
 
 const CATEGORY_ICONS = {
   bagels: IcDonut,
@@ -375,15 +376,19 @@ export default function MenuManager() {
   async function handleAddCategory(label) {
     const id = uniqueId(label, new Set(categories.map((c) => c.id)));
     await supabase.from("menu_categories").insert({ id, label, sort_order: categories.length });
+    logActivity({ action: "create", entity: "category", label, path: t("menu") });
   }
 
   async function handleRenameCategory(id, label) {
+    const prev = categories.find((c) => c.id === id);
     await supabase.from("menu_categories").update({ label }).eq("id", id);
+    logActivity({ action: "update", entity: "category", label, path: t("menu"), details: prev && prev.label !== label ? `${prev.label} → ${label}` : undefined });
   }
 
   async function handleDeleteCategory(item) {
     if (!window.confirm(t("deleteCategoryConfirm", item.label))) return;
     await supabase.from("menu_categories").delete().eq("id", item.id);
+    logActivity({ action: "delete", entity: "category", label: item.label, path: t("menu") });
     if (activeCat === item.id) {
       const next = categories.find((c) => c.id !== item.id);
       setActiveCat(next?.id ?? null);
@@ -396,22 +401,28 @@ export default function MenuManager() {
   }
 
   async function handleCategoryIconChange(id, iconUrl) {
+    const cat = categories.find((c) => c.id === id);
     await supabase.from("menu_categories").update({ icon_url: iconUrl }).eq("id", id);
+    logActivity({ action: "update", entity: "category", label: cat?.label ?? id, path: t("menu"), details: t("iconChanged") });
   }
 
   async function handleAddSubcategory(label) {
     const existing = new Set(activeCategory.subcategories.map((s) => s.id));
     const id = uniqueId(label, existing);
     await supabase.from("menu_subcategories").insert({ category_id: activeCat, id, label, sort_order: activeCategory.subcategories.length });
+    logActivity({ action: "create", entity: "subcategory", label, path: `${t("menu")} > ${activeCategory.label}` });
   }
 
   async function handleRenameSubcategory(id, label) {
+    const prev = activeCategory.subcategories.find((s) => s.id === id);
     await supabase.from("menu_subcategories").update({ label }).eq("category_id", activeCat).eq("id", id);
+    logActivity({ action: "update", entity: "subcategory", label, path: `${t("menu")} > ${activeCategory.label}`, details: prev && prev.label !== label ? `${prev.label} → ${label}` : undefined });
   }
 
   async function handleDeleteSubcategory(item) {
     if (!window.confirm(t("deleteSubcategoryConfirm", item.label))) return;
     await supabase.from("menu_subcategories").delete().eq("category_id", activeCat).eq("id", item.id);
+    logActivity({ action: "delete", entity: "subcategory", label: item.label, path: `${t("menu")} > ${activeCategory.label}` });
     if (activeSubcat === item.id) setActiveSubcat(null);
   }
 
@@ -450,6 +461,7 @@ export default function MenuManager() {
   async function toggleBestSeller(p) {
     if (p.isBestSeller) {
       await supabase.from("products").update({ is_best_seller: false, best_seller_order: null }).eq("id", p.id);
+      logActivity({ action: "delete", entity: "best_seller", label: p.name, path: `${t("menu")} > ${t("bestSellersHeading")}` });
       return;
     }
     if (bestSellerItems.length >= BEST_SELLER_LIMIT) {
@@ -459,6 +471,7 @@ export default function MenuManager() {
     }
     const nextOrder = Object.values(products).reduce((max, x) => (x.isBestSeller ? Math.max(max, x.bestSellerOrder ?? 0) + 1 : max), 0);
     await supabase.from("products").update({ is_best_seller: true, best_seller_order: nextOrder }).eq("id", p.id);
+    logActivity({ action: "create", entity: "best_seller", label: p.name, path: `${t("menu")} > ${t("bestSellersHeading")}` });
   }
 
   function startBestSellerReorder() {
@@ -582,6 +595,16 @@ export default function MenuManager() {
         if (error) throw error;
       }
 
+      const cat = categories.find((c) => c.id === row.category_id);
+      const sub = cat?.subcategories.find((s) => s.id === row.subcategory_id);
+      logActivity({
+        action: form.id ? "update" : "create",
+        entity: "product",
+        label: row.name,
+        path: `${t("menu")} > ${cat?.label ?? row.category_id}${sub ? ` > ${sub.label}` : ""}`,
+        details: `$${row.price.toFixed(2)}`,
+      });
+
       setForm(null);
     } catch (err) {
       setFormError(err.message || t("saveFailed"));
@@ -593,12 +616,24 @@ export default function MenuManager() {
   async function handleDelete(p) {
     if (!window.confirm(t("deleteConfirm", p.name))) return;
     await supabase.from("products").delete().eq("id", p.id);
+    const cat = categories.find((c) => c.id === p.categoryId);
+    const sub = cat?.subcategories.find((s) => s.id === p.subcategoryId);
+    logActivity({ action: "delete", entity: "product", label: p.name, path: `${t("menu")} > ${cat?.label ?? p.categoryId}${sub ? ` > ${sub.label}` : ""}` });
   }
 
   async function addPoolAddon() {
     if (!newAddonName.trim() || newAddonPrice === "") return;
     const category_id = poolTab === "general" ? null : poolTab;
-    await supabase.from("addons").insert({ name: newAddonName.trim(), price: Number(newAddonPrice), category_id });
+    const name = newAddonName.trim();
+    const price = Number(newAddonPrice);
+    await supabase.from("addons").insert({ name, price, category_id });
+    logActivity({
+      action: "create",
+      entity: "addon",
+      label: name,
+      path: `${t("menu")} > ${poolTab === "general" ? t("general") : categories.find((c) => c.id === poolTab)?.label}`,
+      details: `$${price.toFixed(2)}`,
+    });
     setNewAddonName("");
     setNewAddonPrice("");
   }
@@ -606,6 +641,7 @@ export default function MenuManager() {
   async function deletePoolAddon(a) {
     if (!window.confirm(t("removeAddonConfirm", a.name))) return;
     await supabase.from("addons").delete().eq("id", a.id);
+    logActivity({ action: "delete", entity: "addon", label: a.name, path: t("menu") });
   }
 
   return (

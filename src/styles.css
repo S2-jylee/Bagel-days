@@ -870,6 +870,19 @@ footer ul li a:hover{color:#F0D9C9;}
 .order-status-pill.status-accepted{background:#dcefe1; color:#2f6b3d;}
 .order-status-pill.status-rejected{background:#f8dede; color:#a3352a;}
 
+.admin-table.history-table td:nth-child(4),
+.admin-table.history-table td:nth-child(5),
+.admin-table.history-table td:nth-child(6){white-space:normal;}
+.admin-table.history-table td:nth-child(5){min-width:200px;}
+.admin-table.history-table td:nth-child(6){min-width:200px;}
+.history-action-pill{
+  display:inline-block; font-family:'Pretendard', sans-serif; font-weight:700; font-size:.68rem; letter-spacing:.04em; text-transform:uppercase;
+  padding:3px 10px; border-radius:20px;
+}
+.history-action-pill.action-create{background:#dcefe1; color:#2f6b3d;}
+.history-action-pill.action-update{background:#fbecd0; color:#8a6417;}
+.history-action-pill.action-delete{background:#f8dede; color:#a3352a;}
+
 .inventory-layout{display:grid; grid-template-columns:200px 1fr; gap:40px; align-items:start;}
 .inventory-products{padding-top:18px;}
 .inventory-products h2{font-size:1.5rem; margin-bottom:14px;}

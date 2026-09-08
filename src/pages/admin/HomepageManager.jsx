@@ -5,6 +5,7 @@ import { useSiteSettings } from "../../context/SiteSettingsContext";
 import { productImageUrl } from "../../lib/assetUrl";
 import { resizeImage } from "../../lib/imageResize";
 import { useAdminLang } from "../../lib/adminI18n";
+import { logActivity } from "../../lib/activityLog";
 import { IcChevronLeft, IcChevronRight, IcTrash } from "../../components/Icons";
 
 const BUCKET = "site-images";
@@ -78,7 +79,7 @@ function PhotoField({ images, onChange, uploading, setUploading, setError, t }) 
 // A page's hero: title (+ optional tagline) + description + photo set, stored
 // as one row in page_content. Visit's hero has no script tagline in its
 // layout, so showTagline=false hides that field for it.
-function PageSection({ pageId, content, showTagline = true, footerNoteKey, t }) {
+function PageSection({ pageId, sectionLabel, content, showTagline = true, footerNoteKey, t }) {
   // Seeded once from the loaded row, then edited locally until Save — not kept
   // in sync with the live subscription, since page_content covers every page
   // in one table: any change (including this section's own Save) would
@@ -102,6 +103,7 @@ function PageSection({ pageId, content, showTagline = true, footerNoteKey, t }) 
       setError(err.message || t("saveFailed"));
       return;
     }
+    logActivity({ action: "update", entity: "homepage_section", label: sectionLabel, path: t("homepageTab") });
     setSavedFlash(true);
     setTimeout(() => setSavedFlash(false), 2000);
   }
@@ -187,6 +189,7 @@ function BusinessInfoSection({ settings, t }) {
       setError(err.message || t("saveFailed"));
       return;
     }
+    logActivity({ action: "update", entity: "business_info", label: t("footerSectionTitle"), path: t("homepageTab") });
     setSavedFlash(true);
     setTimeout(() => setSavedFlash(false), 2000);
   }
@@ -274,13 +277,13 @@ export default function HomepageManager() {
         ))}
       </div>
 
-      {subTab === "home" && pages.home && <PageSection key="home" pageId="home" content={pages.home} footerNoteKey="homeBusinessInfoNote" t={t} />}
-      {subTab === "pickup" && pages.pickup && <PageSection key="pickup" pageId="pickup" content={pages.pickup} t={t} />}
+      {subTab === "home" && pages.home && <PageSection key="home" pageId="home" sectionLabel={t("homeSectionTitle")} content={pages.home} footerNoteKey="homeBusinessInfoNote" t={t} />}
+      {subTab === "pickup" && pages.pickup && <PageSection key="pickup" pageId="pickup" sectionLabel={t("pickupSectionTitle")} content={pages.pickup} t={t} />}
       {subTab === "visit" && pages.visit && (
-        <PageSection key="visit" pageId="visit" content={pages.visit} showTagline={false} footerNoteKey="visitBusinessInfoNote" t={t} />
+        <PageSection key="visit" pageId="visit" sectionLabel={t("visitSectionTitle")} content={pages.visit} showTagline={false} footerNoteKey="visitBusinessInfoNote" t={t} />
       )}
       {subTab === "contact" && pages.contact && (
-        <PageSection key="contact" pageId="contact" content={pages.contact} footerNoteKey="contactBusinessInfoNote" t={t} />
+        <PageSection key="contact" pageId="contact" sectionLabel={t("contactSectionTitle")} content={pages.contact} footerNoteKey="contactBusinessInfoNote" t={t} />
       )}
       {subTab === "footer" && <BusinessInfoSection key="footer" settings={settings} t={t} />}
     </div>
