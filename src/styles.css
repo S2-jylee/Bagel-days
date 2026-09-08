@@ -428,6 +428,11 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .menu-promo-row .card-grid{grid-column:span 4;}
 .menu-promo-col{grid-column:span 2; display:flex; flex-direction:column; gap:20px;}
 .menu-promo-col .addons-panel{margin:0;}
+/* A floor, not a fixed height — addons-panel's item count and
+   set-banner-mini's image+text both vary in natural height, so a hard
+   height:215px would clip one or the other; min-height instead keeps
+   both no shorter than 215px and lets either grow past it if it needs to. */
+.addons-panel, .set-banner-mini{min-height:215px;}
 /* Text on top, image below (image keeps its own native ratio — a wide
    landscape photo — and sits flush left; any extra width in the box is
    just empty space, not stretched to fill it). */
@@ -647,13 +652,10 @@ footer ul li a:hover{color:#F0D9C9;}
   /* card-grid and menu-promo-col land on separate lines (each un-spanned
      back down to the row's one explicit column, so a leftover span:4/2
      can't make the grid grow implicit tracks and put them side by side
-     again) — but menu-promo-col still measures out to exactly 2 of
-     card-grid's now-full-width columns, same 50%-minus-half-gap math as
-     the desktop 6-track grid, just applied to the full row width instead
-     of splitting it with card-grid. */
+     again). */
   .menu-promo-row{grid-template-columns:1fr;}
   .menu-promo-row .card-grid{grid-column:span 1;}
-  .menu-promo-col{grid-column:span 1; width:calc(50% - 12px);}
+  .menu-promo-col{grid-column:span 1; width:379px;}
   .menu-maincats{
     flex-direction:row; flex-wrap:wrap; justify-content:center; overflow-x:auto; position:static;
     gap:8px; padding-top:0;
