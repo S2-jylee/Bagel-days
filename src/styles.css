@@ -650,10 +650,11 @@ footer ul li a:hover{color:#F0D9C9;}
      again). */
   .menu-promo-row{grid-template-columns:1fr;}
   .menu-promo-row .card-grid{grid-column:span 1;}
-  /* 2 card-grid columns + 1 gap: (50% - 12px) only equals that when
-     card-grid's own gap is the same 24px used here — card-grid must NOT
-     get a smaller gap override at this breakpoint, or the two drift apart. */
-  .menu-promo-col{grid-column:span 1; width:calc(50% - 12px);}
+  /* menu-promo-col takes the full row width here (there's no card-grid
+     sharing the row anymore) so its two children — addons-panel and
+     set-banner-mini — can sit side by side instead of stacked. */
+  .menu-promo-col{grid-column:span 1; width:100%; flex-direction:row;}
+  .menu-promo-col .addons-panel, .menu-promo-col .set-banner-mini{flex:1;}
   .menu-maincats{
     flex-direction:row; flex-wrap:wrap; justify-content:center; overflow-x:auto; position:static;
     gap:8px; padding-top:0;
