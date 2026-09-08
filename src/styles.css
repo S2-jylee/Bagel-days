@@ -871,10 +871,8 @@ footer ul li a:hover{color:#F0D9C9;}
 .order-status-pill.status-rejected{background:#f8dede; color:#a3352a;}
 
 .admin-table.history-table td:nth-child(4),
-.admin-table.history-table td:nth-child(5),
-.admin-table.history-table td:nth-child(6){white-space:normal;}
+.admin-table.history-table td:nth-child(5){white-space:normal;}
 .admin-table.history-table td:nth-child(5){min-width:200px;}
-.admin-table.history-table td:nth-child(6){min-width:200px;}
 .history-action-pill{
   display:inline-block; font-family:'Pretendard', sans-serif; font-weight:700; font-size:.68rem; letter-spacing:.04em; text-transform:uppercase;
   padding:3px 10px; border-radius:20px;
@@ -883,6 +881,10 @@ footer ul li a:hover{color:#F0D9C9;}
 .history-action-pill.action-update{background:#fbecd0; color:#8a6417;}
 .history-action-pill.action-delete{background:#f8dede; color:#a3352a;}
 .history-action-pill.action-reorder{background:#dde8f7; color:#2c5c96;}
+.history-detail-list{display:grid; grid-template-columns:90px 1fr; gap:10px 14px; margin:0 0 22px;}
+.history-detail-list dt{font-family:'Pretendard', sans-serif; font-weight:700; color:var(--body); font-size:.85rem; margin:0;}
+.history-detail-list dd{margin:0; word-break:break-word;}
+.history-detail-text{white-space:pre-wrap; line-height:1.55;}
 
 .inventory-layout{display:grid; grid-template-columns:200px 1fr; gap:40px; align-items:start;}
 .inventory-products{padding-top:18px;}

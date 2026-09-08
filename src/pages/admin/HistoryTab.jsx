@@ -47,6 +47,7 @@ export default function HistoryTab() {
   const [searched, setSearched] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [page, setPage] = useState(1);
+  const [modalEntry, setModalEntry] = useState(null);
 
   useEffect(() => {
     runSearch();
@@ -132,7 +133,11 @@ export default function HistoryTab() {
                     <td><span className={`history-action-pill action-${e.action}`}>{t(ACTION_KEY[e.action] ?? e.action)}</span></td>
                     <td>{e.path || "—"}</td>
                     <td>{t(ENTITY_KEY[e.entity] ?? e.entity)} · {e.label}</td>
-                    <td>{e.details || "—"}</td>
+                    <td>
+                      {e.details ? (
+                        <button type="button" className="btn btn-ghost btn-sm" onClick={() => setModalEntry(e)}>{t("viewDetails")}</button>
+                      ) : "—"}
+                    </td>
                   </tr>
                 ))}
                 {entries.length === 0 && (
@@ -143,6 +148,31 @@ export default function HistoryTab() {
           </div>
           <Pagination page={currentPage} pageCount={pageCount} onChange={setPage} className="admin-pagination" />
         </>
+      )}
+
+      {modalEntry && (
+        <div className="admin-form-overlay" onClick={() => setModalEntry(null)}>
+          <div className="admin-form-panel" onClick={(e) => e.stopPropagation()}>
+            <h3>{t("details")}</h3>
+            <dl className="history-detail-list">
+              <dt>{t("date")}</dt>
+              <dd>{new Date(modalEntry.created_at).toLocaleString("en-AU")}</dd>
+              <dt>{t("user")}</dt>
+              <dd>{modalEntry.actor_email}</dd>
+              <dt>{t("action")}</dt>
+              <dd><span className={`history-action-pill action-${modalEntry.action}`}>{t(ACTION_KEY[modalEntry.action] ?? modalEntry.action)}</span></dd>
+              <dt>{t("path")}</dt>
+              <dd>{modalEntry.path || "—"}</dd>
+              <dt>{t("content")}</dt>
+              <dd>{t(ENTITY_KEY[modalEntry.entity] ?? modalEntry.entity)} · {modalEntry.label}</dd>
+              <dt>{t("details")}</dt>
+              <dd className="history-detail-text">{modalEntry.details}</dd>
+            </dl>
+            <div className="menu-manager-form-actions">
+              <button type="button" className="btn btn-primary" onClick={() => setModalEntry(null)}>{t("close")}</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

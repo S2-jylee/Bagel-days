@@ -142,6 +142,8 @@ const STRINGS = {
     entityHomepageSection: "Homepage section",
     entityBusinessInfo: "Business info",
     iconChanged: "Icon changed",
+    viewDetails: "View Details",
+    close: "Close",
   },
   ko: {
     menuTab: "메뉴",
@@ -284,6 +286,8 @@ const STRINGS = {
     entityHomepageSection: "홈페이지 섹션",
     entityBusinessInfo: "사업자 정보",
     iconChanged: "아이콘 변경",
+    viewDetails: "상세보기",
+    close: "닫기",
   },
 };
 
