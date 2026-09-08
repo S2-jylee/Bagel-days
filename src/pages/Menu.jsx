@@ -60,8 +60,12 @@ export default function Menu() {
   const activeCategory = categories.find((c) => c.id === activeCat) ?? categories[0];
   const activeSubcategory = activeCategory.subcategories?.find((s) => s.id === activeSubcat) ?? null;
   const visibleItems = useMemo(() => {
+    // A product with no subcategory set always shows, regardless of which
+    // subcategory tab is active — otherwise it's invisible on every tab
+    // except "no filter", which isn't reachable once a category has any
+    // subcategories (the first one is always selected by default).
     return Object.values(products)
-      .filter((p) => p.isActive !== false && p.categoryId === activeCat && (!activeSubcategory || p.subcategoryId === activeSubcat))
+      .filter((p) => p.isActive !== false && p.categoryId === activeCat && (!activeSubcategory || !p.subcategoryId || p.subcategoryId === activeSubcat))
       .sort((a, b) => a.sortOrder - b.sortOrder)
       .map((p) => p.id);
   }, [products, activeCat, activeSubcat, activeSubcategory]);

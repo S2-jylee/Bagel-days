@@ -1017,7 +1017,7 @@ footer ul li a:hover{color:#F0D9C9;}
    editing starts) cross that width threshold differently, so without this
    the actions row visibly snapped from line 2 up to line 1 the moment you
    toggled edit mode. */
-.menu-manager-toolbar .menu-manager-toolbar-actions{flex:1 0 100%; justify-content:flex-end;}
+.menu-manager-toolbar .menu-manager-toolbar-actions{flex:1 0 100%;}
 
 /* Category/subcategory manager (admin Menu tab). Outside manage mode, the nav
    variant's buttons are still descendants of .menu-maincats so they pick up

@@ -343,8 +343,11 @@ export default function MenuManager() {
 
   const activeCategory = categories.find((c) => c.id === activeCat) ?? categories[0];
   const activeSubcategory = activeCategory.subcategories?.find((s) => s.id === activeSubcat) ?? null;
+  // A product with no subcategory set always shows, regardless of which
+  // subcategory tab is active — matches Menu.jsx, and keeps staff from
+  // losing track of an item that'd otherwise be invisible on every tab.
   const visibleItems = Object.values(products)
-    .filter((p) => p.categoryId === activeCat && (!activeSubcategory || p.subcategoryId === activeSubcat))
+    .filter((p) => p.categoryId === activeCat && (!activeSubcategory || !p.subcategoryId || p.subcategoryId === activeSubcat))
     .sort((a, b) => a.sortOrder - b.sortOrder);
   const addonList = Object.values(addons);
   const poolAddons = addonList.filter((a) => (poolTab === "general" ? !a.categoryId : a.categoryId === poolTab));
