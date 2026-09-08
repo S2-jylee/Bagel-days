@@ -1008,7 +1008,13 @@ footer ul li a:hover{color:#F0D9C9;}
 .admin-form-panel h3{font-size:1.2rem; margin-bottom:18px;}
 .menu-manager-photo-row{display:flex; align-items:center; gap:16px; margin-bottom:18px;}
 .menu-manager-photo-preview{width:140px; aspect-ratio:4/3; border-radius:8px; object-fit:contain; background:#fff; border:1px solid var(--line); flex-shrink:0;}
-.menu-manager-toolbar{display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-top:4px;}
+.menu-manager-toolbar{display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-top:0;}
+/* Tightened from the base 14px specifically when the list sits directly
+   under the toolbar (i.e. not reordering, which inserts a hint paragraph
+   between them) — brings the first product row's top edge in line with the
+   sidebar's first category button now that both sides' "manage" toggles are
+   the same compact height. */
+.menu-manager-toolbar + .inventory-list{margin-top:6px;}
 .menu-manager-toolbar .menu-subcat-pills{margin:0;}
 .menu-manager-toolbar .taxonomy-editor-pills{margin:0;}
 
@@ -1035,14 +1041,25 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 .taxonomy-pill-btn:hover{border-color:var(--maroon-light);}
 .taxonomy-pill-btn.active{background:var(--maroon); color:#fff; border-color:var(--maroon);}
-.taxonomy-manage-toggle{
+/* Qualified with the always-present .taxonomy-editor ancestor class so this
+   beats .menu-maincats button's (font-size, color, padding, background...)
+   at equal-or-lower specificity would otherwise lose to it in the nav
+   variant — that leak was why "카테고리 관리" rendered at the category
+   buttons' larger 0.9rem/ink-colored/12px-all-round-padding style instead of
+   this one's, inflating its height enough to push every category button
+   (and the "Bagels" row's own top edge) down out of line with the product
+   list on the right. */
+.taxonomy-editor .taxonomy-manage-toggle{
   font-family:'Pretendard', sans-serif; font-weight:600; font-size:.72rem; color:var(--maroon);
-  background:none; border:none; text-decoration:underline; cursor:pointer; padding:0 0 0 12px; margin-bottom:8px;
+  background:none; border:none; text-decoration:underline; cursor:pointer;
+  padding:2px 8px 2px 12px; margin:0; border-radius:6px; transition:background .15s ease;
 }
-/* .menu-maincats button has 12px of left padding before its icon — without
-   matching it here, "카테고리 관리" starts flush left while every category
-   button's icon underneath it starts 12px in, reading as misaligned. */
-.taxonomy-editor-pills .taxonomy-manage-toggle{margin:0 4px 0 0; padding-left:0;}
+.taxonomy-editor .taxonomy-manage-toggle:hover{background:var(--cream-alt);}
+/* .menu-maincats button has 12px of left padding before its icon — matching
+   it here (above) aligns "카테고리 관리" with the icon column below it. The
+   pills variant sits inline before its row instead of stacked above it, so
+   it keeps even padding on both sides rather than that left-aligned indent. */
+.taxonomy-editor.taxonomy-editor-pills .taxonomy-manage-toggle{margin:0 4px 0 0; padding:4px 8px;}
 .taxonomy-manage-hint{margin:0 0 8px;}
 .taxonomy-edit-row{display:flex; align-items:center; gap:6px; padding:6px 8px; border-radius:8px; background:var(--cream-alt); cursor:grab;}
 .taxonomy-edit-row.dragging{opacity:.4;}
@@ -1071,7 +1088,14 @@ footer ul li a:hover{color:#F0D9C9;}
   border:none; border-radius:50%; background:#fff; color:var(--maroon); cursor:pointer;
 }
 .taxonomy-edit-row > button:hover{background:var(--tan);}
-.taxonomy-edit-row > button svg{width:13px; height:13px;}
+/* color:inherit (not just the width/height above) because .menu-maincats
+   button svg sets color:var(--maroon) directly on any svg inside a button
+   under .menu-maincats — a declaration that specific on the element itself
+   beats inheriting from the parent button regardless of the parent's own
+   specificity or !important, so without this override every icon here (nav
+   variant only) rendered maroon even where its button's own color said
+   otherwise — e.g. the delete icon, one shade off its intended maroon-light. */
+.taxonomy-edit-row > button svg{width:13px; height:13px; color:inherit;}
 .taxonomy-delete-btn{color:var(--maroon-light) !important;}
 .taxonomy-delete-btn:disabled{opacity:.3; cursor:not-allowed;}
 /* Fixed width + align-self:flex-start so this looks identical whether it's
@@ -1091,7 +1115,11 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 .taxonomy-add-row button:hover:not(:disabled){background:var(--maroon-light);}
 .taxonomy-add-row button:disabled{opacity:.4; cursor:default; box-shadow:none;}
-.taxonomy-add-row button svg{width:16px; height:16px;}
+/* color:inherit for the same reason as .taxonomy-edit-row > button svg above
+   — without it, the nav variant's "+" rendered maroon-on-maroon (same leak,
+   same fix) while the pills variant (outside .menu-maincats, unaffected)
+   correctly showed white. */
+.taxonomy-add-row button svg{width:16px; height:16px; color:inherit;}
 .menu-manager-photo-hint{font-family:'Pretendard', sans-serif; font-size:.78rem; color:#8a8a8a; margin:0 0 6px;}
 .menu-manager-upload-btn{display:inline-flex; cursor:pointer;}
 .menu-manager-active-toggle{display:flex; align-items:center; gap:8px; font-family:'Pretendard', sans-serif; font-size:.85rem; color:var(--ink); margin:4px 0 6px; cursor:pointer;}
