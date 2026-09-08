@@ -1037,9 +1037,12 @@ footer ul li a:hover{color:#F0D9C9;}
 .taxonomy-pill-btn.active{background:var(--maroon); color:#fff; border-color:var(--maroon);}
 .taxonomy-manage-toggle{
   font-family:'Pretendard', sans-serif; font-weight:600; font-size:.72rem; color:var(--maroon);
-  background:none; border:none; text-decoration:underline; cursor:pointer; padding:0; margin-bottom:8px;
+  background:none; border:none; text-decoration:underline; cursor:pointer; padding:0 0 0 12px; margin-bottom:8px;
 }
-.taxonomy-editor-pills .taxonomy-manage-toggle{margin:0 4px 0 0;}
+/* .menu-maincats button has 12px of left padding before its icon — without
+   matching it here, "카테고리 관리" starts flush left while every category
+   button's icon underneath it starts 12px in, reading as misaligned. */
+.taxonomy-editor-pills .taxonomy-manage-toggle{margin:0 4px 0 0; padding-left:0;}
 .taxonomy-manage-hint{margin:0 0 8px;}
 .taxonomy-edit-row{display:flex; align-items:center; gap:6px; padding:6px 8px; border-radius:8px; background:var(--cream-alt); cursor:grab;}
 .taxonomy-edit-row.dragging{opacity:.4;}
@@ -1071,19 +1074,24 @@ footer ul li a:hover{color:#F0D9C9;}
 .taxonomy-edit-row > button svg{width:13px; height:13px;}
 .taxonomy-delete-btn{color:var(--maroon-light) !important;}
 .taxonomy-delete-btn:disabled{opacity:.3; cursor:not-allowed;}
-.taxonomy-add-row{display:flex; align-items:center; gap:6px; margin-top:6px;}
+/* Fixed width + align-self:flex-start so this looks identical whether it's
+   a flex item in .taxonomy-editor-nav's column (which would otherwise
+   stretch it to the full sidebar width) or in .taxonomy-editor-pills' row —
+   previously the two ended up visibly different sizes for the same control. */
+.taxonomy-add-row{display:flex; align-items:center; gap:6px; margin-top:6px; align-self:flex-start;}
 .taxonomy-editor-pills .taxonomy-add-row{margin-top:0;}
 .taxonomy-add-row input{
-  flex:1; min-width:100px; padding:6px 10px; font-family:'Pretendard', sans-serif; font-size:.82rem;
+  width:140px; padding:7px 12px; font-family:'Pretendard', sans-serif; font-size:.82rem;
   border:1px solid var(--line); border-radius:20px;
 }
 .taxonomy-add-row button{
-  width:26px; height:26px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  width:30px; height:30px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
   border:none; border-radius:50%; background:var(--maroon); color:#fff; cursor:pointer;
+  box-shadow:0 1px 4px rgba(43,27,20,.3);
 }
 .taxonomy-add-row button:hover:not(:disabled){background:var(--maroon-light);}
-.taxonomy-add-row button:disabled{opacity:.4; cursor:default;}
-.taxonomy-add-row button svg{width:14px; height:14px;}
+.taxonomy-add-row button:disabled{opacity:.4; cursor:default; box-shadow:none;}
+.taxonomy-add-row button svg{width:16px; height:16px;}
 .menu-manager-photo-hint{font-family:'Pretendard', sans-serif; font-size:.78rem; color:#8a8a8a; margin:0 0 6px;}
 .menu-manager-upload-btn{display:inline-flex; cursor:pointer;}
 .menu-manager-active-toggle{display:flex; align-items:center; gap:8px; font-family:'Pretendard', sans-serif; font-size:.85rem; color:var(--ink); margin:4px 0 6px; cursor:pointer;}
