@@ -1014,7 +1014,7 @@ footer ul li a:hover{color:#F0D9C9;}
    between them) — brings the first product row's top edge in line with the
    sidebar's first category button now that both sides' "manage" toggles are
    the same compact height. */
-.menu-manager-toolbar + .inventory-list{margin-top:6px;}
+.menu-manager-toolbar + .inventory-list{margin-top:0;}
 .menu-manager-toolbar .menu-subcat-pills{margin:0;}
 .menu-manager-toolbar .taxonomy-editor-pills{margin:0;}
 
@@ -1056,15 +1056,10 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 .taxonomy-editor .taxonomy-manage-toggle:hover{background:var(--cream-alt);}
 /* .menu-maincats button has 12px of left padding before its icon — matching
-   it here (above) aligns "카테고리 관리" with the icon column below it.
-   flex:1 0 100% forces this onto its own line in the wrapping pills row
-   (same trick as a flex "line break") so "서브카테고리 관리" sits on its own
-   row above the pills instead of inline before them — matching the nav
-   variant's own toggle-row-then-item-row shape, so "Bagels" and the first
-   pill row start at the same height instead of the pills (one row, toggle
-   included) landing higher than "Bagels" (its own row, below the taller
-   category-nav toggle row) ever could. */
-.taxonomy-editor.taxonomy-editor-pills .taxonomy-manage-toggle{flex:1 0 100%; margin:0; padding:4px 8px; align-self:flex-start;}
+   it here (above) aligns "카테고리 관리" with the icon column below it. The
+   pills variant sits inline before its row instead of stacked above it, so
+   it keeps even padding on both sides rather than that left-aligned indent. */
+.taxonomy-editor.taxonomy-editor-pills .taxonomy-manage-toggle{margin:0 4px 0 0; padding:4px 8px;}
 .taxonomy-manage-hint{margin:0 0 8px;}
 .taxonomy-edit-row{display:flex; align-items:center; gap:6px; padding:6px 8px; border-radius:8px; background:var(--cream-alt); cursor:grab;}
 .taxonomy-edit-row.dragging{opacity:.4;}
@@ -1118,7 +1113,11 @@ footer ul li a:hover{color:#F0D9C9;}
   border:none; border-radius:50%; background:var(--maroon); color:#fff; cursor:pointer;
   box-shadow:0 1px 4px rgba(43,27,20,.3);
 }
-.taxonomy-add-row button:hover:not(:disabled){background:var(--maroon-light);}
+/* Darkens on hover (matching .btn-primary:hover's --maroon-dark elsewhere on
+   the site) rather than lightening — keeps the white "+" unambiguously
+   readable against the hover background at any monitor/rendering, instead
+   of narrowing the gap the way a lighter shade would. */
+.taxonomy-add-row button:hover:not(:disabled){background:var(--maroon-dark);}
 .taxonomy-add-row button:disabled{opacity:.4; cursor:default; box-shadow:none;}
 /* color:inherit for the same reason as .taxonomy-edit-row > button svg above
    — without it, the nav variant's "+" rendered maroon-on-maroon (same leak,
