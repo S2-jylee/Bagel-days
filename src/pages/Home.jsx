@@ -51,8 +51,8 @@ export default function Home() {
             </p>
             <p className="lede hero-overlay-sub">{content.description}</p>
             <div className="cta-row hero-overlay-sub">
-              <Link to="/menu" className="btn btn-primary btn-lg">View Menu</Link>
-              <Link to="/menu" className="btn btn-ghost btn-lg">Order Online</Link>
+              <Link to="/menu" className="btn btn-primary btn-lg">Order Online</Link>
+              <Link to="/pickup" className="btn btn-ghost btn-lg">Pickup Order</Link>
             </div>
             <span className="sr-only">Bagel Days signature everything bagel and coffee</span>
           </div>
@@ -62,8 +62,8 @@ export default function Home() {
       <div className="hero-fit-subtext wrap">
         <p className="lede">{content.description}</p>
         <div className="cta-row">
-          <Link to="/menu" className="btn btn-primary btn-lg">View Menu</Link>
-          <Link to="/menu" className="btn btn-ghost btn-lg">Order Online</Link>
+          <Link to="/menu" className="btn btn-primary btn-lg">Order Online</Link>
+          <Link to="/pickup" className="btn btn-ghost btn-lg">Pickup Order</Link>
         </div>
       </div>
 
