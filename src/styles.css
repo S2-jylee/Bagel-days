@@ -1111,14 +1111,13 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 .taxonomy-add-row button{
   width:30px; height:30px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-  border:none; border-radius:50%; background:var(--maroon); color:#fff; cursor:pointer;
-  box-shadow:0 1px 4px rgba(43,27,20,.3); transition:background .15s ease, transform .15s ease, box-shadow .15s ease;
+  border:1.5px solid var(--maroon); border-radius:50%; background:var(--maroon); color:#fff; cursor:pointer;
+  box-shadow:0 1px 4px rgba(43,27,20,.3); transition:background .15s ease, color .15s ease, transform .15s ease;
 }
-/* Darkens (matching .btn-primary:hover's --maroon-dark elsewhere on the
-   site) rather than lightening, keeping the white "+" unambiguously
-   readable — plus a slight lift (scale + bigger shadow) since color alone
-   read as too subtle to register as "a button" on hover. */
-.taxonomy-add-row button:hover:not(:disabled){background:var(--maroon-dark); transform:scale(1.08); box-shadow:0 2px 6px rgba(43,27,20,.4);}
+/* Matches the site-wide button language (.btn:hover's translateY(-2px) lift;
+   .scroll-top-btn's cream/maroon swap) instead of a one-off scale — a color
+   invert plus lift, same as everywhere else, rather than a bespoke effect. */
+.taxonomy-add-row button:hover:not(:disabled){background:var(--cream); color:var(--maroon); transform:translateY(-2px);}
 /* not-allowed (not just a dimmer default cursor) so hovering a disabled add
    button still gives *some* feedback — "this is a button, just not
    clickable right now" — instead of feeling inert/decorative. */
