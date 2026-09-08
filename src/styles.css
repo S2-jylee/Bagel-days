@@ -882,6 +882,7 @@ footer ul li a:hover{color:#F0D9C9;}
 .history-action-pill.action-create{background:#dcefe1; color:#2f6b3d;}
 .history-action-pill.action-update{background:#fbecd0; color:#8a6417;}
 .history-action-pill.action-delete{background:#f8dede; color:#a3352a;}
+.history-action-pill.action-reorder{background:#dde8f7; color:#2c5c96;}
 
 .inventory-layout{display:grid; grid-template-columns:200px 1fr; gap:40px; align-items:start;}
 .inventory-products{padding-top:18px;}

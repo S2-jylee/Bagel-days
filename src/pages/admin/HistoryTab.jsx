@@ -28,7 +28,7 @@ const QUICK_RANGES = [
   { key: "thisMonth", from: () => firstOfMonthStr(), to: () => todayStr() },
 ];
 
-const ACTION_KEY = { create: "actionCreate", update: "actionUpdate", delete: "actionDelete" };
+const ACTION_KEY = { create: "actionCreate", update: "actionUpdate", delete: "actionDelete", reorder: "actionReorder" };
 const ENTITY_KEY = {
   category: "entityCategory",
   subcategory: "entitySubcategory",

@@ -46,6 +46,28 @@ function uniqueId(name, existingIds) {
   return id;
 }
 
+// Only reports the fields that actually changed between a product's prior
+// state and the just-submitted form, instead of always repeating the same
+// fixed field (price) regardless of what staff actually edited.
+function diffProductDetails(prev, row, categories, t) {
+  const changes = [];
+  if (prev.name !== row.name) changes.push(`${t("name")}: ${prev.name} → ${row.name}`);
+  if (prev.price !== row.price) changes.push(`${t("price")}: $${prev.price.toFixed(2)} → $${row.price.toFixed(2)}`);
+  if (prev.categoryId !== row.category_id) {
+    const prevCat = categories.find((c) => c.id === prev.categoryId);
+    const nextCat = categories.find((c) => c.id === row.category_id);
+    changes.push(`${t("category")}: ${prevCat?.label ?? prev.categoryId} → ${nextCat?.label ?? row.category_id}`);
+  } else if (prev.subcategoryId !== row.subcategory_id) {
+    const cat = categories.find((c) => c.id === row.category_id);
+    const prevSub = cat?.subcategories.find((s) => s.id === prev.subcategoryId);
+    const nextSub = cat?.subcategories.find((s) => s.id === row.subcategory_id);
+    changes.push(`${t("subcategory")}: ${prevSub?.label ?? "—"} → ${nextSub?.label ?? "—"}`);
+  }
+  if ((prev.desc || "") !== (row.description || "")) changes.push(t("description"));
+  if ((prev.isActive !== false) !== row.is_active) changes.push(t("showOnMenuSite"));
+  return changes.length > 0 ? changes.join("; ") : undefined;
+}
+
 // Shared drag-reorder math: pulls `draggingId` out of `list` and reinserts it
 // at wherever `overId` currently sits — used by both the per-category product
 // list and the Best Sellers preview below.
@@ -398,6 +420,13 @@ export default function MenuManager() {
 
   async function handleReorderCategories(orderedItems) {
     await Promise.all(orderedItems.map((c, i) => supabase.from("menu_categories").update({ sort_order: i }).eq("id", c.id)));
+    logActivity({
+      action: "reorder",
+      entity: "category",
+      label: t("menu"),
+      path: t("menu"),
+      details: orderedItems.map((c) => c.label).join(" → "),
+    });
   }
 
   async function handleCategoryIconChange(id, iconUrl) {
@@ -428,6 +457,13 @@ export default function MenuManager() {
 
   async function handleReorderSubcategories(orderedItems) {
     await Promise.all(orderedItems.map((s, i) => supabase.from("menu_subcategories").update({ sort_order: i }).eq("category_id", activeCat).eq("id", s.id)));
+    logActivity({
+      action: "reorder",
+      entity: "subcategory",
+      label: activeCategory.label,
+      path: `${t("menu")} > ${activeCategory.label}`,
+      details: orderedItems.map((s) => s.label).join(" → "),
+    });
   }
 
   // ---- manual ordering ----
@@ -451,6 +487,13 @@ export default function MenuManager() {
   async function saveOrder() {
     setSavingOrder(true);
     await Promise.all(orderedIds.map((id, i) => supabase.from("products").update({ sort_order: i }).eq("id", id)));
+    logActivity({
+      action: "reorder",
+      entity: "product",
+      label: activeSubcategory ? activeSubcategory.label : activeCategory.label,
+      path: `${t("menu")} > ${activeCategory.label}${activeSubcategory ? ` > ${activeSubcategory.label}` : ""}`,
+      details: orderedIds.map((id) => products[id]?.name).filter(Boolean).join(" → "),
+    });
     setSavingOrder(false);
     setReordering(false);
     setOrderedIds([]);
@@ -493,6 +536,13 @@ export default function MenuManager() {
   async function saveBestSellerOrder() {
     setSavingBestSellerOrder(true);
     await Promise.all(bestSellerOrderedIds.map((id, i) => supabase.from("products").update({ best_seller_order: i }).eq("id", id)));
+    logActivity({
+      action: "reorder",
+      entity: "best_seller",
+      label: t("bestSellersHeading"),
+      path: `${t("menu")} > ${t("bestSellersHeading")}`,
+      details: bestSellerOrderedIds.map((id) => products[id]?.name).filter(Boolean).join(" → "),
+    });
     setSavingBestSellerOrder(false);
     setBestSellerReordering(false);
     setBestSellerOrderedIds([]);
@@ -597,12 +647,13 @@ export default function MenuManager() {
 
       const cat = categories.find((c) => c.id === row.category_id);
       const sub = cat?.subcategories.find((s) => s.id === row.subcategory_id);
+      const prevProduct = form.id ? products[form.id] : null;
       logActivity({
         action: form.id ? "update" : "create",
         entity: "product",
         label: row.name,
         path: `${t("menu")} > ${cat?.label ?? row.category_id}${sub ? ` > ${sub.label}` : ""}`,
-        details: `$${row.price.toFixed(2)}`,
+        details: prevProduct ? diffProductDetails(prevProduct, row, categories, t) : `${t("price")}: $${row.price.toFixed(2)}`,
       });
 
       setForm(null);
