@@ -106,7 +106,7 @@ export default function Menu() {
                   className={activeCat === cat.id ? "active" : ""}
                   onClick={() => selectCategory(cat)}
                 >
-                  <Ic />
+                  {cat.iconUrl ? <img src={cat.iconUrl} alt="" className="menu-maincats-icon" /> : <Ic />}
                   <span>{cat.label}</span>
                 </button>
               );

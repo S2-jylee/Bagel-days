@@ -400,6 +400,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   transition:background .15s ease, color .15s ease;
 }
 .menu-maincats button svg{width:18px; height:18px; flex-shrink:0; color:var(--maroon);}
+.menu-maincats-icon{width:18px; height:18px; flex-shrink:0; object-fit:cover; border-radius:4px;}
 .menu-maincats button:hover{background:var(--cream-alt);}
 .menu-maincats button.active{background:var(--tan); color:var(--maroon);}
 
@@ -1031,26 +1032,34 @@ footer ul li a:hover{color:#F0D9C9;}
   background:none; border:none; text-decoration:underline; cursor:pointer; padding:0; margin-bottom:8px;
 }
 .taxonomy-editor-pills .taxonomy-manage-toggle{margin:0 4px 0 0;}
-.taxonomy-edit-row{display:flex; align-items:center; gap:6px; padding:6px 8px; border-radius:8px; background:var(--cream-alt);}
+.taxonomy-manage-hint{margin:0 0 8px;}
+.taxonomy-edit-row{display:flex; align-items:center; gap:6px; padding:6px 8px; border-radius:8px; background:var(--cream-alt); cursor:grab;}
+.taxonomy-edit-row.dragging{opacity:.4;}
 .taxonomy-editor-pills .taxonomy-edit-row{padding:5px 10px; border-radius:20px; border:1px solid var(--line); background:#fff;}
-.taxonomy-move-btns{display:flex; flex-direction:column;}
-.taxonomy-editor-pills .taxonomy-move-btns{flex-direction:row;}
-.taxonomy-move-btns button{
-  width:18px; height:14px; display:flex; align-items:center; justify-content:center;
-  border:none; background:none; color:var(--body); cursor:pointer; padding:0;
+.taxonomy-drag-handle{display:flex; align-items:center; justify-content:center; width:16px; height:16px; flex-shrink:0; color:var(--body);}
+.taxonomy-drag-handle svg{width:14px; height:14px;}
+.taxonomy-icon-upload{
+  display:flex; align-items:center; justify-content:center; width:24px; height:24px; flex-shrink:0;
+  border-radius:6px; border:1px dashed var(--line); background:#fff; color:var(--maroon); cursor:pointer; overflow:hidden;
 }
-.taxonomy-move-btns button:disabled{opacity:.3; cursor:default;}
-.taxonomy-move-btns button svg{width:12px; height:12px;}
+.taxonomy-icon-upload:hover{border-color:var(--maroon-light);}
+.taxonomy-icon-upload svg{width:14px; height:14px;}
+.taxonomy-icon-upload img{width:100%; height:100%; object-fit:cover;}
 .taxonomy-edit-label{flex:1; font-family:'Pretendard', sans-serif; font-weight:600; font-size:.85rem; color:var(--ink);}
 .taxonomy-editor-pills .taxonomy-edit-label{flex:none; font-size:.8rem;}
 .taxonomy-edit-input{
   flex:1; min-width:80px; padding:4px 8px; font-family:'Pretendard', sans-serif; font-size:.85rem;
-  border:1px solid var(--line); border-radius:6px;
+  border:1px solid var(--line); border-radius:6px; cursor:text;
 }
+/* Buttons here sit inside .menu-maincats, whose own "button:hover" rule
+   (a light cream background) would otherwise leak in at equal specificity —
+   these explicit hover rules keep icons visible on hover regardless of which
+   ancestor a given TaxonomyEditor instance renders inside. */
 .taxonomy-edit-row > button{
   width:22px; height:22px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
   border:none; border-radius:50%; background:#fff; color:var(--maroon); cursor:pointer;
 }
+.taxonomy-edit-row > button:hover{background:var(--tan);}
 .taxonomy-edit-row > button svg{width:13px; height:13px;}
 .taxonomy-delete-btn{color:var(--maroon-light) !important;}
 .taxonomy-delete-btn:disabled{opacity:.3; cursor:not-allowed;}
@@ -1064,6 +1073,7 @@ footer ul li a:hover{color:#F0D9C9;}
   width:26px; height:26px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
   border:none; border-radius:50%; background:var(--maroon); color:#fff; cursor:pointer;
 }
+.taxonomy-add-row button:hover:not(:disabled){background:var(--maroon-light);}
 .taxonomy-add-row button:disabled{opacity:.4; cursor:default;}
 .taxonomy-add-row button svg{width:14px; height:14px;}
 .menu-manager-photo-hint{font-family:'Pretendard', sans-serif; font-size:.78rem; color:#8a8a8a; margin:0 0 6px;}

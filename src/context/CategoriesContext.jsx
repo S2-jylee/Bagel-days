@@ -12,6 +12,7 @@ function buildState(categoryRows, subcategoryRows) {
   return categoryRows.map((c) => ({
     id: c.id,
     label: c.label,
+    iconUrl: c.icon_url || null,
     subcategories: (subsByCat[c.id] || [])
       .slice()
       .sort((a, b) => a.sort_order - b.sort_order)
@@ -59,7 +60,7 @@ export function CategoriesProvider({ children }) {
   return <CategoriesContext.Provider value={state}>{children}</CategoriesContext.Provider>;
 }
 
-// { categories: [{id, label, subcategories: [{id, label}]}], loading }
+// { categories: [{id, label, iconUrl, subcategories: [{id, label}]}], loading }
 export function useCategories() {
   const ctx = useContext(CategoriesContext);
   if (!ctx) throw new Error("useCategories must be used within CategoriesProvider");

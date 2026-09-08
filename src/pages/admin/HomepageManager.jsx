@@ -3,44 +3,15 @@ import { supabase } from "../../lib/supabase";
 import { usePageContent } from "../../context/PageContentContext";
 import { useSiteSettings } from "../../context/SiteSettingsContext";
 import { productImageUrl } from "../../lib/assetUrl";
+import { resizeImage } from "../../lib/imageResize";
 import { useAdminLang } from "../../lib/adminI18n";
 import { IcChevronLeft, IcChevronRight, IcTrash } from "../../components/Icons";
 
 const BUCKET = "site-images";
 const MAX_W = 2400;
 
-// Hero photos keep their native aspect ratio (unlike product photos, which get
-// padded onto a fixed canvas) — just cap the longest edge so a phone-camera
-// upload doesn't ship a multi-MB file to every visitor.
-function resizeImage(file, maxW = MAX_W) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      const scale = Math.min(1, maxW / img.width);
-      const w = Math.round(img.width * scale);
-      const h = Math.round(img.height * scale);
-      const canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
-      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-      URL.revokeObjectURL(url);
-      canvas.toBlob(
-        (blob) => (blob ? resolve(new File([blob], "hero.jpg", { type: "image/jpeg" })) : reject(new Error("Could not process image"))),
-        "image/jpeg",
-        0.9
-      );
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Could not read image file"));
-    };
-    img.src = url;
-  });
-}
-
 async function uploadSiteImage(file) {
-  const resized = await resizeImage(file);
+  const resized = await resizeImage(file, MAX_W);
   const path = `${crypto.randomUUID()}.jpg`;
   const { error } = await supabase.storage.from(BUCKET).upload(path, resized, { cacheControl: "3600", upsert: false });
   if (error) throw error;

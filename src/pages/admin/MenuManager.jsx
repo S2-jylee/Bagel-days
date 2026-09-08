@@ -3,9 +3,10 @@ import { supabase } from "../../lib/supabase";
 import { useProducts } from "../../context/ProductsContext";
 import { useCategories } from "../../context/CategoriesContext";
 import { productImageUrl } from "../../lib/assetUrl";
+import { resizeImage } from "../../lib/imageResize";
 import {
   IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcTag, IcPlus, IcCheck, IcStar, IcGrip,
-  IcChevronUp, IcChevronDown, IcPencil, IcTrash,
+  IcPencil, IcTrash,
 } from "../../components/Icons";
 import { useAdminLang } from "../../lib/adminI18n";
 
@@ -106,19 +107,43 @@ async function uploadProductImage(file) {
   return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
+async function uploadCategoryIcon(file) {
+  const resized = await resizeImage(file, 128);
+  const path = `category-icons/${crypto.randomUUID()}.jpg`;
+  const { error } = await supabase.storage.from("site-images").upload(path, resized, { cacheControl: "3600", upsert: false });
+  if (error) throw error;
+  return supabase.storage.from("site-images").getPublicUrl(path).data.publicUrl;
+}
+
 // Shared category/subcategory list editor — used both for the top-level
 // category nav (variant="nav") and a category's subcategory pills
 // (variant="pills"). Outside of manage mode it renders as a plain selectable
 // list identical to the old hardcoded CATEGORIES nav/pills, so toggling
-// "Manage" is the only visible change for staff who don't need it.
+// "Manage" is the only visible change for staff who don't need it. Reordering
+// in manage mode is drag-and-drop (mirrors the product/best-seller lists
+// elsewhere in this file) rather than a Save step — each drop persists
+// immediately since there's no larger form around it to batch into.
 function TaxonomyEditor({
-  items, selectedId, onSelect, onAdd, onRename, onDelete, onMove, canDelete, deleteBlockedTitle,
-  manageLabel, doneLabel, addPlaceholder, icons, variant = "nav",
+  items, selectedId, onSelect, onAdd, onRename, onDelete, onReorder, onIconChange, canDelete, deleteBlockedTitle,
+  manageLabel, doneLabel, addPlaceholder, manageHint, icons, variant = "nav",
 }) {
   const [managing, setManaging] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState("");
   const [newLabel, setNewLabel] = useState("");
+  const [order, setOrder] = useState(items.map((it) => it.id));
+  const [draggingId, setDraggingId] = useState(null);
+  const [uploadingIconId, setUploadingIconId] = useState(null);
+
+  // Re-derive display order whenever the underlying list changes (add,
+  // delete, or a reorder landing from elsewhere) — drag only touches this
+  // local copy until drop, when the final order is persisted.
+  useEffect(() => {
+    setOrder(items.map((it) => it.id));
+  }, [items]);
+
+  const byId = Object.fromEntries(items.map((it) => [it.id, it]));
+  const orderedItems = order.map((id) => byId[id]).filter(Boolean);
 
   function startEdit(item) {
     setEditingId(item.id);
@@ -138,6 +163,32 @@ function TaxonomyEditor({
     setNewLabel("");
   }
 
+  async function handleIconChange(item, e) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploadingIconId(item.id);
+    try {
+      const url = await uploadCategoryIcon(file);
+      await onIconChange(item.id, url);
+    } catch (err) {
+      window.alert(err.message || "Icon upload failed.");
+    } finally {
+      setUploadingIconId(null);
+    }
+  }
+
+  function handleDragOver(e, overId) {
+    e.preventDefault();
+    if (!draggingId || draggingId === overId) return;
+    setOrder((prev) => moveInList(prev, draggingId, overId));
+  }
+
+  function handleDragEnd() {
+    setDraggingId(null);
+    onReorder(orderedItems);
+  }
+
   return (
     <div className={`taxonomy-editor taxonomy-editor-${variant}`}>
       <button
@@ -151,24 +202,42 @@ function TaxonomyEditor({
         {managing ? doneLabel : manageLabel}
       </button>
 
-      {items.map((item, i) => {
+      {managing && manageHint && <p className="menu-manager-photo-hint taxonomy-manage-hint">{manageHint}</p>}
+
+      {orderedItems.map((item) => {
         if (!managing) {
           const Ic = icons && (icons[item.id] || icons.__fallback);
           const cls = [variant === "pills" ? "taxonomy-pill-btn" : null, selectedId === item.id ? "active" : ""].filter(Boolean).join(" ");
           return (
             <button key={item.id} className={cls} onClick={() => onSelect(item)}>
-              {Ic && <Ic />}
+              {item.iconUrl ? <img src={item.iconUrl} alt="" className="menu-maincats-icon" /> : Ic && <Ic />}
               <span>{item.label}</span>
             </button>
           );
         }
         const deletable = canDelete(item.id);
+        const Ic = icons && (icons[item.id] || icons.__fallback);
         return (
-          <div className="taxonomy-edit-row" key={item.id}>
-            <div className="taxonomy-move-btns">
-              <button type="button" onClick={() => onMove(item.id, -1)} disabled={i === 0} aria-label="Move up"><IcChevronUp /></button>
-              <button type="button" onClick={() => onMove(item.id, 1)} disabled={i === items.length - 1} aria-label="Move down"><IcChevronDown /></button>
-            </div>
+          <div
+            className={`taxonomy-edit-row${draggingId === item.id ? " dragging" : ""}`}
+            key={item.id}
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.effectAllowed = "move";
+              e.dataTransfer.setData("text/plain", item.id);
+              setDraggingId(item.id);
+            }}
+            onDragOver={(e) => handleDragOver(e, item.id)}
+            onDrop={(e) => e.preventDefault()}
+            onDragEnd={handleDragEnd}
+          >
+            <span className="taxonomy-drag-handle" aria-hidden="true"><IcGrip /></span>
+            {onIconChange && (
+              <label className="taxonomy-icon-upload" title="Change icon">
+                {item.iconUrl ? <img src={item.iconUrl} alt="" /> : Ic ? <Ic /> : <IcTag />}
+                <input type="file" accept="image/*" hidden disabled={uploadingIconId === item.id} onChange={(e) => handleIconChange(item, e)} />
+              </label>
+            )}
             {editingId === item.id ? (
               <>
                 <input
@@ -319,13 +388,12 @@ export default function MenuManager() {
     }
   }
 
-  async function handleMoveCategory(id, dir) {
-    const idx = categories.findIndex((c) => c.id === id);
-    const j = idx + dir;
-    if (j < 0 || j >= categories.length) return;
-    const next = [...categories];
-    [next[idx], next[j]] = [next[j], next[idx]];
-    await Promise.all(next.map((c, i) => supabase.from("menu_categories").update({ sort_order: i }).eq("id", c.id)));
+  async function handleReorderCategories(orderedItems) {
+    await Promise.all(orderedItems.map((c, i) => supabase.from("menu_categories").update({ sort_order: i }).eq("id", c.id)));
+  }
+
+  async function handleCategoryIconChange(id, iconUrl) {
+    await supabase.from("menu_categories").update({ icon_url: iconUrl }).eq("id", id);
   }
 
   async function handleAddSubcategory(label) {
@@ -344,14 +412,8 @@ export default function MenuManager() {
     if (activeSubcat === item.id) setActiveSubcat(null);
   }
 
-  async function handleMoveSubcategory(id, dir) {
-    const list = activeCategory.subcategories;
-    const idx = list.findIndex((s) => s.id === id);
-    const j = idx + dir;
-    if (j < 0 || j >= list.length) return;
-    const next = [...list];
-    [next[idx], next[j]] = [next[j], next[idx]];
-    await Promise.all(next.map((s, i) => supabase.from("menu_subcategories").update({ sort_order: i }).eq("category_id", activeCat).eq("id", s.id)));
+  async function handleReorderSubcategories(orderedItems) {
+    await Promise.all(orderedItems.map((s, i) => supabase.from("menu_subcategories").update({ sort_order: i }).eq("category_id", activeCat).eq("id", s.id)));
   }
 
   // ---- manual ordering ----
@@ -653,12 +715,14 @@ export default function MenuManager() {
             onAdd={handleAddCategory}
             onRename={handleRenameCategory}
             onDelete={handleDeleteCategory}
-            onMove={handleMoveCategory}
+            onReorder={handleReorderCategories}
+            onIconChange={handleCategoryIconChange}
             canDelete={(id) => !categoryHasProducts(id)}
             deleteBlockedTitle={t("categoryHasProducts")}
             manageLabel={t("manageCategories")}
             doneLabel={t("done")}
             addPlaceholder={t("newCategoryPlaceholder")}
+            manageHint={t("categoryIconHint")}
             icons={{ ...CATEGORY_ICONS, __fallback: IcTag }}
             variant="nav"
           />
@@ -675,7 +739,7 @@ export default function MenuManager() {
               onAdd={handleAddSubcategory}
               onRename={handleRenameSubcategory}
               onDelete={handleDeleteSubcategory}
-              onMove={handleMoveSubcategory}
+              onReorder={handleReorderSubcategories}
               canDelete={(id) => !subcategoryHasProducts(id)}
               deleteBlockedTitle={t("subcategoryHasProducts")}
               manageLabel={t("manageSubcategories")}
