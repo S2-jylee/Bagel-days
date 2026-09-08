@@ -418,24 +418,25 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .menu-category.active{display:block;}
 .menu-category h2{font-size:1.5rem; margin-bottom:14px;}
 .menu-category > p{color:var(--body); max-width:52ch; margin-bottom:26px;}
-/* Add-ons info sits alongside a compact "Make It A Set" promo on the same
-   row, below the subcategory pills — Add-ons takes up whatever space it
-   needs, the promo takes the rest on the right. */
-.menu-promo-row{display:flex; align-items:stretch; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:26px;}
-.menu-promo-row .addons-panel{margin:0; flex:1; min-width:240px;}
+/* Product grid on the left, a promo column (add-ons info above a compact
+   "Make It A Set" banner) on the right — when a category has no add-ons,
+   the banner sits alone at the top of that column instead of leaving a gap. */
+.menu-promo-row{display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start; margin-bottom:26px;}
+.menu-promo-col{display:flex; flex-direction:column; gap:20px;}
+.menu-promo-col .addons-panel{margin:0;}
 /* Text on top, image below (image keeps its own native ratio — a wide
    landscape photo — and sits flush left; any extra width in the box is
    just empty space, not stretched to fill it). */
 .set-banner-mini{
   display:flex; flex-direction:column-reverse; align-items:flex-start; gap:10px;
-  background:var(--cream-alt); border-radius:var(--radius); padding:16px; width:320px; flex-shrink:0;
+  background:var(--cream-alt); border-radius:var(--radius); padding:16px;
 }
 .set-banner-mini-img{width:220px; max-width:100%; aspect-ratio:1347/784; object-fit:contain; border-radius:6px; display:block;}
 .set-banner-mini-text h4{font-family:'PT Serif', serif; font-size:.9rem; color:var(--maroon); margin-bottom:2px;}
 .set-banner-mini-text p{font-family:'Pretendard', sans-serif; font-size:.75rem; color:var(--body); margin-bottom:4px;}
 .set-banner-mini .price{font-family:'PT Serif',serif; font-weight:700; font-size:.9rem; color:var(--maroon); white-space:nowrap;}
 @media (max-width:600px){
-  .menu-promo-row{flex-direction:column; align-items:stretch;}
+  .menu-promo-col{max-width:none;}
   /* Mobile keeps the original side-by-side composition (image left, text
      right) instead of stacking — only the desktop layout stacks them —
      but the image itself stays the same size as desktop's. */
@@ -640,6 +641,8 @@ footer ul li a:hover{color:#F0D9C9;}
   .special-grid{grid-template-columns:repeat(2,1fr);}
   .menu-order-layout{grid-template-columns:1fr; gap:14px;}
   .menu-products{padding-top:0;}
+  .menu-promo-row{grid-template-columns:1fr;}
+  .menu-promo-col{max-width:320px;}
   .menu-maincats{
     flex-direction:row; flex-wrap:wrap; justify-content:center; overflow-x:auto; position:static;
     gap:8px; padding-top:0;

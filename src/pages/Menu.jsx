@@ -133,35 +133,37 @@ export default function Menu() {
               )}
 
               <div className="menu-promo-row">
-                {addonList.length > 0 && (
-                  <div className="addons-panel">
-                    <h4>{activeCategory.label} Add-ons</h4>
-                    <p className="addons-panel-hint">Available to add when you order.</p>
-                    <ul>
-                      {addonList.map((a) => (
-                        <li key={a.id}>
-                          <span>{a.name}</span>
-                          <span className="p">${a.price.toFixed(2)}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                <div className="card-grid">
+                  {visibleItems.map((id) => (
+                    <FoodCard key={id} id={id} />
+                  ))}
+                </div>
 
-                <div className="set-banner-mini">
-                  <img src={asset("/assets/images/sandwich-set.jpg")} alt="Bagel set" className="set-banner-mini-img" />
-                  <div className="set-banner-mini-text">
-                    <h4>Make It A Set</h4>
-                    <p>Any Bagel + Cream Cheese + Coffee</p>
-                    <div className="price">From $12.50</div>
+                <div className="menu-promo-col">
+                  {addonList.length > 0 && (
+                    <div className="addons-panel">
+                      <h4>{activeCategory.label} Add-ons</h4>
+                      <p className="addons-panel-hint">Available to add when you order.</p>
+                      <ul>
+                        {addonList.map((a) => (
+                          <li key={a.id}>
+                            <span>{a.name}</span>
+                            <span className="p">${a.price.toFixed(2)}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <div className="set-banner-mini">
+                    <img src={asset("/assets/images/sandwich-set.jpg")} alt="Bagel set" className="set-banner-mini-img" />
+                    <div className="set-banner-mini-text">
+                      <h4>Make It A Set</h4>
+                      <p>Any Bagel + Cream Cheese + Coffee</p>
+                      <div className="price">From $12.50</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              <div className="card-grid">
-                {visibleItems.map((id) => (
-                  <FoodCard key={id} id={id} />
-                ))}
               </div>
             </div>
           </div>
