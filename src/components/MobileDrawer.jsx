@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { NAV_ITEMS } from "./Header";
+import { ORDER_NOW_URL } from "../lib/orderNow";
 
 export default function MobileDrawer({ open, onClose }) {
   return (
@@ -14,9 +15,9 @@ export default function MobileDrawer({ open, onClose }) {
         {NAV_ITEMS.map((item) => (
           <Link key={item.to} to={item.to} onClick={onClose}>{item.label}</Link>
         ))}
-        <Link to="/pickup" className="btn btn-primary" style={{ marginTop: 16 }} onClick={onClose}>
+        <a href={ORDER_NOW_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ marginTop: 16 }} onClick={onClose}>
           Order Online
-        </Link>
+        </a>
       </div>
     </div>
   );

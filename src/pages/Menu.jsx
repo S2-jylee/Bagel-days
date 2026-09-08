@@ -5,6 +5,7 @@ import { useProducts } from "../context/ProductsContext";
 import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcBag, IcTag } from "../components/Icons";
 import { IcChevron } from "../components/DeliveryButtons";
 import { asset } from "../lib/assetUrl";
+import { ORDER_NOW_URL } from "../lib/orderNow";
 import { useSeo, SITE_URL } from "../lib/seo";
 
 const CATEGORY_ICONS = {
@@ -14,10 +15,6 @@ const CATEGORY_ICONS = {
   dessert: IcCakeSlice,
   coffee: IcCup,
 };
-
-// TODO: replace with the store's real OrderNow link (order-now.app/home/list/shop/<id>/)
-// once it's issued — orders are placed entirely on OrderNow, not on this site.
-const ORDER_NOW_URL = "https://order-now.app/home/list/shop/TODO";
 
 function OrderNowButton({ className = "delivery-btn delivery-btn-direct" }) {
   return (
