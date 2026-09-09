@@ -311,8 +311,21 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   font-family:'Pretendard', sans-serif; font-weight:400; font-size:.68rem; line-height:1; letter-spacing:.02em; color:#fff;
   padding:6px 11px 4px; border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
 }
-.food-card-badge-signature{background:#F08A3E; -webkit-text-stroke:.5px #9c5a28;}
-.food-card-badge-best{background:#A7B899; -webkit-text-stroke:.5px #6d7863;}
+/* text-shadow (not -webkit-text-stroke) so the outline sits outside each
+   letterform instead of straddling it — a centered stroke eats into the
+   white fill from both sides, thinning it and closing up counters (the
+   inside of an "a" or "g"); stacking 8 solid offset copies behind the real
+   text only adds an outer edge, leaving the fill itself untouched. */
+.food-card-badge-signature{
+  background:#F08A3E;
+  text-shadow:-1px -1px 0 #9c5a28, 1px -1px 0 #9c5a28, -1px 1px 0 #9c5a28, 1px 1px 0 #9c5a28,
+    0 -1px 0 #9c5a28, 0 1px 0 #9c5a28, -1px 0 0 #9c5a28, 1px 0 0 #9c5a28;
+}
+.food-card-badge-best{
+  background:#A7B899;
+  text-shadow:-1px -1px 0 #6d7863, 1px -1px 0 #6d7863, -1px 1px 0 #6d7863, 1px 1px 0 #6d7863,
+    0 -1px 0 #6d7863, 0 1px 0 #6d7863, -1px 0 0 #6d7863, 1px 0 0 #6d7863;
+}
 .food-card-small .food-card-badges{bottom:4px; left:4px; right:4px; gap:2px;}
 .food-card-small .food-card-badge{font-size:.52rem; padding:1px 4px; gap:2px;}
 .food-card .body{padding:14px 16px 18px; display:flex; flex-direction:column; flex:1;}
