@@ -11,7 +11,7 @@ const IcClose = () => (
   </svg>
 );
 
-const BADGE_LABELS = { signature: "Signature", best: "Best" };
+const BADGE_LABELS = { signature: "Signature", best: "Best", new: "New" };
 
 export default function FoodCard({ id, small }) {
   const { products } = useProducts();

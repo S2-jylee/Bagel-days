@@ -1395,6 +1395,7 @@ export default function MenuManager() {
                   {[
                     { value: "signature", label: t("badgeSignature") },
                     { value: "best", label: t("badgeBest") },
+                    { value: "new", label: t("badgeNew") },
                   ].map((opt) => {
                     const active = form.badges.includes(opt.value);
                     return (

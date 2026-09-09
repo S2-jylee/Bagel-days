@@ -326,6 +326,11 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   text-shadow:-1px -1px 0 #6d7863, 1px -1px 0 #6d7863, -1px 1px 0 #6d7863, 1px 1px 0 #6d7863,
     0 -1px 0 #6d7863, 0 1px 0 #6d7863, -1px 0 0 #6d7863, 1px 0 0 #6d7863;
 }
+.food-card-badge-new{
+  background:#D6A62C;
+  text-shadow:-1px -1px 0 #8b6c1d, 1px -1px 0 #8b6c1d, -1px 1px 0 #8b6c1d, 1px 1px 0 #8b6c1d,
+    0 -1px 0 #8b6c1d, 0 1px 0 #8b6c1d, -1px 0 0 #8b6c1d, 1px 0 0 #8b6c1d;
+}
 .food-card-small .food-card-badges{bottom:4px; left:4px; right:4px; gap:2px;}
 .food-card-small .food-card-badge{font-size:.52rem; padding:1px 4px; gap:2px;}
 .food-card .body{padding:14px 16px 18px; display:flex; flex-direction:column; flex:1;}
