@@ -271,11 +271,15 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    alignment — centered text made a wrapped 2-line name (e.g. "Rainbow
    Funfetti") look like it had uneven, overly wide side margins, since the
    shorter second line centers with more empty space on each side. Padding
-   matches .card-grid .food-card .body's own mobile value (8px 6px) below. */
-.food-card-small .body{padding:8px 6px;}
-.food-card-small h4{font-size:.7rem; margin-bottom:0; line-height:1.2;}
+   matches .card-grid .food-card .body's own mobile value (8px 6px) below.
+   Selector combines both classes on the card itself (.food-card.food-card-
+   small), not just .food-card-small as an ancestor — otherwise this tied
+   .food-card .body's own specificity and lost to it by simply coming
+   first in the file, silently never applying at all. */
+.food-card.food-card-small .body{padding:8px 6px;}
+.food-card.food-card-small h4{font-size:.68rem; margin-bottom:0; line-height:1.25;}
 .food-card-small .card-quick-row{margin-top:2px;}
-.food-card-small .card-price{font-size:.68rem;}
+.food-card-small .card-price{font-size:.7rem;}
 
 /* ---------- Features row ---------- */
 .features{padding:0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--cream-alt);}
@@ -316,7 +320,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   padding:1px 5px; border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
 }
 .food-card-badge-signature{background:linear-gradient(135deg, rgba(139,92,246,.82), rgba(109,40,217,.82));}
-.food-card-badge-best{background:linear-gradient(135deg, rgba(245,179,1,.82), rgba(232,137,12,.82));}
+.food-card-badge-best{background:linear-gradient(135deg, rgba(244,114,182,.82), rgba(219,39,119,.82));}
 .food-card-small .food-card-badges{top:4px; left:4px; gap:2px;}
 .food-card-small .food-card-badge{font-size:.58rem; padding:1px 5px; gap:2px;}
 /* Mobile-only alternative to the pill badges above (see the <=600px
@@ -329,7 +333,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .food-card-star{display:none; position:absolute; align-items:center; justify-content:center;}
 .food-card-star-shape{position:absolute; inset:0; width:100%; height:100%;}
 .food-card-star-signature .food-card-star-shape{fill:#7c3aed;}
-.food-card-star-best .food-card-star-shape{fill:#e8890c;}
+.food-card-star-best .food-card-star-shape{fill:#ec4899;}
 .food-card-star-label{
   position:relative; font-family:'Pretendard', sans-serif; font-weight:800; color:#fff;
 }
