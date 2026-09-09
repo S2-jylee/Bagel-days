@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useStaffAuth } from "../lib/useStaffAuth";
 import StaffLogin from "../components/StaffLogin";
+import InviteStaffModal from "../components/InviteStaffModal";
 import OrderHistory from "./admin/OrderHistory";
 import MenuManager from "./admin/MenuManager";
 import HomepageManager from "./admin/HomepageManager";
@@ -11,6 +12,7 @@ import { AdminLangProvider, useAdminLang } from "../lib/adminI18n";
 function AdminShell({ signOut }) {
   const { lang, setLang, t } = useAdminLang();
   const [tab, setTab] = useState("menu");
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   return (
     <div className="admin-page" data-lang={lang}>
@@ -26,6 +28,7 @@ function AdminShell({ signOut }) {
             <button type="button" className={lang === "ko" ? "active" : ""} onClick={() => setLang("ko")}>한국어</button>
             <button type="button" className={lang === "en" ? "active" : ""} onClick={() => setLang("en")}>English</button>
           </div>
+          <button className="btn btn-ghost btn-sm" onClick={() => setInviteOpen(true)}>{t("inviteStaffButton")}</button>
           <button className="btn btn-ghost btn-sm" onClick={signOut}>{t("signOut")}</button>
         </div>
       </div>
@@ -34,6 +37,8 @@ function AdminShell({ signOut }) {
       {tab === "homepage" && <HomepageManager />}
       {tab === "orders" && <OrderHistory />}
       {tab === "history" && <HistoryTab />}
+
+      {inviteOpen && <InviteStaffModal onClose={() => setInviteOpen(false)} />}
     </div>
   );
 }
