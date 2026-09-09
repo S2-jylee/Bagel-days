@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useProducts } from "../context/ProductsContext";
+import { useCategories } from "../context/CategoriesContext";
 import { IcBag } from "./Icons";
 import { IcChevron } from "./DeliveryButtons";
 import { ORDER_NOW_URL } from "../lib/orderNow";
@@ -15,6 +16,7 @@ const BADGE_LABELS = { signature: "Signature", best: "Best", new: "New" };
 
 export default function FoodCard({ id, small }) {
   const { products } = useProducts();
+  const { categories } = useCategories();
   const p = products[id];
   const [open, setOpen] = useState(false);
 
@@ -78,25 +80,28 @@ export default function FoodCard({ id, small }) {
               )}
               <p>{p.desc}</p>
 
-              {p.setItems.length > 0 && (() => {
-                const items = p.setItems.map((setId) => products[setId]).filter(Boolean);
-                const sum = items.reduce((s, sp) => s + sp.price, 0);
-                const discount = sum - p.price;
-                return (
-                  <div className="modal-addons">
-                    <h4>What's Included</h4>
-                    <ul className="modal-addon-list-plain">
-                      {items.map((sp) => (
-                        <li key={sp.id}><span>{sp.name}</span><span className="p">${sp.price.toFixed(2)}</span></li>
-                      ))}
-                    </ul>
-                    <div className="modal-set-totals">
-                      <span>Total value: ${sum.toFixed(2)}</span>
-                      {discount > 0 && <span className="modal-set-discount">You save ${discount.toFixed(2)}</span>}
-                    </div>
-                  </div>
-                );
-              })()}
+              {p.setSections.length > 0 && (
+                <div className="modal-set-sections">
+                  {p.setSections.map((section, i) => {
+                    const choiceText = section.choices
+                      .map((c) => {
+                        if (c.type === "product") return products[c.productId]?.name;
+                        const cat = categories.find((cc) => cc.id === c.categoryId);
+                        const scopeLabel = c.subcategoryId ? cat?.subcategories.find((s) => s.id === c.subcategoryId)?.label : cat?.label;
+                        return scopeLabel ? `Choose any ${scopeLabel}` : null;
+                      })
+                      .filter(Boolean)
+                      .join(" · ");
+                    if (!choiceText) return null;
+                    return (
+                      <div className="modal-set-section" key={i}>
+                        <h4>{section.label}</h4>
+                        <p className="modal-set-section-choices">{choiceText}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
               {p.addons.length > 0 && (
                 <div className="modal-addons">

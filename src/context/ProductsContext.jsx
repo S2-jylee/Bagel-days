@@ -34,6 +34,13 @@ function buildState(products, addons, links) {
       variants: Array.isArray(p.variants) ? p.variants : [],
       baseVariantLabel: p.base_variant_label || "",
       setItems: Array.isArray(p.set_items) ? p.set_items : [],
+      // A set's actual composition — a list of labeled sections, each
+      // offering either specific products or "any item in this category/
+      // subcategory" as choices. Replaces the flat set_items list above,
+      // which described one fixed combo rather than a menu of combinable
+      // options (this is a build-your-own-combo listing, not a
+      // separately-orderable product — see MenuManager's set-builder).
+      setSections: Array.isArray(p.set_sections) ? p.set_sections : [],
       addons: (addonsByProduct[p.id] || []).filter(Boolean),
     };
   }

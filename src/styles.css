@@ -409,12 +409,16 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .modal-addon-list-plain li{display:flex; justify-content:space-between; gap:10px; font-size:.85rem; color:var(--ink); padding:6px 0; border-bottom:1px solid var(--line);}
 .modal-addon-list-plain li:last-child{border-bottom:none;}
 .modal-addon-list-plain .p{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon);}
-.modal-set-totals{
-  display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
-  font-family:'Pretendard', sans-serif; font-weight:700; font-size:.85rem; color:var(--ink);
-  margin-top:10px;
-}
-.modal-set-discount{color:var(--maroon);}
+/* A Set product's composition: labeled sections ("Bagel", "Cream Cheese"),
+   each listing what a customer can combine into that spot — either named
+   items or a "choose any X" category reference. Not a fixed included-items
+   list with a price/discount breakdown, since sets are build-your-own
+   combos ordered off-site rather than a single fixed bundle. */
+.modal-set-sections{margin-bottom:18px;}
+.modal-set-section{margin-bottom:14px;}
+.modal-set-section:last-child{margin-bottom:0;}
+.modal-set-section h4{font-family:'PT Serif', serif; font-size:.9rem; color:var(--maroon); margin-bottom:4px;}
+.modal-set-section-choices{font-size:.85rem; color:var(--ink); line-height:1.5;}
 
 /* ---------- About / story split ---------- */
 .split-section{padding-top:32px;}
@@ -1226,24 +1230,29 @@ footer ul li a:hover{color:#F0D9C9;}
 .name-price-row{display:flex; gap:14px;}
 .name-price-row .field:first-child{flex:1 1 auto;}
 .name-price-row .field:last-child{flex:0 1 220px; min-width:140px;}
+/* Each section is its own labeled card: a name field + remove button, its
+   own category->subcategory->item picker, and the running list of choices
+   that picker has added so far. */
+.set-section{border:1px solid var(--line); border-radius:8px; padding:12px; margin-bottom:14px; background:var(--cream-alt);}
+.set-section-head{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+.set-section-label-input{flex:1; font-weight:700;}
+.set-section-remove-btn{
+  flex-shrink:0; width:28px; height:28px; display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--body); cursor:pointer; font-size:1rem; line-height:1;
+  transition:border-color .15s ease, color .15s ease;
+}
+.set-section-remove-btn:hover:not(:disabled){border-color:var(--maroon-light); color:var(--maroon);}
+.set-section-remove-btn:disabled{opacity:.35; cursor:not-allowed;}
 .set-builder-row{display:flex; gap:10px; margin-bottom:10px;}
 .set-builder-row select{flex:1; min-width:0;}
-.set-builder-summary{margin-top:12px; padding:12px 14px; background:var(--cream-alt); border-radius:8px;}
-.set-builder-items{list-style:none; margin:0 0 10px; padding:0; display:flex; flex-direction:column; gap:4px;}
-.set-builder-items li{display:flex; justify-content:space-between; gap:10px; font-size:.85rem; color:var(--ink);}
-.set-builder-items .p{color:var(--body); font-weight:600;}
-.set-builder-item-right{display:flex; align-items:center; gap:8px;}
+.set-builder-items{list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; gap:4px;}
+.set-builder-items li{display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:.85rem; color:var(--ink);}
 .set-item-remove-btn{
   flex-shrink:0; width:20px; height:20px; display:flex; align-items:center; justify-content:center;
   border:1px solid var(--line); border-radius:4px; background:#fff; color:var(--body); cursor:pointer; font-size:.85rem; line-height:1; padding:0;
   transition:border-color .15s ease, color .15s ease;
 }
 .set-item-remove-btn:hover{border-color:var(--maroon-light); color:var(--maroon);}
-.set-builder-totals{
-  display:flex; flex-wrap:wrap; gap:14px; font-family:'Pretendard', sans-serif; font-weight:700; font-size:.85rem;
-  color:var(--ink); padding-top:10px; border-top:1px solid var(--tan-dark);
-}
-.set-builder-discount{color:var(--maroon);}
 
 .menu-manager-toolbar{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:4px;}
 .menu-manager-toolbar .menu-subcat-pills{margin:0;}

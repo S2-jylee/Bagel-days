@@ -325,12 +325,17 @@ function TaxonomyEditor({
   );
 }
 
-// The Set category's item picker (category -> subcategory -> product
-// cascading selects) is a single reusable row, not one row per item —
-// picking a product adds it to `setItems` and resets this back to blank
-// rather than needing a separate row per item.
-function emptySetPicker() {
+// A Set product isn't a fixed combo of specific items — it's a listing of
+// build-your-own combinations (customers actually order by combining items
+// themselves, off-site). So it's described as labeled "sections" (e.g.
+// "Bagel", "Cream Cheese"), each offering a menu of choices: either
+// specific products, or a whole category/subcategory ("choose any X").
+function emptySetSectionPicker() {
   return { categoryId: "", subcategoryId: "", productId: "" };
+}
+
+function emptySetSection() {
+  return { label: "", choices: [], picker: emptySetSectionPicker() };
 }
 
 function emptyForm(category, subcategory) {
@@ -350,8 +355,7 @@ function emptyForm(category, subcategory) {
     isActive: true,
     badges: [],
     variants: category === "coffee" ? [{ label: "", price: "" }] : [],
-    setItems: [],
-    setPicker: emptySetPicker(),
+    setSections: category === "set" ? [emptySetSection()] : [],
     addonIds: new Set(),
   };
 }
@@ -689,8 +693,10 @@ export default function MenuManager() {
       // removed) would otherwise show just one row here — pad it back up to
       // the required 2-row minimum.
       variants: p.categoryId === "coffee" && variants.length === 0 ? [{ label: "", price: "" }] : variants,
-      setItems: p.setItems || [],
-      setPicker: emptySetPicker(),
+      setSections:
+        p.categoryId === "set"
+          ? [...(p.setSections || []).map((s) => ({ label: s.label, choices: s.choices, picker: emptySetSectionPicker() })), emptySetSection()]
+          : [],
       addonIds: new Set(p.addons.map((a) => a.id)),
     });
   }
@@ -728,18 +734,44 @@ export default function MenuManager() {
     setForm((f) => ({ ...f, variants: f.variants.filter((_, i) => i !== index) }));
   }
 
-  // ---- Set category item picker (category -> subcategory -> product) ----
+  // ---- Set category sections (each a labeled group of choices, built via
+  // its own category -> subcategory -> product picker) ----
 
-  function updateSetPicker(patch) {
-    setForm((f) => ({ ...f, setPicker: { ...f.setPicker, ...patch } }));
+  function addSetSection() {
+    setForm((f) => ({ ...f, setSections: [...f.setSections, emptySetSection()] }));
   }
 
-  function addSetItem(productId) {
-    setForm((f) => ({ ...f, setItems: [...f.setItems, productId], setPicker: emptySetPicker() }));
+  function removeSetSection(index) {
+    setForm((f) => ({ ...f, setSections: f.setSections.filter((_, i) => i !== index) }));
   }
 
-  function removeSetItem(index) {
-    setForm((f) => ({ ...f, setItems: f.setItems.filter((_, i) => i !== index) }));
+  function updateSetSectionLabel(index, label) {
+    setForm((f) => ({ ...f, setSections: f.setSections.map((s, i) => (i === index ? { ...s, label } : s)) }));
+  }
+
+  function updateSetSectionPicker(index, patch) {
+    setForm((f) => ({
+      ...f,
+      setSections: f.setSections.map((s, i) => (i === index ? { ...s, picker: { ...s.picker, ...patch } } : s)),
+    }));
+  }
+
+  function addSetSectionChoice(index, choice) {
+    setForm((f) => ({
+      ...f,
+      setSections: f.setSections.map((s, i) =>
+        i === index ? { ...s, choices: [...s.choices, choice], picker: emptySetSectionPicker() } : s
+      ),
+    }));
+  }
+
+  function removeSetSectionChoice(sectionIndex, choiceIndex) {
+    setForm((f) => ({
+      ...f,
+      setSections: f.setSections.map((s, i) =>
+        i === sectionIndex ? { ...s, choices: s.choices.filter((_, ci) => ci !== choiceIndex) } : s
+      ),
+    }));
   }
 
   async function handlePhotoChange(e) {
@@ -782,7 +814,13 @@ export default function MenuManager() {
           .filter((v) => v.label.trim() && v.price !== "")
           .map((v) => ({ label: v.label.trim(), price: Number(v.price) })),
         base_variant_label: form.categoryId === "coffee" ? form.baseVariantLabel.trim() || null : null,
-        set_items: form.categoryId === "set" ? form.setItems : [],
+        set_items: [],
+        set_sections:
+          form.categoryId === "set"
+            ? form.setSections
+                .filter((s) => s.label.trim() && s.choices.length > 0)
+                .map((s) => ({ label: s.label.trim(), choices: s.choices }))
+            : [],
       };
 
       if (form.id) {
@@ -1296,69 +1334,115 @@ export default function MenuManager() {
                   </>
                 )}
 
-                {form.categoryId === "set" && (() => {
-                  const picker = form.setPicker;
-                  const pickerCat = categories.find((c) => c.id === picker.categoryId);
-                  const hasSubcats = (pickerCat?.subcategories.length ?? 0) > 0;
-                  const pickerProducts = Object.values(products).filter(
-                    (p) => p.categoryId === picker.categoryId && (!hasSubcats || p.subcategoryId === picker.subcategoryId) && p.id !== form.id
-                  );
-                  const chosen = form.setItems.map((id, i) => ({ i, p: products[id] })).filter((x) => x.p);
-                  const sum = chosen.reduce((s, x) => s + x.p.price, 0);
-                  const discount = form.price !== "" ? sum - Number(form.price) : null;
-                  return (
-                    <div className="field full set-builder">
-                      <label>{t("setItemsLabel")}</label>
-                      <div className="set-builder-row">
-                        <select
-                          value={picker.categoryId}
-                          onChange={(e) => updateSetPicker({ categoryId: e.target.value, subcategoryId: "", productId: "" })}
-                        >
-                          <option value="">{t("setSelectCategory")}</option>
-                          {categories.filter((c) => c.id !== "set").map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
-                        </select>
-                        <select
-                          value={picker.subcategoryId}
-                          onChange={(e) => updateSetPicker({ subcategoryId: e.target.value, productId: "" })}
-                          disabled={!hasSubcats}
-                        >
-                          <option value="">{t("setSelectSubcategory")}</option>
-                          {pickerCat?.subcategories.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
-                        </select>
-                        <select
-                          value={picker.productId}
-                          onChange={(e) => { if (e.target.value) addSetItem(e.target.value); }}
-                          disabled={!picker.categoryId || (hasSubcats && !picker.subcategoryId)}
-                        >
-                          <option value="">{t("setSelectProduct")}</option>
-                          {pickerProducts.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                        </select>
-                      </div>
-                      {chosen.length > 0 && (
-                        <div className="set-builder-summary">
-                          <ul className="set-builder-items">
-                            {chosen.map(({ i, p }) => (
-                              <li key={i}>
-                                <span>{p.name}</span>
-                                <span className="set-builder-item-right">
-                                  <span className="p">${p.price.toFixed(2)}</span>
-                                  <button type="button" className="set-item-remove-btn" onClick={() => removeSetItem(i)} aria-label={t("removeSetItem")} title={t("removeSetItem")}>−</button>
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                          <div className="set-builder-totals">
-                            <span>{t("setItemCount", chosen.length)}</span>
-                            <span>{t("setItemsTotal")}: ${sum.toFixed(2)}</span>
-                            {discount !== null && (
-                              <span className="set-builder-discount">{t("setDiscount")}: ${discount.toFixed(2)}</span>
-                            )}
+                {form.categoryId === "set" && (
+                  <div className="field full set-builder">
+                    <label>{t("setSectionsLabel")}</label>
+                    {form.setSections.map((section, si) => {
+                      const picker = section.picker;
+                      const pickerCat = categories.find((c) => c.id === picker.categoryId);
+                      const hasSubcats = (pickerCat?.subcategories.length ?? 0) > 0;
+                      const pickerProducts = Object.values(products).filter(
+                        (p) => p.categoryId === picker.categoryId && (!hasSubcats || p.subcategoryId === picker.subcategoryId) && p.id !== form.id
+                      );
+                      const scopeLabel = hasSubcats
+                        ? pickerCat?.subcategories.find((s) => s.id === picker.subcategoryId)?.label
+                        : pickerCat?.label;
+                      return (
+                        <div className="set-section" key={si}>
+                          <div className="set-section-head">
+                            <input
+                              type="text"
+                              className="set-section-label-input"
+                              placeholder={t("setSectionLabelPlaceholder")}
+                              value={section.label}
+                              onChange={(e) => updateSetSectionLabel(si, e.target.value)}
+                            />
+                            <button
+                              type="button"
+                              className="set-section-remove-btn"
+                              onClick={() => removeSetSection(si)}
+                              aria-label={t("removeSetSection")}
+                              title={t("removeSetSection")}
+                              disabled={form.setSections.length < 2}
+                            >
+                              ×
+                            </button>
                           </div>
+                          <div className="set-builder-row">
+                            <select
+                              value={picker.categoryId}
+                              onChange={(e) => updateSetSectionPicker(si, { categoryId: e.target.value, subcategoryId: "", productId: "" })}
+                            >
+                              <option value="">{t("setSelectCategory")}</option>
+                              {categories.filter((c) => c.id !== "set").map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+                            </select>
+                            <select
+                              value={picker.subcategoryId}
+                              onChange={(e) => updateSetSectionPicker(si, { subcategoryId: e.target.value, productId: "" })}
+                              disabled={!hasSubcats}
+                            >
+                              <option value="">{t("setSelectSubcategory")}</option>
+                              {pickerCat?.subcategories.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+                            </select>
+                            <select
+                              value={picker.productId}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (!val) return;
+                                if (val === "__any__") {
+                                  addSetSectionChoice(si, {
+                                    type: "category",
+                                    categoryId: picker.categoryId,
+                                    subcategoryId: hasSubcats ? picker.subcategoryId : null,
+                                  });
+                                } else {
+                                  addSetSectionChoice(si, { type: "product", productId: val });
+                                }
+                              }}
+                              disabled={!picker.categoryId || (hasSubcats && !picker.subcategoryId)}
+                            >
+                              <option value="">{t("setSelectProduct")}</option>
+                              {scopeLabel && <option value="__any__">{t("setAnyItemIn", scopeLabel)}</option>}
+                              {pickerProducts.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                            </select>
+                          </div>
+                          {section.choices.length > 0 && (
+                            <ul className="set-builder-items">
+                              {section.choices.map((choice, ci) => {
+                                const text =
+                                  choice.type === "product"
+                                    ? products[choice.productId]?.name ?? "—"
+                                    : t(
+                                        "setAnyItemIn",
+                                        choice.subcategoryId
+                                          ? categories
+                                              .find((c) => c.id === choice.categoryId)
+                                              ?.subcategories.find((s) => s.id === choice.subcategoryId)?.label
+                                          : categories.find((c) => c.id === choice.categoryId)?.label
+                                      );
+                                return (
+                                  <li key={ci}>
+                                    <span>{text}</span>
+                                    <button
+                                      type="button"
+                                      className="set-item-remove-btn"
+                                      onClick={() => removeSetSectionChoice(si, ci)}
+                                      aria-label={t("removeSetItem")}
+                                      title={t("removeSetItem")}
+                                    >
+                                      −
+                                    </button>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  );
-                })()}
+                      );
+                    })}
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={addSetSection}>{t("addSetSection")}</button>
+                  </div>
+                )}
 
                 <div className="field full">
                   <label>{t("description")}</label>
