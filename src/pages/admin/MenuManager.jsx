@@ -325,11 +325,11 @@ function TaxonomyEditor({
   );
 }
 
-// One row of the Set category's item picker (category -> subcategory ->
-// product cascading selects). Kept separate from the persisted `setItems`
-// (a plain array of product ids) since a row can sit half-filled while
-// staff are still narrowing it down.
-function emptySetRow() {
+// The Set category's item picker (category -> subcategory -> product
+// cascading selects) is a single reusable row, not one row per item —
+// picking a product adds it to `setItems` and resets this back to blank
+// rather than needing a separate row per item.
+function emptySetPicker() {
   return { categoryId: "", subcategoryId: "", productId: "" };
 }
 
@@ -350,7 +350,8 @@ function emptyForm(category, subcategory) {
     isActive: true,
     badges: [],
     variants: category === "coffee" ? [{ label: "", price: "" }] : [],
-    setRows: [emptySetRow()],
+    setItems: [],
+    setPicker: emptySetPicker(),
     addonIds: new Set(),
   };
 }
@@ -672,14 +673,6 @@ export default function MenuManager() {
 
   function openEdit(p) {
     setFormError("");
-    // Rebuild each row from the composed product's *current* category/subcategory
-    // (not whatever it was when the set was first put together) so the cascading
-    // selects land on a valid combination — a product that moved categories since
-    // still resolves correctly here. Once a product no longer exists it's dropped.
-    const existingRows = (p.setItems || [])
-      .map((id) => products[id])
-      .filter(Boolean)
-      .map((sp) => ({ categoryId: sp.categoryId, subcategoryId: sp.subcategoryId || "", productId: sp.id }));
     const variants = (p.variants || []).map((v) => ({ label: v.label, price: String(v.price) }));
     setForm({
       id: p.id,
@@ -696,7 +689,8 @@ export default function MenuManager() {
       // removed) would otherwise show just one row here — pad it back up to
       // the required 2-row minimum.
       variants: p.categoryId === "coffee" && variants.length === 0 ? [{ label: "", price: "" }] : variants,
-      setRows: [...existingRows, emptySetRow()],
+      setItems: p.setItems || [],
+      setPicker: emptySetPicker(),
       addonIds: new Set(p.addons.map((a) => a.id)),
     });
   }
@@ -734,18 +728,18 @@ export default function MenuManager() {
     setForm((f) => ({ ...f, variants: f.variants.filter((_, i) => i !== index) }));
   }
 
-  // ---- Set category item picker rows (category -> subcategory -> product) ----
+  // ---- Set category item picker (category -> subcategory -> product) ----
 
-  function addSetRow() {
-    setForm((f) => ({ ...f, setRows: [...f.setRows, emptySetRow()] }));
+  function updateSetPicker(patch) {
+    setForm((f) => ({ ...f, setPicker: { ...f.setPicker, ...patch } }));
   }
 
-  function updateSetRow(index, patch) {
-    setForm((f) => ({ ...f, setRows: f.setRows.map((r, i) => (i === index ? { ...r, ...patch } : r)) }));
+  function addSetItem(productId) {
+    setForm((f) => ({ ...f, setItems: [...f.setItems, productId], setPicker: emptySetPicker() }));
   }
 
-  function removeSetRow(index) {
-    setForm((f) => ({ ...f, setRows: f.setRows.filter((_, i) => i !== index) }));
+  function removeSetItem(index) {
+    setForm((f) => ({ ...f, setItems: f.setItems.filter((_, i) => i !== index) }));
   }
 
   async function handlePhotoChange(e) {
@@ -788,7 +782,7 @@ export default function MenuManager() {
           .filter((v) => v.label.trim() && v.price !== "")
           .map((v) => ({ label: v.label.trim(), price: Number(v.price) })),
         base_variant_label: form.categoryId === "coffee" ? form.baseVariantLabel.trim() || null : null,
-        set_items: form.categoryId === "set" ? form.setRows.map((r) => r.productId).filter(Boolean) : [],
+        set_items: form.categoryId === "set" ? form.setItems : [],
       };
 
       if (form.id) {
@@ -1303,61 +1297,54 @@ export default function MenuManager() {
                 )}
 
                 {form.categoryId === "set" && (() => {
-                  const chosen = form.setRows.map((r) => r.productId).filter(Boolean).map((id) => products[id]).filter(Boolean);
-                  const sum = chosen.reduce((s, p) => s + p.price, 0);
+                  const picker = form.setPicker;
+                  const pickerCat = categories.find((c) => c.id === picker.categoryId);
+                  const hasSubcats = (pickerCat?.subcategories.length ?? 0) > 0;
+                  const pickerProducts = Object.values(products).filter(
+                    (p) => p.categoryId === picker.categoryId && (!hasSubcats || p.subcategoryId === picker.subcategoryId) && p.id !== form.id
+                  );
+                  const chosen = form.setItems.map((id, i) => ({ i, p: products[id] })).filter((x) => x.p);
+                  const sum = chosen.reduce((s, x) => s + x.p.price, 0);
                   const discount = form.price !== "" ? sum - Number(form.price) : null;
                   return (
                     <div className="field full set-builder">
                       <label>{t("setItemsLabel")}</label>
-                      {form.setRows.map((row, i) => {
-                        const cat = categories.find((c) => c.id === row.categoryId);
-                        const hasSubcats = (cat?.subcategories.length ?? 0) > 0;
-                        const rowProducts = Object.values(products).filter(
-                          (p) => p.categoryId === row.categoryId && (!hasSubcats || p.subcategoryId === row.subcategoryId) && p.id !== form.id
-                        );
-                        const isLast = i === form.setRows.length - 1;
-                        return (
-                          <div className="set-builder-row" key={i}>
-                            <select
-                              value={row.categoryId}
-                              onChange={(e) => updateSetRow(i, { categoryId: e.target.value, subcategoryId: "", productId: "" })}
-                            >
-                              <option value="">{t("setSelectCategory")}</option>
-                              {categories.filter((c) => c.id !== "set").map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
-                            </select>
-                            <select
-                              value={row.subcategoryId}
-                              onChange={(e) => updateSetRow(i, { subcategoryId: e.target.value, productId: "" })}
-                              disabled={!hasSubcats}
-                            >
-                              <option value="">{t("setSelectSubcategory")}</option>
-                              {cat?.subcategories.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
-                            </select>
-                            <select
-                              value={row.productId}
-                              onChange={(e) => updateSetRow(i, { productId: e.target.value })}
-                              disabled={!row.categoryId || (hasSubcats && !row.subcategoryId)}
-                            >
-                              <option value="">{t("setSelectProduct")}</option>
-                              {rowProducts.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                            </select>
-                            {isLast ? (
-                              <button type="button" className="set-builder-add-btn" onClick={addSetRow} aria-label={t("addSetItem")} title={t("addSetItem")}>
-                                <IcPlus />
-                              </button>
-                            ) : (
-                              <button type="button" className="set-builder-remove-btn" onClick={() => removeSetRow(i)} aria-label={t("removeSetItem")} title={t("removeSetItem")}>
-                                ×
-                              </button>
-                            )}
-                          </div>
-                        );
-                      })}
+                      <div className="set-builder-row">
+                        <select
+                          value={picker.categoryId}
+                          onChange={(e) => updateSetPicker({ categoryId: e.target.value, subcategoryId: "", productId: "" })}
+                        >
+                          <option value="">{t("setSelectCategory")}</option>
+                          {categories.filter((c) => c.id !== "set").map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+                        </select>
+                        <select
+                          value={picker.subcategoryId}
+                          onChange={(e) => updateSetPicker({ subcategoryId: e.target.value, productId: "" })}
+                          disabled={!hasSubcats}
+                        >
+                          <option value="">{t("setSelectSubcategory")}</option>
+                          {pickerCat?.subcategories.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+                        </select>
+                        <select
+                          value={picker.productId}
+                          onChange={(e) => { if (e.target.value) addSetItem(e.target.value); }}
+                          disabled={!picker.categoryId || (hasSubcats && !picker.subcategoryId)}
+                        >
+                          <option value="">{t("setSelectProduct")}</option>
+                          {pickerProducts.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                        </select>
+                      </div>
                       {chosen.length > 0 && (
                         <div className="set-builder-summary">
                           <ul className="set-builder-items">
-                            {chosen.map((p) => (
-                              <li key={p.id}><span>{p.name}</span><span className="p">${p.price.toFixed(2)}</span></li>
+                            {chosen.map(({ i, p }) => (
+                              <li key={i}>
+                                <span>{p.name}</span>
+                                <span className="set-builder-item-right">
+                                  <span className="p">${p.price.toFixed(2)}</span>
+                                  <button type="button" className="set-item-remove-btn" onClick={() => removeSetItem(i)} aria-label={t("removeSetItem")} title={t("removeSetItem")}>−</button>
+                                </span>
+                              </li>
                             ))}
                           </ul>
                           <div className="set-builder-totals">
