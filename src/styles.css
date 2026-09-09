@@ -519,9 +519,17 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .set-banner-mini{
   display:flex; flex-direction:column-reverse; align-items:flex-start; gap:clamp(3px, 1.6cqw, 8px);
   background:var(--cream-alt); border-radius:var(--radius); padding:clamp(8px, 7cqw, 26px);
-  cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;
+  cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; box-sizing:border-box;
 }
 .set-banner-mini:hover{transform:translateY(-2px);}
+/* .wrap tops out at its own max-width here, so card-grid's product cards
+   stop growing and settle at a fixed height (~234px: thumb's 4/3 ratio at
+   a 178px card width, plus the name/price rows below it) — matches that
+   fixed height so this banner sits level with a card in the same row
+   instead of looking short next to it. */
+@media (min-width:1470px){
+  .set-banner-mini{min-height:234px;}
+}
 .set-banner-mini-img{width:57.5%; max-width:100%; aspect-ratio:1347/784; object-fit:contain; border-radius:6px; display:block;}
 .set-banner-mini-text h4{font-family:'PT Serif', serif; font-size:clamp(.75rem, 3.8cqw, 1rem); color:var(--maroon); margin-bottom:2px;}
 .set-banner-mini-text p{font-family:'Pretendard', sans-serif; font-size:clamp(.65rem, 3.15cqw, .85rem); color:var(--body); margin-bottom:4px;}
