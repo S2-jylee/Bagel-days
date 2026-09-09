@@ -78,7 +78,7 @@ export default function FoodCard({ id, small }) {
                   <span className="product-modal-price">${p.price.toFixed(2)}</span>
                 </div>
               )}
-              <p>{p.desc}</p>
+              <p className={p.setSections.length > 0 ? "product-modal-desc-bold" : undefined}>{p.desc}</p>
 
               {p.setSections.length > 0 && (
                 <div className="modal-set-sections">

@@ -395,6 +395,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .product-modal-size-label{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--ink); font-size:.92rem;}
 .product-modal-price{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon); font-size:1.1rem; flex-shrink:0;}
 .product-modal-body p{color:var(--body); font-size:.92rem; line-height:1.6; margin-bottom:18px;}
+.product-modal-desc-bold{font-weight:700;}
 .product-modal-body .row{display:flex; align-items:center; justify-content:space-between; gap:14px;}
 .product-modal-body .price{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon); font-size:1.1rem;}
 .product-modal-body .add-btn{font-size:.88rem; padding:11px 20px;}
