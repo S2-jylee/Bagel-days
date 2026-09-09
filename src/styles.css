@@ -265,8 +265,12 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .widget-about-link:hover{text-decoration:underline;}
 .widget-bestsellers{justify-content:flex-start;}
 .mini-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
-.widget-bestsellers .mini-grid{grid-template-columns:repeat(4,1fr); gap:8px; flex:1; align-content:center;}
-.widget-bestsellers .mini-grid > :nth-child(n+5){display:none;}
+/* Fixed 6 slots regardless of how many best sellers are actually marked
+   (4-6) — with repeat(4,1fr), registering only 4 stretched each card to
+   fill the row, so a shop with 4 best sellers looked different-sized from
+   one with 6. Unfilled slots (5th/6th) at 4 or 5 marked just stay empty
+   grid cells instead of the existing cards growing to cover them. */
+.widget-bestsellers .mini-grid{grid-template-columns:repeat(6,1fr); gap:8px; flex:1; align-content:center;}
 .food-card-small .body{padding:8px 4px 0; text-align:center;}
 .food-card-small h4{font-size:.7rem; margin-bottom:0; line-height:1.2;}
 
@@ -663,8 +667,7 @@ footer ul li a:hover{color:#F0D9C9;}
 @media (max-width:1200px){
   .widgets-grid{grid-template-columns:repeat(3,1fr);}
   .widget-bestsellers{grid-column:1/-1;}
-  .widget-bestsellers .mini-grid{grid-template-columns:repeat(6,1fr); gap:10px;}
-  .widget-bestsellers .mini-grid > :nth-child(n+5){display:block;}
+  .widget-bestsellers .mini-grid{gap:10px;}
 }
 /* nav.links needs its own breakpoint (not the general 980px mobile one) because
    the full row (logo + 6 links + social/cart/Order Online) stops fitting a bit
@@ -760,8 +763,7 @@ footer ul li a:hover{color:#F0D9C9;}
   .home-hero{padding-bottom:0;}
   .widgets-grid{grid-template-columns:1fr;}
   .widget-bestsellers{grid-column:auto;}
-  .widget-bestsellers .mini-grid{grid-template-columns:repeat(4,1fr); gap:6px;}
-  .widget-bestsellers .mini-grid > :nth-child(n+5){display:none;}
+  .widget-bestsellers .mini-grid{gap:6px;}
   .widget-about-badge{display:block; width:90px;}
   /* Order Online widget: text on the left, Uber Eats/DoorDash stacked
      top-to-bottom in a column on the right (not full-width below the text,
