@@ -695,7 +695,9 @@ export default function MenuManager() {
       variants: p.categoryId === "coffee" && variants.length === 0 ? [{ label: "", price: "" }] : variants,
       setSections:
         p.categoryId === "set"
-          ? [...(p.setSections || []).map((s) => ({ label: s.label, choices: s.choices, picker: emptySetSectionPicker() })), emptySetSection()]
+          ? (p.setSections || []).length > 0
+            ? (p.setSections || []).map((s) => ({ label: s.label, choices: s.choices, picker: emptySetSectionPicker() }))
+            : [emptySetSection()]
           : [],
       addonIds: new Set(p.addons.map((a) => a.id)),
     });
@@ -985,23 +987,25 @@ export default function MenuManager() {
         <div className="inventory-products">
           <h2>{activeCategory.label}</h2>
 
-          <div className="menu-manager-toolbar">
-            <TaxonomyEditor
-              items={activeCategory.subcategories}
-              selectedId={activeSubcat}
-              onSelect={(sub) => setActiveSubcat(sub.id)}
-              onAdd={handleAddSubcategory}
-              onRename={handleRenameSubcategory}
-              onDelete={handleDeleteSubcategory}
-              onReorder={handleReorderSubcategories}
-              canDelete={(id) => !subcategoryHasProducts(id)}
-              deleteBlockedTitle={t("subcategoryHasProducts")}
-              manageLabel={t("manageSubcategories")}
-              doneLabel={t("done")}
-              addPlaceholder={t("newSubcategoryPlaceholder")}
-              variant="pills"
-            />
-          </div>
+          {activeCat !== "set" && (
+            <div className="menu-manager-toolbar">
+              <TaxonomyEditor
+                items={activeCategory.subcategories}
+                selectedId={activeSubcat}
+                onSelect={(sub) => setActiveSubcat(sub.id)}
+                onAdd={handleAddSubcategory}
+                onRename={handleRenameSubcategory}
+                onDelete={handleDeleteSubcategory}
+                onReorder={handleReorderSubcategories}
+                canDelete={(id) => !subcategoryHasProducts(id)}
+                deleteBlockedTitle={t("subcategoryHasProducts")}
+                manageLabel={t("manageSubcategories")}
+                doneLabel={t("done")}
+                addPlaceholder={t("newSubcategoryPlaceholder")}
+                variant="pills"
+              />
+            </div>
+          )}
 
           {activeCat !== "set" && (
             <>
@@ -1206,7 +1210,7 @@ export default function MenuManager() {
               <div className="form-grid">
                 {form.categoryId === "set" ? (
                   <>
-                    <div className="name-price-row field full">
+                    <div className="name-price-row field full set-name-price-row">
                       <div className="field">
                         <label>{t("name")}</label>
                         <input type="text" value={form.name} onChange={(e) => updateForm({ name: e.target.value })} required />

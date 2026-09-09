@@ -379,10 +379,6 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   position:relative; background:#fff; border-radius:var(--radius); overflow:hidden auto;
   max-width:420px; width:100%; max-height:90vh; box-shadow:0 20px 50px rgba(0,0,0,.3);
 }
-/* A Set product's modal needs room for a grid of choice cards per section
-   (not just a couple of text lines), so it's allowed to run wider than the
-   standard product modal instead of trying to match it. */
-.product-modal-wide{max-width:520px;}
 .product-modal-close{
   position:absolute; top:12px; right:12px; z-index:1;
   width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.9); border:none;
@@ -429,15 +425,8 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .modal-set-sections{margin-bottom:18px;}
 .modal-set-section{margin-bottom:14px;}
 .modal-set-section:last-child{margin-bottom:0;}
-.modal-set-section h4{font-family:'PT Serif', serif; font-size:.9rem; color:var(--maroon); margin-bottom:8px;}
-/* Fixed-width tiles, not 1fr/minmax columns — those still stretch to fill
-   whatever's left in the row, which barely shrank the cards at all. A flat
-   pixel size never grows past it regardless of modal width or item count;
-   extra row space just stays empty instead of inflating each card. */
-.modal-set-section-grid{display:grid; grid-template-columns:repeat(auto-fill, 76px); gap:8px;}
-@media (max-width:600px){
-  .modal-set-section-grid{grid-template-columns:repeat(auto-fill, 68px);}
-}
+.modal-set-section h4{font-family:'PT Serif', serif; font-size:.9rem; color:var(--maroon); margin-bottom:4px;}
+.modal-set-section-choices{font-size:.85rem; color:var(--ink); line-height:1.5;}
 
 /* ---------- About / story split ---------- */
 .split-section{padding-top:32px;}
@@ -1248,6 +1237,10 @@ footer ul li a:hover{color:#F0D9C9;}
    other category's own item form alike. */
 .name-price-row{display:flex; gap:14px;}
 .name-price-row .field:first-child{flex:1 1 auto;}
+/* .field's own margin-bottom stacks on top of .form-grid's row gap, doubling
+   the space below this row — only noticeable here since the field right
+   after it (Description) is a single short line with nothing else nearby. */
+.set-name-price-row{margin-bottom:0;}
 .name-price-row .field:last-child{flex:0 1 220px; min-width:140px;}
 /* Each section is its own labeled card: a name field + remove button, its
    own category->subcategory->item picker, and the running list of choices
