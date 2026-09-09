@@ -476,6 +476,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .menu-maincats-icon{width:18px; height:18px; flex-shrink:0; object-fit:cover; border-radius:4px;}
 .menu-maincats button:hover{background:var(--cream-alt);}
 .menu-maincats button.active{background:var(--tan); color:var(--maroon);}
+.taxonomy-editor.taxonomy-editor-nav button.active{box-shadow:inset 0 0 0 1px #D8BC98;}
 
 /* Sub-category pills, rendered inline above the product grid when a category has them */
 .menu-subcat-pills{display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 26px;}
@@ -1314,23 +1315,7 @@ footer ul li a:hover{color:#F0D9C9;}
    pills variant sits inline before its row instead of stacked above it, so
    it keeps even padding on both sides rather than that left-aligned indent. */
 .taxonomy-editor.taxonomy-editor-pills .taxonomy-manage-toggle{margin:0 4px 0 0; padding:4px 8px;}
-/* Extra bottom margin (beyond .taxonomy-editor-nav's own 4px gap) so "Bagels"
-   lands at the same height as the Add-on pool bar's top edge on the right —
-   that side's own spacing (toolbar+pills row, then the pool bar's own
-   margin-top) is taller than this sidebar's single toggle line, so this
-   side needs the larger gap rather than shrinking the other side to match
-   (which previously required a negative margin and visibly overlapped the
-   list). Extra 6px of top padding (2px -> 8px) separately makes "Manage
-   Categories" itself start level with "Manage Subcategories" (14px h2
-   margin + 4px toolbar margin + 4px toggle padding = 22px on that side,
-   vs. this side's 14px h3 margin alone). Right side's total offset from
-   the h2's bottom to the pool bar's top: 4px toolbar margin + ~38px pill
-   row height (13.12px pill font * 1.55 line-height + 16px padding + 2px
-   border) + 18px pool-bar margin =~60px. Left side needs to match that
-   from the h3's bottom: ~28px toggle height (8px+2px padding + 11.52px
-   toggle font * 1.55 line-height) + margin-bottom + 4px column gap — so
-   margin-bottom is set to ~28px (60 - 28 - 4). */
-.taxonomy-editor.taxonomy-editor-nav .taxonomy-manage-toggle{padding-top:8px; margin-bottom:28px;}
+.taxonomy-editor.taxonomy-editor-nav .taxonomy-manage-toggle{padding-top:8px; margin-bottom:19px;}
 .taxonomy-manage-hint{margin:0 0 8px;}
 .taxonomy-edit-row{display:flex; align-items:center; gap:6px; padding:6px 8px; border-radius:8px; background:var(--cream-alt); cursor:grab;}
 .taxonomy-edit-row.dragging{opacity:.4;}
