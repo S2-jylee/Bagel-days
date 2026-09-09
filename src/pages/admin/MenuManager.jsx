@@ -1421,49 +1421,35 @@ export default function MenuManager() {
                             </select>
                           </div>
                           {section.choices.length > 0 && (
-                            <div className="bestseller-grid set-choice-grid">
+                            <ul className="set-builder-items">
                               {section.choices.map((choice, ci) => {
-                                if (choice.type === "product") {
-                                  const cp = products[choice.productId];
-                                  if (!cp) return null;
-                                  return (
-                                    <div className="bestseller-card" key={ci}>
-                                      <button
-                                        type="button"
-                                        className="bestseller-card-remove"
-                                        onClick={() => removeSetSectionChoice(si, ci)}
-                                        aria-label={t("removeSetItem")}
-                                        title={t("removeSetItem")}
-                                      >
-                                        &times;
-                                      </button>
-                                      {cp.img ? <img src={cp.img} alt={cp.name} /> : <div className="menu-manager-noimg" />}
-                                      <span className="bestseller-card-name">{cp.name}</span>
-                                    </div>
-                                  );
-                                }
-                                const wildCat = categories.find((c) => c.id === choice.categoryId);
-                                const wildLabel = choice.subcategoryId
-                                  ? wildCat?.subcategories.find((s) => s.id === choice.subcategoryId)?.label
-                                  : wildCat?.label;
-                                const WildIc = CATEGORY_ICONS[choice.categoryId] || IcTag;
+                                const text =
+                                  choice.type === "product"
+                                    ? products[choice.productId]?.name ?? "—"
+                                    : t(
+                                        "setAnyItemIn",
+                                        choice.subcategoryId
+                                          ? categories
+                                              .find((c) => c.id === choice.categoryId)
+                                              ?.subcategories.find((s) => s.id === choice.subcategoryId)?.label
+                                          : categories.find((c) => c.id === choice.categoryId)?.label
+                                      );
                                 return (
-                                  <div className="bestseller-card set-choice-wildcard" key={ci}>
+                                  <li key={ci}>
+                                    <span>{text}</span>
                                     <button
                                       type="button"
-                                      className="bestseller-card-remove"
+                                      className="set-item-remove-btn"
                                       onClick={() => removeSetSectionChoice(si, ci)}
                                       aria-label={t("removeSetItem")}
                                       title={t("removeSetItem")}
                                     >
-                                      &times;
+                                      −
                                     </button>
-                                    <div className="set-choice-wildcard-icon"><WildIc /></div>
-                                    <span className="bestseller-card-name">{t("setAnyItemIn", wildLabel)}</span>
-                                  </div>
+                                  </li>
                                 );
                               })}
-                            </div>
+                            </ul>
                           )}
                         </div>
                       );
