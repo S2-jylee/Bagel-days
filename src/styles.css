@@ -271,7 +271,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    alignment — centered text made a wrapped 2-line name (e.g. "Rainbow
    Funfetti") look like it had uneven, overly wide side margins, since the
    shorter second line centers with more empty space on each side. */
-.food-card-small .body{padding:8px 4px 0;}
+.food-card-small .body{padding:8px 4px 0 2px;}
 .food-card-small h4{font-size:.7rem; margin-bottom:0; line-height:1.2;}
 
 /* ---------- Features row ---------- */
@@ -300,12 +300,12 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .food-card-badge{
   display:inline-flex; align-items:center; gap:3px;
   font-family:'Pretendard', sans-serif; font-weight:700; font-size:.68rem; letter-spacing:.02em; color:#fff;
-  padding:2px 7px; border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
+  padding:1px 5px; border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
 }
 .food-card-badge-signature{background:linear-gradient(135deg, rgba(139,92,246,.82), rgba(109,40,217,.82));}
 .food-card-badge-best{background:linear-gradient(135deg, rgba(245,179,1,.82), rgba(232,137,12,.82));}
 .food-card-small .food-card-badges{top:4px; left:4px; gap:2px;}
-.food-card-small .food-card-badge{font-size:.58rem; padding:1px 6px; gap:2px;}
+.food-card-small .food-card-badge{font-size:.58rem; padding:1px 5px; gap:2px;}
 .food-card .body{padding:14px 16px 18px; display:flex; flex-direction:column; flex:1;}
 .food-card h4{font-family:'PT Serif', serif; font-weight:500; font-size:.82rem; color:var(--ink); margin-bottom:0; cursor:pointer;}
 .card-price{display:block; font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon); font-size:.85rem;}
@@ -766,7 +766,7 @@ footer ul li a:hover{color:#F0D9C9;}
   .card-grid .food-card h4{font-size:.68rem; line-height:1.25;}
   .card-grid .food-card .body{padding:8px 6px;}
   .card-grid .card-price{font-size:.7rem;}
-  .card-grid .food-card-badge{font-size:.56rem; padding:1px 6px;}
+  .card-grid .food-card-badge{font-size:.56rem; padding:1px 5px;}
   .card-grid .quick-add-btn{width:22px; height:22px;}
   .card-grid .quick-add-btn svg{width:11px; height:11px;}
   .features .wrap{grid-template-columns:1fr;}
