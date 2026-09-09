@@ -292,7 +292,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    reads as a badge at a glance rather than blending into the card. A
    product can carry both at once, so the position:absolute lives on the
    wrapper (stacking them) rather than on each pill. */
-.food-card-badges{position:absolute; top:8px; left:8px; z-index:1; display:flex; flex-direction:column; align-items:flex-start; gap:4px;}
+.food-card-badges{position:absolute; top:8px; left:8px; z-index:1; display:flex; flex-direction:row; flex-wrap:wrap; align-items:flex-start; gap:4px;}
 .food-card-badge{
   display:inline-flex; align-items:center; gap:3px;
   font-family:'Pretendard', sans-serif; font-weight:700; font-size:.68rem; letter-spacing:.02em; color:#fff;
