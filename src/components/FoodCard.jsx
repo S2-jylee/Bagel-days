@@ -80,6 +80,26 @@ export default function FoodCard({ id, small }) {
               )}
               <p>{p.desc}</p>
 
+              {p.setItems.length > 0 && (() => {
+                const items = p.setItems.map((setId) => products[setId]).filter(Boolean);
+                const sum = items.reduce((s, sp) => s + sp.price, 0);
+                const discount = sum - p.price;
+                return (
+                  <div className="modal-addons">
+                    <h4>What's Included</h4>
+                    <ul className="modal-addon-list-plain">
+                      {items.map((sp) => (
+                        <li key={sp.id}><span>{sp.name}</span><span className="p">${sp.price.toFixed(2)}</span></li>
+                      ))}
+                    </ul>
+                    <div className="modal-set-totals">
+                      <span>Total value: ${sum.toFixed(2)}</span>
+                      {discount > 0 && <span className="modal-set-discount">You save ${discount.toFixed(2)}</span>}
+                    </div>
+                  </div>
+                );
+              })()}
+
               {p.addons.length > 0 && (
                 <div className="modal-addons">
                   <h4>Add-ons</h4>

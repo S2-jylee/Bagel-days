@@ -372,6 +372,12 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .modal-addon-list-plain li{display:flex; justify-content:space-between; gap:10px; font-size:.85rem; color:var(--ink); padding:6px 0; border-bottom:1px solid var(--line);}
 .modal-addon-list-plain li:last-child{border-bottom:none;}
 .modal-addon-list-plain .p{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon);}
+.modal-set-totals{
+  display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  font-family:'Pretendard', sans-serif; font-weight:700; font-size:.85rem; color:var(--ink);
+  margin-top:10px;
+}
+.modal-set-discount{color:var(--maroon);}
 
 /* ---------- About / story split ---------- */
 .split-section{padding-top:32px;}
