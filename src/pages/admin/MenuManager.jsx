@@ -139,11 +139,11 @@ async function uploadProductImage(file) {
 }
 
 async function uploadCategoryIcon(file) {
-  // Fill transparent areas with the page's own cream tone (not white) so an
-  // icon with a transparent background blends into the sidebar it renders on
-  // instead of showing a faint white square.
-  const resized = await resizeImage(file, 128, "#FFF9F0");
-  const path = `category-icons/${crypto.randomUUID()}.jpg`;
+  // Keep transparency (PNG) instead of flattening onto one fixed color — the
+  // icon's button background isn't constant (transparent normally, tan when
+  // active), so any single baked-in fill would only match one of those states.
+  const resized = await resizeImage(file, 128, { format: "image/png" });
+  const path = `category-icons/${crypto.randomUUID()}.png`;
   const { error } = await supabase.storage.from("site-images").upload(path, resized, { cacheControl: "3600", upsert: false });
   if (error) throw error;
   return supabase.storage.from("site-images").getPublicUrl(path).data.publicUrl;
