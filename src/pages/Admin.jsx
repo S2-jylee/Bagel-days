@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useStaffAuth } from "../lib/useStaffAuth";
 import StaffLogin from "../components/StaffLogin";
-import InviteStaffModal from "../components/InviteStaffModal";
+import StaffManageModal from "../components/StaffManageModal";
 import OrderHistory from "./admin/OrderHistory";
 import MenuManager from "./admin/MenuManager";
 import HomepageManager from "./admin/HomepageManager";
@@ -14,11 +14,11 @@ import { AdminLangProvider, useAdminLang } from "../lib/adminI18n";
 // enforcement is server-side (RLS policies keyed off the JWT's own role
 // claim, checked again inside the invite-staff function) — hiding a button
 // was never going to be the actual security boundary.
-function AdminShell({ role, signOut }) {
+function AdminShell({ role, userId, signOut }) {
   const { lang, setLang, t } = useAdminLang();
   const isOwner = role === "owner";
   const [tab, setTab] = useState("menu");
-  const [inviteOpen, setInviteOpen] = useState(false);
+  const [staffModalOpen, setStaffModalOpen] = useState(false);
 
   return (
     <div className="admin-page" data-lang={lang}>
@@ -34,7 +34,7 @@ function AdminShell({ role, signOut }) {
             <button type="button" className={lang === "ko" ? "active" : ""} onClick={() => setLang("ko")}>한국어</button>
             <button type="button" className={lang === "en" ? "active" : ""} onClick={() => setLang("en")}>English</button>
           </div>
-          {isOwner && <button className="btn btn-ghost btn-sm" onClick={() => setInviteOpen(true)}>{t("inviteStaffButton")}</button>}
+          {isOwner && <button className="btn btn-ghost btn-sm" onClick={() => setStaffModalOpen(true)}>{t("inviteStaffButton")}</button>}
           <button className="btn btn-ghost btn-sm" onClick={signOut}>{t("signOut")}</button>
         </div>
       </div>
@@ -44,7 +44,7 @@ function AdminShell({ role, signOut }) {
       {isOwner && tab === "orders" && <OrderHistory />}
       {isOwner && tab === "history" && <HistoryTab />}
 
-      {isOwner && inviteOpen && <InviteStaffModal onClose={() => setInviteOpen(false)} />}
+      {isOwner && staffModalOpen && <StaffManageModal currentUserId={userId} onClose={() => setStaffModalOpen(false)} />}
     </div>
   );
 }
@@ -64,7 +64,7 @@ export default function Admin() {
 
   return (
     <AdminLangProvider>
-      <AdminShell role={role} signOut={signOut} />
+      <AdminShell role={role} userId={session.user.id} signOut={signOut} />
     </AdminLangProvider>
   );
 }
