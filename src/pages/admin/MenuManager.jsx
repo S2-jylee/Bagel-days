@@ -21,6 +21,7 @@ const CATEGORY_ICONS = {
 
 const BUCKET = "product-images";
 const BEST_SELLER_LIMIT = 6;
+const CATEGORY_BEST_LIMIT = 4;
 
 // Unicode-aware: keeps letters from any script (Korean names included) instead
 // of stripping everything down to "item" the way an ASCII-only [a-z0-9] filter
@@ -65,6 +66,7 @@ function diffProductDetails(prev, row, categories, t) {
   }
   if ((prev.desc || "") !== (row.description || "")) changes.push(t("description"));
   if ((prev.isActive !== false) !== row.is_active) changes.push(t("showOnMenuSite"));
+  if ((prev.badge || null) !== (row.badge || null)) changes.push(t("badgeLabel"));
   return changes.length > 0 ? changes.join("; ") : undefined;
 }
 
@@ -324,6 +326,7 @@ function emptyForm(category, subcategory) {
     subcategoryId: subcategory,
     imageUrl: "",
     isActive: true,
+    badge: null,
     addonIds: new Set(),
   };
 }
@@ -355,6 +358,7 @@ export default function MenuManager() {
   const [savingBestSellerOrder, setSavingBestSellerOrder] = useState(false);
   const [draggingBestSellerId, setDraggingBestSellerId] = useState(null);
   const [bestSellerLimitId, setBestSellerLimitId] = useState(null); // product id currently showing the "max 6" notice
+  const [categoryBestLimitId, setCategoryBestLimitId] = useState(null); // product id currently showing the "max 4" notice
 
   // Leaving the category/subcategory you were reordering discards the
   // unsaved drag state rather than trying to carry it somewhere it no
@@ -372,6 +376,7 @@ export default function MenuManager() {
   const visibleItems = Object.values(products)
     .filter((p) => p.categoryId === activeCat && (!activeSubcategory || !p.subcategoryId || p.subcategoryId === activeSubcat))
     .sort((a, b) => a.sortOrder - b.sortOrder);
+  const categoryBestItems = visibleItems.filter((p) => p.isCategoryBest).sort((a, b) => (a.categoryBestOrder ?? 0) - (b.categoryBestOrder ?? 0));
   const addonList = Object.values(addons);
   const poolAddons = addonList.filter((a) => (poolTab === "general" ? !a.categoryId : a.categoryId === poolTab));
   const allProductIds = Object.keys(products);
@@ -517,6 +522,27 @@ export default function MenuManager() {
     logActivity({ action: "create", entity: "best_seller", label: p.name, path: `${t("menu")} > ${t("bestSellersHeading")}` });
   }
 
+  // ---- category best (top row of the product grid for this exact
+  // category/subcategory view — scoped separately from the Home best sellers) ----
+
+  const categoryBestPath = `${t("menu")} > ${activeCategory.label}${activeSubcategory ? ` > ${activeSubcategory.label}` : ""}`;
+
+  async function toggleCategoryBest(p) {
+    if (p.isCategoryBest) {
+      await supabase.from("products").update({ is_category_best: false, category_best_order: null }).eq("id", p.id);
+      logActivity({ action: "delete", entity: "category_best", label: p.name, path: categoryBestPath });
+      return;
+    }
+    if (categoryBestItems.length >= CATEGORY_BEST_LIMIT) {
+      setCategoryBestLimitId(p.id);
+      setTimeout(() => setCategoryBestLimitId((cur) => (cur === p.id ? null : cur)), 2200);
+      return;
+    }
+    const nextOrder = categoryBestItems.reduce((max, x) => Math.max(max, x.categoryBestOrder ?? 0) + 1, 0);
+    await supabase.from("products").update({ is_category_best: true, category_best_order: nextOrder }).eq("id", p.id);
+    logActivity({ action: "create", entity: "category_best", label: p.name, path: categoryBestPath });
+  }
+
   function startBestSellerReorder() {
     setBestSellerOrderedIds(bestSellerItems.map((p) => p.id));
     setBestSellerReordering(true);
@@ -571,6 +597,7 @@ export default function MenuManager() {
       subcategoryId: p.subcategoryId,
       imageUrl: p.imageUrl || "",
       isActive: p.isActive !== false,
+      badge: p.badge || null,
       addonIds: new Set(p.addons.map((a) => a.id)),
     });
   }
@@ -628,21 +655,23 @@ export default function MenuManager() {
         category_id: form.categoryId,
         subcategory_id: form.subcategoryId,
         is_active: form.isActive,
+        badge: form.badge || null,
       };
 
       if (form.id) {
         const { error } = await supabase.from("products").update(row).eq("id", form.id);
         if (error) throw error;
       } else {
-        // Without an explicit sort_order, a new row defaults to wherever the
-        // DB puts it (0, tying it with whichever existing item never had its
-        // order set either) — landing it in the middle of the list instead
-        // of at the end. Append it after every product already in the same
-        // category/subcategory bucket.
-        const siblingCount = Object.values(products).filter(
-          (p) => p.categoryId === row.category_id && p.subcategoryId === row.subcategory_id
-        ).length;
-        const { error } = await supabase.from("products").insert({ ...row, sort_order: siblingCount });
+        // Without an explicit sort_order, a new row defaults to the DB's 0 —
+        // tying it with whichever existing item never had its order set
+        // either, landing it in the middle of the list. Put it at the very
+        // top of its category/subcategory bucket instead (one below the
+        // current lowest sort_order there).
+        const siblingOrders = Object.values(products)
+          .filter((p) => p.categoryId === row.category_id && p.subcategoryId === row.subcategory_id)
+          .map((p) => p.sortOrder ?? 0);
+        const topOrder = siblingOrders.length > 0 ? Math.min(...siblingOrders) - 1 : 0;
+        const { error } = await supabase.from("products").insert({ ...row, sort_order: topOrder });
         if (error) throw error;
       }
 
@@ -904,6 +933,20 @@ export default function MenuManager() {
                         <span className="menu-manager-star-notice">{t("bestSellersFull")}</span>
                       )}
                     </div>
+                    <div className="menu-manager-star-wrap">
+                      <button
+                        type="button"
+                        className={`menu-manager-star menu-manager-category-best${p.isCategoryBest ? " active" : ""}`}
+                        onClick={() => toggleCategoryBest(p)}
+                        aria-label={p.isCategoryBest ? t("removeFromCategoryBest") : t("markAsCategoryBest")}
+                        title={p.isCategoryBest ? t("categoryBestShownOnMenu") : t("markAsCategoryBest")}
+                      >
+                        <IcTag />
+                      </button>
+                      {categoryBestLimitId === p.id && (
+                        <span className="menu-manager-star-notice">{t("categoryBestFull")}</span>
+                      )}
+                    </div>
                     <div className="menu-manager-row-actions">
                       <button type="button" className="btn btn-ghost btn-sm" onClick={() => openEdit(p)}>{t("edit")}</button>
                       <button type="button" className="btn btn-ghost btn-sm menu-manager-delete" onClick={() => handleDelete(p)}>{t("delete")}</button>
@@ -992,6 +1035,26 @@ export default function MenuManager() {
                 </div>
                 );
               })()}
+
+              <div className="field full badge-select-field">
+                <label>{t("badgeLabel")}</label>
+                <div className="badge-select">
+                  {[
+                    { value: null, label: t("badgeNone") },
+                    { value: "signature", label: t("badgeSignature") },
+                    { value: "best", label: t("badgeBest") },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value ?? "none"}
+                      type="button"
+                      className={`badge-select-btn${(form.badge || null) === opt.value ? " active" : ""}`}
+                      onClick={() => updateForm({ badge: opt.value })}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               <label className="menu-manager-active-toggle">
                 <input type="checkbox" checked={form.isActive} onChange={(e) => updateForm({ isActive: e.target.checked })} />

@@ -59,15 +59,27 @@ export default function Menu() {
 
   const activeCategory = categories.find((c) => c.id === activeCat) ?? categories[0];
   const activeSubcategory = activeCategory.subcategories?.find((s) => s.id === activeSubcat) ?? null;
-  const visibleItems = useMemo(() => {
+  // Split into a "Best Menu" row (staff-picked per category/subcategory in
+  // Admin, capped at 4) and everything else — kept as two separate id lists
+  // so they render as two visually distinct sections instead of one grid.
+  const { bestIds, regularIds } = useMemo(() => {
     // A product with no subcategory set always shows, regardless of which
     // subcategory tab is active — otherwise it's invisible on every tab
     // except "no filter", which isn't reachable once a category has any
     // subcategories (the first one is always selected by default).
-    return Object.values(products)
-      .filter((p) => p.isActive !== false && p.categoryId === activeCat && (!activeSubcategory || !p.subcategoryId || p.subcategoryId === activeSubcat))
+    const all = Object.values(products).filter(
+      (p) => p.isActive !== false && p.categoryId === activeCat && (!activeSubcategory || !p.subcategoryId || p.subcategoryId === activeSubcat)
+    );
+    const best = all
+      .filter((p) => p.isCategoryBest)
+      .sort((a, b) => (a.categoryBestOrder ?? 0) - (b.categoryBestOrder ?? 0))
+      .map((p) => p.id);
+    const bestSet = new Set(best);
+    const regular = all
+      .filter((p) => !bestSet.has(p.id))
       .sort((a, b) => a.sortOrder - b.sortOrder)
       .map((p) => p.id);
+    return { bestIds: best, regularIds: regular };
   }, [products, activeCat, activeSubcat, activeSubcategory]);
   // Scoped to whichever category tab is active, same as the product grid —
   // otherwise every add-on ever created (cream cheese swaps, coffee syrups,
@@ -132,9 +144,22 @@ export default function Menu() {
                 </div>
               )}
 
+              {bestIds.length > 0 && (
+                <div className="menu-best-section">
+                  <h3 className="menu-section-label">Best Menu</h3>
+                  <div className="card-grid menu-best-grid">
+                    {bestIds.map((id) => (
+                      <FoodCard key={id} id={id} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {bestIds.length > 0 && <h3 className="menu-section-label">All Items</h3>}
+
               <div className="menu-promo-row">
                 <div className="card-grid">
-                  {visibleItems.map((id) => (
+                  {regularIds.map((id) => (
                     <FoodCard key={id} id={id} />
                   ))}
                 </div>

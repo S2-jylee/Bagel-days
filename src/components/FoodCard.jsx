@@ -11,6 +11,8 @@ const IcClose = () => (
   </svg>
 );
 
+const BADGE_LABELS = { signature: "Signature", best: "Best" };
+
 export default function FoodCard({ id, small }) {
   const { products } = useProducts();
   const p = products[id];
@@ -29,6 +31,7 @@ export default function FoodCard({ id, small }) {
         aria-label={`View ${p.name} details`}
       >
         <div className="thumb">
+          {p.badge && <span className={`food-card-badge food-card-badge-${p.badge}`}>✨ {BADGE_LABELS[p.badge]}</span>}
           <img src={p.img} alt={p.name} />
         </div>
         <div className="body">

@@ -35,6 +35,7 @@ const ENTITY_KEY = {
   product: "entityProduct",
   addon: "entityAddon",
   best_seller: "entityBestSeller",
+  category_best: "entityCategoryBest",
   homepage_section: "entityHomepageSection",
   business_info: "entityBusinessInfo",
 };

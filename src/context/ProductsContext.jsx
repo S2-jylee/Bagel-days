@@ -28,6 +28,9 @@ function buildState(products, addons, links) {
       sortOrder: p.sort_order,
       isBestSeller: p.is_best_seller,
       bestSellerOrder: p.best_seller_order,
+      isCategoryBest: p.is_category_best,
+      categoryBestOrder: p.category_best_order,
+      badge: p.badge,
       addons: (addonsByProduct[p.id] || []).filter(Boolean),
     };
   }

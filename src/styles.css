@@ -286,8 +286,19 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 /* aspect-ratio + object-fit:contain (not cover) so every card is the same
    height regardless of a photo's native proportions, and the photo is
    letterboxed on white rather than cropped or stretched to fill it. */
-.food-card .thumb{display:block; width:100%; aspect-ratio:4/3; margin:0; padding:0; border:none; background:#fff; overflow:hidden; cursor:pointer;}
+.food-card .thumb{position:relative; display:block; width:100%; aspect-ratio:4/3; margin:0; padding:0; border:none; background:#fff; overflow:hidden; cursor:pointer;}
 .food-card .thumb img{width:100%; height:100%; object-fit:contain;}
+/* Deliberately off-palette (gold/violet, not the site's maroon/cream) so it
+   reads as a badge at a glance rather than blending into the card. */
+.food-card-badge{
+  position:absolute; top:8px; left:8px; z-index:1;
+  display:inline-flex; align-items:center; gap:3px;
+  font-family:'Pretendard', sans-serif; font-weight:700; font-size:.68rem; letter-spacing:.02em; color:#fff;
+  padding:4px 9px; border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
+}
+.food-card-badge-signature{background:linear-gradient(135deg, #8b5cf6, #6d28d9);}
+.food-card-badge-best{background:linear-gradient(135deg, #f5b301, #e8890c);}
+.food-card-small .food-card-badge{top:4px; left:4px; font-size:.58rem; padding:3px 7px; gap:2px;}
 .food-card .body{padding:14px 16px 18px; display:flex; flex-direction:column; flex:1;}
 .food-card h4{font-family:'PT Serif', serif; font-weight:500; font-size:.82rem; color:var(--ink); margin-bottom:0; cursor:pointer;}
 .card-price{display:block; font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon); font-size:.85rem;}
@@ -419,6 +430,14 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .menu-category.active{display:block;}
 .menu-category h2{font-size:1.5rem; margin-bottom:14px;}
 .menu-category > p{color:var(--body); max-width:52ch; margin-bottom:26px;}
+.menu-section-label{
+  font-family:'PT Serif', serif; font-size:1.05rem; color:var(--maroon);
+  margin:0 0 14px; padding-bottom:8px; border-bottom:2px solid var(--tan);
+}
+.menu-best-section{
+  background:var(--cream-alt); border-radius:var(--radius); padding:20px 20px 4px; margin-bottom:28px;
+}
+.menu-best-section .menu-section-label{border-bottom-color:var(--maroon-light);}
 /* Product grid on the left, a promo column (add-ons info above a compact
    "Make It A Set" banner) on the right — when a category has no add-ons,
    the banner sits alone at the top of that column instead of leaving a gap.
@@ -1059,6 +1078,8 @@ footer ul li a:hover{color:#F0D9C9;}
 .menu-manager-star svg{width:17px; height:17px;}
 .menu-manager-star:hover{border-color:#d4a017; color:#d4a017;}
 .menu-manager-star.active{border-color:#d4a017; color:#d4a017; background:#fdf6e3;}
+.menu-manager-category-best:hover{border-color:var(--maroon); color:var(--maroon);}
+.menu-manager-category-best.active{border-color:var(--maroon); color:var(--maroon); background:var(--cream-alt);}
 .menu-manager-drag-handle{display:flex; align-items:center; justify-content:center; width:24px; height:24px; flex-shrink:0; color:var(--body); cursor:grab;}
 .menu-manager-drag-handle svg{width:18px; height:18px;}
 .inventory-row.reordering{cursor:grab;}
@@ -1214,6 +1235,15 @@ footer ul li a:hover{color:#F0D9C9;}
 .menu-manager-upload-btn{display:inline-flex; cursor:pointer;}
 .menu-manager-active-toggle{display:flex; align-items:center; gap:8px; font-family:'Pretendard', sans-serif; font-size:.85rem; color:var(--ink); margin:4px 0 6px; cursor:pointer;}
 .menu-manager-active-toggle input{width:16px; height:16px; accent-color:var(--maroon); cursor:pointer;}
+.badge-select-field{margin-bottom:10px;}
+.badge-select{display:flex; gap:8px; flex-wrap:wrap;}
+.badge-select-btn{
+  font-family:'Pretendard', sans-serif; font-weight:600; font-size:.82rem;
+  padding:8px 16px; border-radius:20px; border:1px solid var(--line); background:#fff; color:var(--body); cursor:pointer;
+  transition:background .15s ease, color .15s ease, border-color .15s ease;
+}
+.badge-select-btn:hover{border-color:var(--maroon-light);}
+.badge-select-btn.active{background:var(--maroon); color:#fff; border-color:var(--maroon);}
 .menu-manager-form-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:20px;}
 @media (max-width:600px){
   .menu-manager-row-actions{width:100%; justify-content:flex-end;}
