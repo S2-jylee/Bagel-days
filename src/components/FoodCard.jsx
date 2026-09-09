@@ -12,6 +12,13 @@ const IcClose = () => (
 );
 
 const BADGE_LABELS = { signature: "Signature", best: "Best" };
+// Single-letter versions for the mobile "star" badges, which sit outside the
+// card's own edge instead of on top of the photo — a full word wouldn't fit
+// a star that small. Sorted to a fixed order (not badge-toggle order) so the
+// staggered pair always stacks the same way regardless of which one staff
+// added first.
+const STAR_LABELS = { signature: "S", best: "B" };
+const STAR_ORDER = ["signature", "best"];
 
 export default function FoodCard({ id, small }) {
   const { products } = useProducts();
@@ -20,33 +27,40 @@ export default function FoodCard({ id, small }) {
 
   if (!p) return null;
 
+  const starBadges = [...p.badges].sort((a, b) => STAR_ORDER.indexOf(a) - STAR_ORDER.indexOf(b));
+
   return (
     <>
-      <div
-        className={`food-card${small ? " food-card-small" : ""}`}
-        role="button"
-        tabIndex={0}
-        onClick={() => setOpen(true)}
-        onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setOpen(true))}
-        aria-label={`View ${p.name} details`}
-      >
-        <div className="thumb">
-          {p.badges.length > 0 && (
-            <div className="food-card-badges">
-              {p.badges.map((b) => (
-                <span key={b} className={`food-card-badge food-card-badge-${b}`}>{BADGE_LABELS[b]}</span>
-              ))}
-            </div>
-          )}
-          <img src={p.img} alt={p.name} />
-        </div>
-        <div className="body">
-          <h4 className="card-name-trigger">{p.name}</h4>
-          {!small && (
-            <div className="card-quick-row">
-              <span className="card-price">${p.price.toFixed(2)}</span>
-            </div>
-          )}
+      <div className="food-card-wrap">
+        {starBadges.map((b, i) => (
+          <span key={b} className={`food-card-star food-card-star-${b} food-card-star-pos-${i}`}>{STAR_LABELS[b]}</span>
+        ))}
+        <div
+          className={`food-card${small ? " food-card-small" : ""}`}
+          role="button"
+          tabIndex={0}
+          onClick={() => setOpen(true)}
+          onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setOpen(true))}
+          aria-label={`View ${p.name} details`}
+        >
+          <div className="thumb">
+            {p.badges.length > 0 && (
+              <div className="food-card-badges">
+                {p.badges.map((b) => (
+                  <span key={b} className={`food-card-badge food-card-badge-${b}`}>{BADGE_LABELS[b]}</span>
+                ))}
+              </div>
+            )}
+            <img src={p.img} alt={p.name} />
+          </div>
+          <div className="body">
+            <h4 className="card-name-trigger">{p.name}</h4>
+            {!small && (
+              <div className="card-quick-row">
+                <span className="card-price">${p.price.toFixed(2)}</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

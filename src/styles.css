@@ -285,6 +285,12 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 
 /* ---------- Card grid (best sellers / general) ---------- */
 .card-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:24px;}
+/* Plain positioning context around .food-card (which needs its own
+   overflow:hidden to clip/round the photo) — the mobile star badges below
+   are positioned relative to THIS instead, so they can poke past the card's
+   own edge into the grid gutter without .food-card's overflow clipping them
+   off. */
+.food-card-wrap{position:relative; min-width:0;}
 .food-card{background:#fff; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; min-width:0; display:flex; flex-direction:column; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;}
 .food-card:hover{transform:translateY(-4px); }
 /* aspect-ratio + object-fit:contain (not cover) so every card is the same
@@ -306,6 +312,11 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .food-card-badge-best{background:linear-gradient(135deg, rgba(245,179,1,.82), rgba(232,137,12,.82));}
 .food-card-small .food-card-badges{top:4px; left:4px; gap:2px;}
 .food-card-small .food-card-badge{font-size:.58rem; padding:1px 5px; gap:2px;}
+/* Mobile-only alternative to the pill badges above (see the <=600px
+   override below) — a small star pinned to food-card-wrap, not .food-card,
+   so it can hang half off the card's own top-left corner into the grid
+   gutter instead of sitting on top of the photo. Hidden above 600px. */
+.food-card-star{display:none;}
 .food-card .body{padding:14px 16px 18px; display:flex; flex-direction:column; flex:1;}
 .food-card h4{font-family:'PT Serif', serif; font-weight:500; font-size:.82rem; color:var(--ink); margin-bottom:0; cursor:pointer;}
 .card-price{display:block; font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon); font-size:.85rem;}
@@ -767,6 +778,22 @@ footer ul li a:hover{color:#F0D9C9;}
   .card-grid .food-card .body{padding:8px 6px;}
   .card-grid .card-price{font-size:.7rem;}
   .card-grid .food-card-badge{font-size:.56rem; padding:1px 5px;}
+  /* Below 600px, badges move off the photo entirely and become small stars
+     hanging off the card's own top-left corner instead — poking into the
+     grid gutter rather than covering part of the product image, which
+     mattered more once photos got this small. */
+  .food-card-badges{display:none;}
+  .food-card-star{
+    display:flex; align-items:center; justify-content:center;
+    position:absolute; z-index:2; width:22px; height:22px;
+    font-family:'Pretendard', sans-serif; font-weight:800; font-size:.6rem; color:#fff;
+    clip-path:polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    box-shadow:0 2px 4px rgba(0,0,0,.3);
+  }
+  .food-card-star-pos-0{top:-6px; left:-6px;}
+  .food-card-star-pos-1{top:14px; left:8px;}
+  .food-card-star-signature{background:linear-gradient(135deg, #8b5cf6, #6d28d9);}
+  .food-card-star-best{background:linear-gradient(135deg, #f5b301, #e8890c);}
   .card-grid .quick-add-btn{width:22px; height:22px;}
   .card-grid .quick-add-btn svg{width:11px; height:11px;}
   .features .wrap{grid-template-columns:1fr;}
