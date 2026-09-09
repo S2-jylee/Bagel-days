@@ -1222,7 +1222,7 @@ export default function MenuManager() {
                     </div>
                     <div className="field full">
                       <label>{t("description")}</label>
-                      <input type="text" value={form.description} onChange={(e) => updateForm({ description: e.target.value })} />
+                      <input type="text" className="set-description-input" value={form.description} onChange={(e) => updateForm({ description: e.target.value })} />
                     </div>
                   </>
                 ) : form.categoryId === "coffee" ? (

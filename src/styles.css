@@ -1241,6 +1241,7 @@ footer ul li a:hover{color:#F0D9C9;}
    the space below this row — only noticeable here since the field right
    after it (Description) is a single short line with nothing else nearby. */
 .set-name-price-row{margin-bottom:0;}
+.set-description-input{font-weight:700;}
 .name-price-row .field:last-child{flex:0 1 220px; min-width:140px;}
 /* Each section is its own labeled card: a name field + remove button, its
    own category->subcategory->item picker, and the running list of choices
