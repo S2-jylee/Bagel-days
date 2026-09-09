@@ -30,7 +30,7 @@ function buildState(products, addons, links) {
       bestSellerOrder: p.best_seller_order,
       isCategoryBest: p.is_category_best,
       categoryBestOrder: p.category_best_order,
-      badge: p.badge,
+      badges: Array.isArray(p.badges) ? p.badges : [],
       variants: Array.isArray(p.variants) ? p.variants : [],
       addons: (addonsByProduct[p.id] || []).filter(Boolean),
     };

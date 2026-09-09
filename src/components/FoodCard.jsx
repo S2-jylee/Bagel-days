@@ -31,7 +31,13 @@ export default function FoodCard({ id, small }) {
         aria-label={`View ${p.name} details`}
       >
         <div className="thumb">
-          {p.badge && <span className={`food-card-badge food-card-badge-${p.badge}`}>{BADGE_LABELS[p.badge]}</span>}
+          {p.badges.length > 0 && (
+            <div className="food-card-badges">
+              {p.badges.map((b) => (
+                <span key={b} className={`food-card-badge food-card-badge-${b}`}>{BADGE_LABELS[b]}</span>
+              ))}
+            </div>
+          )}
           <img src={p.img} alt={p.name} />
         </div>
         <div className="body">

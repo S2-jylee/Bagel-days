@@ -66,7 +66,7 @@ function diffProductDetails(prev, row, categories, t) {
   }
   if ((prev.desc || "") !== (row.description || "")) changes.push(t("description"));
   if ((prev.isActive !== false) !== row.is_active) changes.push(t("showOnMenuSite"));
-  if ((prev.badge || null) !== (row.badge || null)) changes.push(t("badgeLabel"));
+  if (JSON.stringify([...(prev.badges || [])].sort()) !== JSON.stringify([...row.badges].sort())) changes.push(t("badgeLabel"));
   if (JSON.stringify(prev.variants || []) !== JSON.stringify(row.variants)) changes.push(t("addVariantRow"));
   return changes.length > 0 ? changes.join("; ") : undefined;
 }
@@ -327,7 +327,7 @@ function emptyForm(category, subcategory) {
     subcategoryId: subcategory,
     imageUrl: "",
     isActive: true,
-    badge: null,
+    badges: [],
     variants: [],
     addonIds: new Set(),
   };
@@ -551,7 +551,12 @@ export default function MenuManager() {
       return;
     }
     const nextOrder = categoryBestItems.reduce((max, x) => Math.max(max, x.categoryBestOrder ?? 0) + 1, 0);
-    await supabase.from("products").update({ is_category_best: true, category_best_order: nextOrder }).eq("id", p.id);
+    // Marking an item as this list's Best Menu also puts the "Best" badge
+    // on it, so the highlighted row and the visible badge stay in sync
+    // without a separate trip to the edit form — un-marking it later
+    // leaves the badge alone, since staff may still want it shown.
+    const nextBadges = p.badges.includes("best") ? p.badges : [...p.badges, "best"];
+    await supabase.from("products").update({ is_category_best: true, category_best_order: nextOrder, badges: nextBadges }).eq("id", p.id);
     logActivity({ action: "create", entity: "category_best", label: p.name, path: categoryBestPath });
   }
 
@@ -647,7 +652,7 @@ export default function MenuManager() {
       subcategoryId: p.subcategoryId,
       imageUrl: p.imageUrl || "",
       isActive: p.isActive !== false,
-      badge: p.badge || null,
+      badges: p.badges || [],
       variants: (p.variants || []).map((v) => ({ label: v.label, price: String(v.price) })),
       addonIds: new Set(p.addons.map((a) => a.id)),
     });
@@ -721,7 +726,7 @@ export default function MenuManager() {
         category_id: form.categoryId,
         subcategory_id: form.subcategoryId,
         is_active: form.isActive,
-        badge: form.badge || null,
+        badges: form.badges,
         variants: form.variants
           .filter((v) => v.label.trim() && v.price !== "")
           .map((v) => ({ label: v.label.trim(), price: Number(v.price) })),
@@ -1180,19 +1185,23 @@ export default function MenuManager() {
                 <label>{t("badgeLabel")}</label>
                 <div className="badge-select">
                   {[
-                    { value: null, label: t("badgeNone") },
                     { value: "signature", label: t("badgeSignature") },
                     { value: "best", label: t("badgeBest") },
-                  ].map((opt) => (
-                    <button
-                      key={opt.value ?? "none"}
-                      type="button"
-                      className={`badge-select-btn${(form.badge || null) === opt.value ? " active" : ""}`}
-                      onClick={() => updateForm({ badge: opt.value })}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+                  ].map((opt) => {
+                    const active = form.badges.includes(opt.value);
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        className={`badge-select-btn${active ? " active" : ""}`}
+                        onClick={() => updateForm({
+                          badges: active ? form.badges.filter((b) => b !== opt.value) : [...form.badges, opt.value],
+                        })}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

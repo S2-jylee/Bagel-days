@@ -289,16 +289,19 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .food-card .thumb{position:relative; display:block; width:100%; aspect-ratio:4/3; margin:0; padding:0; border:none; background:#fff; overflow:hidden; cursor:pointer;}
 .food-card .thumb img{width:100%; height:100%; object-fit:contain;}
 /* Deliberately off-palette (gold/violet, not the site's maroon/cream) so it
-   reads as a badge at a glance rather than blending into the card. */
+   reads as a badge at a glance rather than blending into the card. A
+   product can carry both at once, so the position:absolute lives on the
+   wrapper (stacking them) rather than on each pill. */
+.food-card-badges{position:absolute; top:8px; left:8px; z-index:1; display:flex; flex-direction:column; align-items:flex-start; gap:4px;}
 .food-card-badge{
-  position:absolute; top:8px; left:8px; z-index:1;
   display:inline-flex; align-items:center; gap:3px;
   font-family:'Pretendard', sans-serif; font-weight:700; font-size:.68rem; letter-spacing:.02em; color:#fff;
   padding:4px 9px; border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
 }
 .food-card-badge-signature{background:linear-gradient(135deg, #8b5cf6, #6d28d9);}
 .food-card-badge-best{background:linear-gradient(135deg, #f5b301, #e8890c);}
-.food-card-small .food-card-badge{top:4px; left:4px; font-size:.58rem; padding:3px 7px; gap:2px;}
+.food-card-small .food-card-badges{top:4px; left:4px; gap:2px;}
+.food-card-small .food-card-badge{font-size:.58rem; padding:3px 7px; gap:2px;}
 .food-card .body{padding:14px 16px 18px; display:flex; flex-direction:column; flex:1;}
 .food-card h4{font-family:'PT Serif', serif; font-weight:500; font-size:.82rem; color:var(--ink); margin-bottom:0; cursor:pointer;}
 .card-price{display:block; font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon); font-size:.85rem;}
@@ -981,6 +984,11 @@ footer ul li a:hover{color:#F0D9C9;}
 .bestseller-panel{
   background:var(--tan); border:1px solid var(--tan-dark); border-radius:var(--radius); padding:16px 18px; margin-bottom:24px;
 }
+/* .inventory-hint's own margin-left:240px and bold black text is tuned for
+   a specific full-width spot below the sidebar — reused bare inside this
+   narrower panel (its empty state), that huge left offset and heavy color
+   just looked like a stray line of black text sitting in the wrong place. */
+.bestseller-panel .inventory-hint{margin:0; font-weight:600; font-size:.85rem; color:var(--body);}
 /* Same pattern as the Home best-seller panel, just lower-key — this one
    repeats per category/subcategory view, so it shouldn't compete with it
    for visual weight. */
