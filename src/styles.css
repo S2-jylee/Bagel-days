@@ -1316,7 +1316,7 @@ footer ul li a:hover{color:#F0D9C9;}
    alignment and the extra top offset (to match "Manage Subcategories"
    text height) are done with margin instead of padding, since margin sits
    outside the painted background box and doesn't inflate it. */
-.taxonomy-editor.taxonomy-editor-nav .taxonomy-manage-toggle{margin:4px 0 16px 4px;}
+.taxonomy-editor.taxonomy-editor-nav .taxonomy-manage-toggle{margin:2px 0 19px 4px;}
 .taxonomy-manage-hint{margin:0 0 8px;}
 .taxonomy-edit-row{display:flex; align-items:center; gap:6px; padding:6px 8px; border-radius:8px; background:var(--cream-alt); cursor:grab;}
 .taxonomy-edit-row.dragging{opacity:.4;}
