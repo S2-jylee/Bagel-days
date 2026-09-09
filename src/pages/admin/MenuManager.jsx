@@ -1063,6 +1063,7 @@ export default function MenuManager() {
                 <button type="button" className="btn btn-primary btn-sm" onClick={saveOrder} disabled={savingOrder}>
                   {savingOrder ? t("saving") : t("saveOrder")}
                 </button>
+                <p className="inventory-hint inventory-hint-inline">{t("dragHint")}</p>
               </>
             ) : (
               <>
@@ -1071,8 +1072,6 @@ export default function MenuManager() {
               </>
             )}
           </div>
-
-          {reordering && <p className="inventory-hint">{t("dragHint")}</p>}
 
           <div className="inventory-list">
             {displayItems.map((p) => (
