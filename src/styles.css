@@ -1318,8 +1318,14 @@ footer ul li a:hover{color:#F0D9C9;}
    that side's own spacing (toolbar + subcategory pills row) is taller than
    this sidebar's single toggle line, so this side needs the larger gap
    rather than shrinking the other side to match (which previously required
-   a negative margin and visibly overlapped the list). */
-.taxonomy-editor.taxonomy-editor-nav .taxonomy-manage-toggle{margin-bottom:21px;}
+   a negative margin and visibly overlapped the list). Extra 6px of top
+   padding (2px -> 8px) makes "Manage Categories" itself start level with
+   "Manage Subcategories" (14px h2 margin + 4px toolbar margin + 4px toggle
+   padding = 22px on that side, vs. this side's 14px h3 margin alone) —
+   margin-bottom trimmed by the same 6px so the total space before the
+   first category button, and its alignment with the product list, is
+   unchanged. */
+.taxonomy-editor.taxonomy-editor-nav .taxonomy-manage-toggle{padding-top:8px; margin-bottom:15px;}
 .taxonomy-manage-hint{margin:0 0 8px;}
 .taxonomy-edit-row{display:flex; align-items:center; gap:6px; padding:6px 8px; border-radius:8px; background:var(--cream-alt); cursor:grab;}
 .taxonomy-edit-row.dragging{opacity:.4;}
