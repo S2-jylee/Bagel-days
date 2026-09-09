@@ -136,7 +136,10 @@ async function uploadProductImage(file) {
 }
 
 async function uploadCategoryIcon(file) {
-  const resized = await resizeImage(file, 128);
+  // Fill transparent areas with the page's own cream tone (not white) so an
+  // icon with a transparent background blends into the sidebar it renders on
+  // instead of showing a faint white square.
+  const resized = await resizeImage(file, 128, "#FFF9F0");
   const path = `category-icons/${crypto.randomUUID()}.jpg`;
   const { error } = await supabase.storage.from("site-images").upload(path, resized, { cacheControl: "3600", upsert: false });
   if (error) throw error;
