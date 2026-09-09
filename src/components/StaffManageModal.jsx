@@ -27,6 +27,7 @@ export default function StaffManageModal({ currentUserId, onClose }) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [note, setNote] = useState("");
   // Defaults to the least-privileged option — an owner has to deliberately
   // pick "owner" for a new account to get full access.
   const [role, setRole] = useState("staff");
@@ -67,12 +68,13 @@ export default function StaffManageModal({ currentUserId, onClose }) {
     setSaving(true);
     setFormError("");
     try {
-      const created = await callStaffFn({ action: "create", email: email.trim(), password, role });
+      const created = await callStaffFn({ action: "create", email: email.trim(), password, role, note: note.trim() });
       logActivity({ action: "create", entity: "staff", label: created.email, path: t("inviteStaffButton"), details: t(role === "owner" ? "roleOwner" : "roleStaff") });
       setStaff((prev) => [...prev, created].sort((a, b) => a.email.localeCompare(b.email)));
       setEmail("");
       setPassword("");
       setRole("staff");
+      setNote("");
       setShowAddForm(false);
     } catch (err) {
       setFormError(err.message || t("inviteStaffFailed"));
@@ -94,13 +96,16 @@ export default function StaffManageModal({ currentUserId, onClose }) {
             {staff.map((u) => (
               <li key={u.id} className="staff-list-row">
                 <div className="staff-list-info">
-                  <span className="staff-list-email">
-                    {u.email}
-                    {u.id === currentUserId && <span className="staff-list-you"> ({t("staffListYou")})</span>}
-                  </span>
-                  <span className={`badge-select-btn staff-list-role${u.role === "owner" ? " active" : ""}`}>
-                    {u.role === "owner" ? t("roleOwner") : t("roleStaff")}
-                  </span>
+                  <div className="staff-list-info-top">
+                    <span className="staff-list-email">
+                      {u.email}
+                      {u.id === currentUserId && <span className="staff-list-you"> ({t("staffListYou")})</span>}
+                    </span>
+                    <span className={`badge-select-btn staff-list-role${u.role === "owner" ? " active" : ""}`}>
+                      {u.role === "owner" ? t("roleOwner") : t("roleStaff")}
+                    </span>
+                  </div>
+                  {u.note && <span className="staff-list-note">{u.note}</span>}
                 </div>
                 <button
                   type="button"
@@ -134,6 +139,11 @@ export default function StaffManageModal({ currentUserId, onClose }) {
                 <label>{t("inviteStaffPasswordLabel")}</label>
                 <input type="text" value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} required />
                 <p className="menu-manager-photo-hint">{t("inviteStaffPasswordHint")}</p>
+              </div>
+              <div className="field full">
+                <label>{t("inviteStaffNoteLabel")}</label>
+                <input type="text" value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("inviteStaffNotePlaceholder")} />
+                <p className="menu-manager-photo-hint">{t("inviteStaffNoteHint")}</p>
               </div>
               <div className="field full badge-select-field">
                 <label>{t("inviteStaffRoleLabel")}</label>

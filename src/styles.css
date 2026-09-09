@@ -1339,10 +1339,12 @@ footer ul li a:hover{color:#F0D9C9;}
 .staff-list{display:flex; flex-direction:column; gap:2px; margin:0 0 18px; max-height:260px; overflow-y:auto;}
 .staff-list-row{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 2px; border-bottom:1px solid var(--line);}
 .staff-list-row:last-child{border-bottom:none;}
-.staff-list-info{display:flex; align-items:center; gap:10px; min-width:0;}
+.staff-list-info{display:flex; flex-direction:column; gap:2px; min-width:0; flex:1;}
+.staff-list-info-top{display:flex; align-items:center; gap:10px; min-width:0;}
 .staff-list-email{font-family:'Pretendard', sans-serif; font-weight:600; font-size:.88rem; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .staff-list-you{font-weight:400; color:var(--body);}
 .staff-list-role{cursor:default; padding:3px 12px; font-size:.7rem; flex-shrink:0;}
+.staff-list-note{font-family:'Pretendard', sans-serif; font-size:.78rem; color:var(--body); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .staff-add-form{margin-top:6px; padding-top:14px; border-top:1px solid var(--line);}
 .menu-manager-form-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:20px;}
 @media (max-width:600px){
