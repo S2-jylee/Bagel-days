@@ -69,7 +69,10 @@ function diffProductDetails(prev, row, categories, t) {
   if ((prev.desc || "") !== (row.description || "")) changes.push(t("description"));
   if ((prev.isActive !== false) !== row.is_active) changes.push(t("showOnMenuSite"));
   if (JSON.stringify([...(prev.badges || [])].sort()) !== JSON.stringify([...row.badges].sort())) changes.push(t("badgeLabel"));
-  if (JSON.stringify(prev.variants || []) !== JSON.stringify(row.variants)) changes.push(t("addVariantRow"));
+  if (
+    JSON.stringify(prev.variants || []) !== JSON.stringify(row.variants) ||
+    (prev.baseVariantLabel || "") !== (row.base_variant_label || "")
+  ) changes.push(t("addVariantRow"));
   return changes.length > 0 ? changes.join("; ") : undefined;
 }
 
@@ -335,13 +338,18 @@ function emptyForm(category, subcategory) {
     id: null,
     name: "",
     price: "",
+    // Coffee & Drink items are priced per size rather than having one plain
+    // price — this pairs with `price` to make the first size row, and seeding
+    // one extra (empty) variant row here gets the required 2-row minimum on
+    // screen from the start instead of staff having to click "Add Size" first.
+    baseVariantLabel: "",
     description: "",
     categoryId: category,
     subcategoryId: subcategory,
     imageUrl: "",
     isActive: true,
     badges: [],
-    variants: [],
+    variants: category === "coffee" ? [{ label: "", price: "" }] : [],
     setRows: [emptySetRow()],
     addonIds: new Set(),
   };
@@ -665,17 +673,22 @@ export default function MenuManager() {
       .map((id) => products[id])
       .filter(Boolean)
       .map((sp) => ({ categoryId: sp.categoryId, subcategoryId: sp.subcategoryId || "", productId: sp.id }));
+    const variants = (p.variants || []).map((v) => ({ label: v.label, price: String(v.price) }));
     setForm({
       id: p.id,
       name: p.name,
       price: String(p.price),
+      baseVariantLabel: p.baseVariantLabel || "",
       description: p.desc,
       categoryId: p.categoryId,
       subcategoryId: p.subcategoryId,
       imageUrl: p.imageUrl || "",
       isActive: p.isActive !== false,
       badges: p.badges || [],
-      variants: (p.variants || []).map((v) => ({ label: v.label, price: String(v.price) })),
+      // A coffee item saved before this feature (or with every size later
+      // removed) would otherwise show just one row here — pad it back up to
+      // the required 2-row minimum.
+      variants: p.categoryId === "coffee" && variants.length === 0 ? [{ label: "", price: "" }] : variants,
       setRows: [...existingRows, emptySetRow()],
       addonIds: new Set(p.addons.map((a) => a.id)),
     });
@@ -767,6 +780,7 @@ export default function MenuManager() {
         variants: form.variants
           .filter((v) => v.label.trim() && v.price !== "")
           .map((v) => ({ label: v.label.trim(), price: Number(v.price) })),
+        base_variant_label: form.categoryId === "coffee" ? form.baseVariantLabel.trim() || null : null,
         set_items: form.categoryId === "set" ? form.setRows.map((r) => r.productId).filter(Boolean) : [],
       };
 
@@ -1139,7 +1153,7 @@ export default function MenuManager() {
                       {uploading ? t("uploading") : t("uploadPhoto")}
                       <input type="file" accept="image/*" onChange={handlePhotoChange} disabled={uploading} hidden />
                     </label>
-                    {form.categoryId !== "set" && (
+                    {form.categoryId !== "set" && form.categoryId !== "coffee" && (
                       <button type="button" className="btn btn-ghost btn-sm" onClick={addVariantRow}>{t("addVariantRow")}</button>
                     )}
                   </div>
@@ -1169,8 +1183,13 @@ export default function MenuManager() {
                       <select
                         value={form.categoryId}
                         onChange={(e) => {
-                          const cat = categories.find((c) => c.id === e.target.value);
-                          updateForm({ categoryId: e.target.value, subcategoryId: cat.subcategories?.[0]?.id ?? null });
+                          const nextCategoryId = e.target.value;
+                          const cat = categories.find((c) => c.id === nextCategoryId);
+                          updateForm({
+                            categoryId: nextCategoryId,
+                            subcategoryId: cat.subcategories?.[0]?.id ?? null,
+                            variants: nextCategoryId === "coffee" && form.variants.length === 0 ? [{ label: "", price: "" }] : form.variants,
+                          });
                         }}
                       >
                         {categories.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
@@ -1186,6 +1205,36 @@ export default function MenuManager() {
                         </select>
                       </div>
                     )}
+                    {form.categoryId === "coffee" ? (
+                      <div className="field full coffee-size-rows">
+                        <div className="coffee-size-row">
+                          <div className="field">
+                            <label>{t("variantLabel")}</label>
+                            <input type="text" value={form.baseVariantLabel} onChange={(e) => updateForm({ baseVariantLabel: e.target.value })} required />
+                          </div>
+                          <div className="field">
+                            <label>{t("price")}</label>
+                            <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
+                          </div>
+                        </div>
+                        {form.variants.map((v, i) => (
+                          <div className="coffee-size-row" key={i}>
+                            <div className="field">
+                              <label>{t("variantLabel")}</label>
+                              <input type="text" value={v.label} onChange={(e) => updateVariantRow(i, { label: e.target.value })} required />
+                            </div>
+                            <div className="field">
+                              <label>{t("price")}</label>
+                              <div className="variant-price-input-row">
+                                <input type="number" min="0" step="0.01" value={v.price} onChange={(e) => updateVariantRow(i, { price: e.target.value })} required />
+                                <button type="button" className="variant-remove-btn" onClick={() => removeVariantRow(i)} aria-label={t("removeVariantRow")} title={t("removeVariantRow")}>×</button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        <button type="button" className="btn btn-ghost btn-sm" onClick={addVariantRow}>{t("addVariantRow")}</button>
+                      </div>
+                    ) : (
                     <div className="price-variant-row field full">
                       <div className="field">
                         <label>{t("price")}</label>
@@ -1205,6 +1254,7 @@ export default function MenuManager() {
                         </div>,
                       ])}
                     </div>
+                    )}
                   </>
                 )}
 

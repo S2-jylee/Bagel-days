@@ -58,16 +58,26 @@ export default function FoodCard({ id, small }) {
             </button>
             <div className="product-modal-img"><img src={p.img} alt={p.name} /></div>
             <div className="product-modal-body">
-              <div className="product-modal-title-row">
-                <h3>{p.name}</h3>
-                <span className="product-modal-price">${p.price.toFixed(2)}</span>
-              </div>
-              {p.variants.map((v, i) => (
-                <div className="product-modal-title-row" key={i}>
-                  <h3>{v.label}</h3>
-                  <span className="product-modal-price">${Number(v.price).toFixed(2)}</span>
+              {p.variants.length > 0 ? (
+                <>
+                  <h3 className="product-modal-name">{p.name}</h3>
+                  <div className="product-modal-title-row">
+                    <span className="product-modal-size-label">{p.baseVariantLabel}</span>
+                    <span className="product-modal-price">${p.price.toFixed(2)}</span>
+                  </div>
+                  {p.variants.map((v, i) => (
+                    <div className="product-modal-title-row" key={i}>
+                      <span className="product-modal-size-label">{v.label}</span>
+                      <span className="product-modal-price">${Number(v.price).toFixed(2)}</span>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <div className="product-modal-title-row">
+                  <h3>{p.name}</h3>
+                  <span className="product-modal-price">${p.price.toFixed(2)}</span>
                 </div>
-              ))}
+              )}
               <p>{p.desc}</p>
 
               {p.addons.length > 0 && (

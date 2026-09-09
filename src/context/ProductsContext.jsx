@@ -32,6 +32,7 @@ function buildState(products, addons, links) {
       categoryBestOrder: p.category_best_order,
       badges: Array.isArray(p.badges) ? p.badges : [],
       variants: Array.isArray(p.variants) ? p.variants : [],
+      baseVariantLabel: p.base_variant_label || "",
       setItems: Array.isArray(p.set_items) ? p.set_items : [],
       addons: (addonsByProduct[p.id] || []).filter(Boolean),
     };
