@@ -93,6 +93,22 @@ export const IcGrip = () => (
 export const IcCakeSlice = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20h16M4 20V12l8-6 8 6v8"/><path d="M4 15h16M12 6v3"/></svg>
 );
+// A shallow bowl (rim + a small mound of food inside) — for "Side".
+export const IcBowl = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 11h18a9 9 0 0 1-9 9 9 9 0 0 1-9-9Z" />
+    <path d="M7 11c.4-3.2 2.2-5 5-5s4.6 1.8 5 5" />
+  </svg>
+);
+// Two overlapping circles — items bundled into one set. Kept abstract
+// rather than a literal bagel+cup mashup, which turned to visual noise
+// at the ~18px size this renders at in the sidebar.
+export const IcSet = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="9" cy="9" r="6.5" />
+    <circle cx="15" cy="15" r="6.5" />
+  </svg>
+);
 export const IcChevronLeft = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
 );

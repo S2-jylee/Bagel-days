@@ -5,7 +5,7 @@ import { useCategories } from "../../context/CategoriesContext";
 import { productImageUrl } from "../../lib/assetUrl";
 import { resizeImage } from "../../lib/imageResize";
 import {
-  IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcTag, IcPlus, IcCheck, IcStar, IcGrip,
+  IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcBowl, IcSet, IcTag, IcPlus, IcCheck, IcStar, IcGrip,
   IcPencil, IcTrash,
 } from "../../components/Icons";
 import { useAdminLang } from "../../lib/adminI18n";
@@ -17,6 +17,8 @@ const CATEGORY_ICONS = {
   "salt-bread": IcBread,
   dessert: IcCakeSlice,
   coffee: IcCup,
+  side: IcBowl,
+  set: IcSet,
 };
 
 const BUCKET = "product-images";
