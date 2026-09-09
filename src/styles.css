@@ -299,15 +299,21 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    wrapper (stacking them) rather than on each pill. Bottom-right corner of
    the photo (not top-left) so it doesn't compete with the category/star
    icon area elsewhere in the UI. */
-.food-card-badges{position:absolute; bottom:8px; right:8px; z-index:1; display:flex; flex-direction:row; flex-wrap:wrap; justify-content:flex-end; align-items:flex-end; gap:4px;}
+/* left is set too (not just right) so the flex box gets the card's full
+   width as available space — with only "right" set, an absolutely
+   positioned box's shrink-to-fit width is capped at that available space,
+   which was sometimes just barely too narrow for "Signature" + "Best"
+   together and forced them to wrap onto two lines instead of sitting side
+   by side; justify-content still hugs them to the right edge. */
+.food-card-badges{position:absolute; bottom:8px; left:8px; right:8px; z-index:1; display:flex; flex-direction:row; flex-wrap:wrap; justify-content:flex-end; align-items:flex-end; gap:4px;}
 .food-card-badge{
   display:inline-flex; align-items:center; gap:3px;
-  font-family:'Pretendard', sans-serif; font-weight:700; font-size:.68rem; letter-spacing:.02em; color:#fff;
+  font-family:'Pretendard', sans-serif; font-weight:500; font-size:.68rem; letter-spacing:.02em; color:#fff;
   padding:1px 5px; border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
 }
-.food-card-badge-signature{background:linear-gradient(135deg, rgba(139,92,246,.82), rgba(109,40,217,.82));}
-.food-card-badge-best{background:linear-gradient(135deg, rgba(245,179,1,.82), rgba(232,137,12,.82));}
-.food-card-small .food-card-badges{bottom:4px; right:4px; gap:2px;}
+.food-card-badge-signature{background:linear-gradient(135deg, #8b5cf6, #6d28d9);}
+.food-card-badge-best{background:linear-gradient(135deg, #f5b301, #e8890c);}
+.food-card-small .food-card-badges{bottom:4px; left:4px; right:4px; gap:2px;}
 .food-card-small .food-card-badge{font-size:.52rem; padding:1px 4px; gap:2px;}
 .food-card .body{padding:14px 16px 18px; display:flex; flex-direction:column; flex:1;}
 .food-card h4{font-family:'PT Serif', serif; font-weight:500; font-size:.82rem; color:var(--ink); margin-bottom:0; cursor:pointer;}
@@ -780,7 +786,13 @@ footer ul li a:hover{color:#F0D9C9;}
   .food-card.food-card-small .body{padding:8px 6px;}
   .food-card.food-card-small h4{font-size:.68rem; line-height:1.25;}
   .food-card-small .card-price{font-size:.7rem;}
-  .card-grid .food-card-badge{font-size:.5rem; padding:1px 4px;}
+  .card-grid .food-card-badge{font-size:.5rem; padding:1px 3px; letter-spacing:0;}
+  /* Sit closer to the photo's bottom edge on mobile than the 8px/4px used
+     above 600px, and tighter gap/edge margins — a narrow mobile card left
+     just barely too little room for "Signature" + "Best" side by side
+     otherwise, wrapping them onto two lines despite flex-direction:row. */
+  .food-card-badges{bottom:3px; left:2px; right:2px; gap:2px;}
+  .food-card-small .food-card-badges{bottom:2px; left:1px; right:1px; gap:2px;}
   .card-grid .quick-add-btn{width:22px; height:22px;}
   .card-grid .quick-add-btn svg{width:11px; height:11px;}
   .features .wrap{grid-template-columns:1fr;}
