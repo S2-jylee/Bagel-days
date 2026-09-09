@@ -195,7 +195,7 @@ export default function Menu() {
                     <img src={asset("/assets/images/sandwich-set.jpg")} alt="Bagel set" className="set-banner-mini-img" />
                     <div className="set-banner-mini-text">
                       <h4>Make It A Set</h4>
-                      <p>저렴하게 구성된 세트메뉴를 즐겨보세요!</p>
+                      <p>Enjoy our great-value set menu!</p>
                     </div>
                   </div>
                 </div>

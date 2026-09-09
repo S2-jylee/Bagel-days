@@ -265,12 +265,8 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .widget-about-link:hover{text-decoration:underline;}
 .widget-bestsellers{justify-content:flex-start;}
 .mini-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
-/* Fixed 6 slots regardless of how many best sellers are actually marked
-   (4-6) — with repeat(4,1fr), registering only 4 stretched each card to
-   fill the row, so a shop with 4 best sellers looked different-sized from
-   one with 6. Unfilled slots (5th/6th) at 4 or 5 marked just stay empty
-   grid cells instead of the existing cards growing to cover them. */
-.widget-bestsellers .mini-grid{grid-template-columns:repeat(6,1fr); gap:8px; flex:1; align-content:center;}
+.widget-bestsellers .mini-grid{grid-template-columns:repeat(4,1fr); gap:8px; flex:1; align-content:center;}
+.widget-bestsellers .mini-grid > :nth-child(n+5){display:none;}
 .food-card-small .body{padding:8px 4px 0; text-align:center;}
 .food-card-small h4{font-size:.7rem; margin-bottom:0; line-height:1.2;}
 
@@ -440,6 +436,10 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 }
 .menu-best-section{margin-bottom:28px;}
 .menu-best-section .menu-section-label{border-bottom-color:var(--maroon-light);}
+/* Fixed 6 slots regardless of how many are actually marked category-best
+   (up to 6) — otherwise 4 marked would stretch to fill 4 columns while 6
+   marked would be narrower, sizing inconsistently depending on count. */
+.menu-best-grid{grid-template-columns:repeat(6,1fr);}
 /* Product grid on the left, a promo column (add-ons info above a compact
    "Make It A Set" banner) on the right — when a category has no add-ons,
    the banner sits alone at the top of that column instead of leaving a gap.
@@ -460,10 +460,10 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    just empty space, not stretched to fill it). */
 .set-banner-mini{
   display:flex; flex-direction:column-reverse; align-items:flex-start; gap:clamp(3px, 1.6cqw, 8px);
-  background:var(--cream-alt); border-radius:var(--radius); padding:clamp(8px, 3.2cqw, 14px);
+  background:var(--cream-alt); border-radius:var(--radius); padding:clamp(8px, 7cqw, 26px);
   cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;
 }
-.set-banner-mini:hover{transform:translateY(-2px); box-shadow:0 4px 14px rgba(43,27,20,.12);}
+.set-banner-mini:hover{transform:translateY(-2px);}
 .set-banner-mini-img{width:57.5%; max-width:100%; aspect-ratio:1347/784; object-fit:contain; border-radius:6px; display:block;}
 .set-banner-mini-text h4{font-family:'PT Serif', serif; font-size:clamp(.75rem, 3.8cqw, 1rem); color:var(--maroon); margin-bottom:2px;}
 .set-banner-mini-text p{font-family:'Pretendard', sans-serif; font-size:clamp(.65rem, 3.15cqw, .85rem); color:var(--body); margin-bottom:4px;}
@@ -667,7 +667,8 @@ footer ul li a:hover{color:#F0D9C9;}
 @media (max-width:1200px){
   .widgets-grid{grid-template-columns:repeat(3,1fr);}
   .widget-bestsellers{grid-column:1/-1;}
-  .widget-bestsellers .mini-grid{gap:10px;}
+  .widget-bestsellers .mini-grid{grid-template-columns:repeat(6,1fr); gap:10px;}
+  .widget-bestsellers .mini-grid > :nth-child(n+5){display:block;}
 }
 /* nav.links needs its own breakpoint (not the general 980px mobile one) because
    the full row (logo + 6 links + social/cart/Order Online) stops fitting a bit
@@ -763,7 +764,8 @@ footer ul li a:hover{color:#F0D9C9;}
   .home-hero{padding-bottom:0;}
   .widgets-grid{grid-template-columns:1fr;}
   .widget-bestsellers{grid-column:auto;}
-  .widget-bestsellers .mini-grid{gap:6px;}
+  .widget-bestsellers .mini-grid{grid-template-columns:repeat(4,1fr); gap:6px;}
+  .widget-bestsellers .mini-grid > :nth-child(n+5){display:none;}
   .widget-about-badge{display:block; width:90px;}
   /* Order Online widget: text on the left, Uber Eats/DoorDash stacked
      top-to-bottom in a column on the right (not full-width below the text,
@@ -982,7 +984,7 @@ footer ul li a:hover{color:#F0D9C9;}
 /* Same pattern as the Home best-seller panel, just lower-key — this one
    repeats per category/subcategory view, so it shouldn't compete with it
    for visual weight. */
-.category-best-panel{background:var(--cream-alt); border-color:var(--line); padding:12px 16px; margin-bottom:18px;}
+.category-best-panel{background:var(--cream-alt); border-color:var(--line); padding:12px 16px; margin-bottom:24px;}
 .category-best-panel .bestseller-grid{grid-template-columns:repeat(6,1fr); gap:8px; margin-top:10px;}
 .category-best-panel .bestseller-card img, .category-best-panel .bestseller-card .menu-manager-noimg{aspect-ratio:1/1;}
 .category-best-panel .bestseller-card-name{font-size:.68rem;}
@@ -1072,7 +1074,7 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 .menu-manager-row-actions{display:flex; gap:8px; flex-shrink:0;}
 .menu-manager-delete{color:var(--maroon-light);}
-.menu-manager-toolbar-actions{display:flex; align-items:center; gap:8px;}
+.menu-manager-toolbar-actions{display:flex; align-items:center; gap:12px;}
 .menu-manager-star-wrap{position:relative; display:flex; flex-shrink:0;}
 .menu-manager-star{
   display:flex; align-items:center; justify-content:center; width:34px; height:34px; flex-shrink:0;
@@ -1104,20 +1106,14 @@ footer ul li a:hover{color:#F0D9C9;}
 .admin-form-panel h3{font-size:1.2rem; margin-bottom:18px;}
 .menu-manager-photo-row{display:flex; align-items:center; gap:16px; margin-bottom:18px;}
 .menu-manager-photo-preview{width:140px; aspect-ratio:4/3; border-radius:8px; object-fit:contain; background:#fff; border:1px solid var(--line); flex-shrink:0;}
-/* Same look as .taxonomy-add-row button (maroon circle, cream/maroon swap +
-   lift on hover) — the site's shared "add" affordance. */
-.menu-manager-variant-add-btn{
-  width:34px; height:34px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-left:auto;
-  border:1.5px solid var(--maroon); border-radius:50%; background:var(--maroon); color:#fff; cursor:pointer;
-  box-shadow:0 1px 4px rgba(43,27,20,.3); transition:background .15s ease, color .15s ease, transform .15s ease;
-}
-.menu-manager-variant-add-btn:hover{background:var(--cream); color:var(--maroon); transform:translateY(-2px);}
-.menu-manager-variant-add-btn svg{width:16px; height:16px;}
-/* Price + any size/option pairs, split into equal boxes (3 when the first
-   option row exists: Price | Label | Price) and wrapping to a new line of
-   3 for each additional option beyond that. */
+.menu-manager-photo-actions{display:flex; align-items:center; gap:10px;}
+/* Price sits at a third of the row from the start (not stretched to
+   100% just because it's alone) so adding the first size/option — two
+   more boxes of the same width — completes an even 3-way split instead
+   of visibly resizing Price. flex-shrink (not 0) lets it still give way
+   on a narrow modal instead of overflowing. */
 .price-variant-row{display:flex; flex-wrap:wrap; gap:14px;}
-.price-variant-row .field{flex:1 1 150px;}
+.price-variant-row .field{flex:0 1 calc(33.333% - 10px); min-width:100px;}
 .variant-price-input-row{display:flex; align-items:center; gap:6px;}
 .variant-price-input-row input{flex:1; min-width:0;}
 .variant-remove-btn{

@@ -964,7 +964,6 @@ export default function MenuManager() {
             <div className="bestseller-panel-head">
               <div className="inventory-fillall-text">
                 <strong>{t("categoryBestHeading")}</strong>
-                <span>{t("categoryBestDesc")}</span>
               </div>
               <div className="menu-manager-toolbar-actions">
                 {categoryBestReordering ? (
@@ -1092,14 +1091,14 @@ export default function MenuManager() {
                 {form.imageUrl ? <img src={productImageUrl(form.imageUrl)} alt="" className="menu-manager-photo-preview" /> : <div className="menu-manager-noimg large" />}
                 <div>
                   <p className="menu-manager-photo-hint">{t("recommendedSize")}</p>
-                  <label className="btn btn-ghost btn-sm menu-manager-upload-btn">
-                    {uploading ? t("uploading") : t("uploadPhoto")}
-                    <input type="file" accept="image/*" onChange={handlePhotoChange} disabled={uploading} hidden />
-                  </label>
+                  <div className="menu-manager-photo-actions">
+                    <label className="btn btn-ghost btn-sm menu-manager-upload-btn">
+                      {uploading ? t("uploading") : t("uploadPhoto")}
+                      <input type="file" accept="image/*" onChange={handlePhotoChange} disabled={uploading} hidden />
+                    </label>
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={addVariantRow}>{t("addVariantRow")}</button>
+                  </div>
                 </div>
-                <button type="button" className="menu-manager-variant-add-btn" onClick={addVariantRow} aria-label={t("addVariantRow")} title={t("addVariantRow")}>
-                  <IcPlus />
-                </button>
               </div>
 
               <div className="form-grid">
