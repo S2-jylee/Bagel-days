@@ -1411,35 +1411,49 @@ export default function MenuManager() {
                             </select>
                           </div>
                           {section.choices.length > 0 && (
-                            <ul className="set-builder-items">
+                            <div className="bestseller-grid set-choice-grid">
                               {section.choices.map((choice, ci) => {
-                                const text =
-                                  choice.type === "product"
-                                    ? products[choice.productId]?.name ?? "—"
-                                    : t(
-                                        "setAnyItemIn",
-                                        choice.subcategoryId
-                                          ? categories
-                                              .find((c) => c.id === choice.categoryId)
-                                              ?.subcategories.find((s) => s.id === choice.subcategoryId)?.label
-                                          : categories.find((c) => c.id === choice.categoryId)?.label
-                                      );
+                                if (choice.type === "product") {
+                                  const cp = products[choice.productId];
+                                  if (!cp) return null;
+                                  return (
+                                    <div className="bestseller-card" key={ci}>
+                                      <button
+                                        type="button"
+                                        className="bestseller-card-remove"
+                                        onClick={() => removeSetSectionChoice(si, ci)}
+                                        aria-label={t("removeSetItem")}
+                                        title={t("removeSetItem")}
+                                      >
+                                        &times;
+                                      </button>
+                                      {cp.img ? <img src={cp.img} alt={cp.name} /> : <div className="menu-manager-noimg" />}
+                                      <span className="bestseller-card-name">{cp.name}</span>
+                                    </div>
+                                  );
+                                }
+                                const wildCat = categories.find((c) => c.id === choice.categoryId);
+                                const wildLabel = choice.subcategoryId
+                                  ? wildCat?.subcategories.find((s) => s.id === choice.subcategoryId)?.label
+                                  : wildCat?.label;
+                                const WildIc = CATEGORY_ICONS[choice.categoryId] || IcTag;
                                 return (
-                                  <li key={ci}>
-                                    <span>{text}</span>
+                                  <div className="bestseller-card set-choice-wildcard" key={ci}>
                                     <button
                                       type="button"
-                                      className="set-item-remove-btn"
+                                      className="bestseller-card-remove"
                                       onClick={() => removeSetSectionChoice(si, ci)}
                                       aria-label={t("removeSetItem")}
                                       title={t("removeSetItem")}
                                     >
-                                      −
+                                      &times;
                                     </button>
-                                  </li>
+                                    <div className="set-choice-wildcard-icon"><WildIc /></div>
+                                    <span className="bestseller-card-name">{t("setAnyItemIn", wildLabel)}</span>
+                                  </div>
                                 );
                               })}
-                            </ul>
+                            </div>
                           )}
                         </div>
                       );
