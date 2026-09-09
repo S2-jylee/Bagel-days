@@ -710,8 +710,10 @@ footer ul li a:hover{color:#F0D9C9;}
   /* The Best Menu grid's fixed 6 columns were sized to share a row with the
      promo column (desktop's 6-track layout) — once that column drops below
      instead of sitting alongside, match the "All Items" grid's own 4 columns
-     below it rather than staying cramped at 6. */
+     below it rather than staying cramped at 6. A 5th/6th item then hides
+     instead of wrapping onto a short second row of its own. */
   .menu-best-grid{grid-template-columns:repeat(4,1fr);}
+  .menu-best-grid > :nth-child(n+5){display:none;}
   /* menu-promo-col takes the full row width here (there's no card-grid
      sharing the row anymore) so its two children — addons-panel and
      set-banner-mini — can sit side by side instead of stacked. Each one
@@ -1142,13 +1144,6 @@ footer ul li a:hover{color:#F0D9C9;}
 .menu-manager-photo-row{display:flex; align-items:center; gap:16px; margin-bottom:18px;}
 .menu-manager-photo-preview{width:140px; aspect-ratio:4/3; border-radius:8px; object-fit:contain; background:#fff; border:1px solid var(--line); flex-shrink:0;}
 .menu-manager-photo-actions{display:flex; align-items:center; gap:10px;}
-/* Price sits at a third of the row from the start (not stretched to
-   100% just because it's alone) so adding the first size/option — two
-   more boxes of the same width — completes an even 3-way split instead
-   of visibly resizing Price. flex-shrink (not 0) lets it still give way
-   on a narrow modal instead of overflowing. */
-.price-variant-row{display:flex; flex-wrap:wrap; gap:14px;}
-.price-variant-row .field{flex:0 1 calc(33.333% - 10px); min-width:100px;}
 .variant-price-input-row{display:flex; align-items:center; gap:6px;}
 .variant-price-input-row input{flex:1; min-width:0;}
 .variant-remove-btn{
@@ -1158,20 +1153,21 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 .variant-remove-btn:hover{border-color:var(--maroon-light); color:var(--maroon);}
 
-/* Coffee & Drink's per-size pricing: unlike the generic price-variant-row
-   (one plain base price + optional labelled extras), every row here is an
-   equal Label+Price pair — the "size" concept has no unlabeled default tier
-   the way other categories' base price does. */
-.coffee-size-row{display:flex; gap:14px; margin-bottom:14px;}
-.coffee-size-row .field{flex:1 1 0; min-width:100px;}
-.coffee-size-rows > .btn{margin-top:2px;}
+/* Each "Add Item" row (an Item name + its own Price, plus a remove button) —
+   used for Coffee & Drink's required per-size pricing and for any other
+   category's optional extra items, so every row is a clean, equal pair
+   instead of the old flex-wrap layout where several 1/3-width fields could
+   land on the same visual line unpredictably. */
+.option-row{display:flex; gap:14px; margin-bottom:14px;}
+.option-row .field{flex:1 1 0; min-width:100px;}
+.option-rows > .btn{margin-top:2px;}
 
-/* Set category's compact item form: name+price share a row (no category/
-   subcategory selects — a set is always registered under "Set"), followed
-   by the category->subcategory->product picker used to compose it. */
-.set-name-price-row{display:flex; gap:14px;}
-.set-name-price-row .field:first-child{flex:1 1 auto;}
-.set-name-price-row .field:last-child{flex:0 1 220px; min-width:140px;}
+/* Name+Price sharing one row: the Set category's compact item form (no
+   category/subcategory selects — a set always belongs to "Set") and every
+   other category's own item form alike. */
+.name-price-row{display:flex; gap:14px;}
+.name-price-row .field:first-child{flex:1 1 auto;}
+.name-price-row .field:last-child{flex:0 1 220px; min-width:140px;}
 .set-builder-row{display:flex; gap:10px; margin-bottom:10px;}
 .set-builder-row select{flex:1; min-width:0;}
 .set-builder-add-btn, .set-builder-remove-btn{

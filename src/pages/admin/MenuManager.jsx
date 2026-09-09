@@ -1162,7 +1162,7 @@ export default function MenuManager() {
 
               <div className="form-grid">
                 {form.categoryId === "set" ? (
-                  <div className="set-name-price-row field full">
+                  <div className="name-price-row field full">
                     <div className="field">
                       <label>{t("name")}</label>
                       <input type="text" value={form.name} onChange={(e) => updateForm({ name: e.target.value })} required />
@@ -1172,7 +1172,7 @@ export default function MenuManager() {
                       <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
                     </div>
                   </div>
-                ) : (
+                ) : form.categoryId === "coffee" ? (
                   <>
                     <div className="field full">
                       <label>{t("name")}</label>
@@ -1205,55 +1205,92 @@ export default function MenuManager() {
                         </select>
                       </div>
                     )}
-                    {form.categoryId === "coffee" ? (
-                      <div className="field full coffee-size-rows">
-                        <div className="coffee-size-row">
+                    <div className="field full option-rows">
+                      <div className="option-row">
+                        <div className="field">
+                          <label>{t("variantLabel")}</label>
+                          <input type="text" value={form.baseVariantLabel} onChange={(e) => updateForm({ baseVariantLabel: e.target.value })} required />
+                        </div>
+                        <div className="field">
+                          <label>{t("price")}</label>
+                          <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
+                        </div>
+                      </div>
+                      {form.variants.map((v, i) => (
+                        <div className="option-row" key={i}>
                           <div className="field">
                             <label>{t("variantLabel")}</label>
-                            <input type="text" value={form.baseVariantLabel} onChange={(e) => updateForm({ baseVariantLabel: e.target.value })} required />
+                            <input type="text" value={v.label} onChange={(e) => updateVariantRow(i, { label: e.target.value })} required />
                           </div>
                           <div className="field">
                             <label>{t("price")}</label>
-                            <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
+                            <div className="variant-price-input-row">
+                              <input type="number" min="0" step="0.01" value={v.price} onChange={(e) => updateVariantRow(i, { price: e.target.value })} required />
+                              <button type="button" className="variant-remove-btn" onClick={() => removeVariantRow(i)} aria-label={t("removeVariantRow")} title={t("removeVariantRow")}>×</button>
+                            </div>
                           </div>
                         </div>
+                      ))}
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={addVariantRow}>{t("addVariantRow")}</button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="name-price-row field full">
+                      <div className="field">
+                        <label>{t("name")}</label>
+                        <input type="text" value={form.name} onChange={(e) => updateForm({ name: e.target.value })} required />
+                      </div>
+                      <div className="field">
+                        <label>{t("price")}</label>
+                        <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
+                      </div>
+                    </div>
+                    <div className="field">
+                      <label>{t("category")}</label>
+                      <select
+                        value={form.categoryId}
+                        onChange={(e) => {
+                          const nextCategoryId = e.target.value;
+                          const cat = categories.find((c) => c.id === nextCategoryId);
+                          updateForm({
+                            categoryId: nextCategoryId,
+                            subcategoryId: cat.subcategories?.[0]?.id ?? null,
+                            variants: nextCategoryId === "coffee" && form.variants.length === 0 ? [{ label: "", price: "" }] : form.variants,
+                          });
+                        }}
+                      >
+                        {categories.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+                      </select>
+                    </div>
+                    {categories.find((c) => c.id === form.categoryId)?.subcategories.length > 0 && (
+                      <div className="field">
+                        <label>{t("subcategory")}</label>
+                        <select value={form.subcategoryId ?? ""} onChange={(e) => updateForm({ subcategoryId: e.target.value })}>
+                          {categories.find((c) => c.id === form.categoryId).subcategories.map((s) => (
+                            <option key={s.id} value={s.id}>{s.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                    {form.variants.length > 0 && (
+                      <div className="field full option-rows">
                         {form.variants.map((v, i) => (
-                          <div className="coffee-size-row" key={i}>
+                          <div className="option-row" key={i}>
                             <div className="field">
                               <label>{t("variantLabel")}</label>
-                              <input type="text" value={v.label} onChange={(e) => updateVariantRow(i, { label: e.target.value })} required />
+                              <input type="text" value={v.label} onChange={(e) => updateVariantRow(i, { label: e.target.value })} />
                             </div>
                             <div className="field">
                               <label>{t("price")}</label>
                               <div className="variant-price-input-row">
-                                <input type="number" min="0" step="0.01" value={v.price} onChange={(e) => updateVariantRow(i, { price: e.target.value })} required />
+                                <input type="number" min="0" step="0.01" value={v.price} onChange={(e) => updateVariantRow(i, { price: e.target.value })} />
                                 <button type="button" className="variant-remove-btn" onClick={() => removeVariantRow(i)} aria-label={t("removeVariantRow")} title={t("removeVariantRow")}>×</button>
                               </div>
                             </div>
                           </div>
                         ))}
-                        <button type="button" className="btn btn-ghost btn-sm" onClick={addVariantRow}>{t("addVariantRow")}</button>
                       </div>
-                    ) : (
-                    <div className="price-variant-row field full">
-                      <div className="field">
-                        <label>{t("price")}</label>
-                        <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
-                      </div>
-                      {form.variants.flatMap((v, i) => [
-                        <div className="field" key={`variant-label-${i}`}>
-                          <label>{t("variantLabel")}</label>
-                          <input type="text" value={v.label} onChange={(e) => updateVariantRow(i, { label: e.target.value })} />
-                        </div>,
-                        <div className="field" key={`variant-price-${i}`}>
-                          <label>{t("price")}</label>
-                          <div className="variant-price-input-row">
-                            <input type="number" min="0" step="0.01" value={v.price} onChange={(e) => updateVariantRow(i, { price: e.target.value })} />
-                            <button type="button" className="variant-remove-btn" onClick={() => removeVariantRow(i)} aria-label={t("removeVariantRow")} title={t("removeVariantRow")}>×</button>
-                          </div>
-                        </div>,
-                      ])}
-                    </div>
                     )}
                   </>
                 )}
