@@ -789,7 +789,7 @@ footer ul li a:hover{color:#F0D9C9;}
   /* PC/desktop keeps the original wider pill (padding:1px 5px, border-
      radius:20px, from the base rule above) — this tighter, more
      rectangular version is mobile-only. */
-  .card-grid .food-card-badge{font-size:.5rem; padding:1px; border-radius:4px; letter-spacing:0;}
+  .card-grid .food-card-badge{font-size:.5rem; padding:1px 2px; border-radius:4px; letter-spacing:0;}
   /* Sit closer to the photo's bottom edge on mobile than the 8px/4px used
      above 600px, and tighter gap/edge margins — a narrow mobile card left
      just barely too little room for "Signature" + "Best" side by side
