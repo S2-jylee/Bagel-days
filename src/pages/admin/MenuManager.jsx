@@ -963,21 +963,6 @@ export default function MenuManager() {
               addPlaceholder={t("newSubcategoryPlaceholder")}
               variant="pills"
             />
-            <div className="menu-manager-toolbar-actions">
-              {reordering ? (
-                <>
-                  <button type="button" className="btn btn-ghost btn-sm" onClick={cancelReorder} disabled={savingOrder}>{t("cancel")}</button>
-                  <button type="button" className="btn btn-primary btn-sm" onClick={saveOrder} disabled={savingOrder}>
-                    {savingOrder ? t("saving") : t("saveOrder")}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button type="button" className="btn btn-ghost btn-sm" onClick={startReorder} disabled={visibleItems.length < 2}>{t("reorder")}</button>
-                  <button type="button" className="btn btn-primary btn-sm" onClick={openCreate}>{t("addNewItem")}</button>
-                </>
-              )}
-            </div>
           </div>
 
           <div className="inventory-fillall-bar">
@@ -1069,6 +1054,22 @@ export default function MenuManager() {
               ))}
               {categoryBestItems.length === 0 && <p className="inventory-hint">{t("noCategoryBestYet")}</p>}
             </div>
+          </div>
+
+          <div className="menu-manager-toolbar-actions">
+            {reordering ? (
+              <>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={cancelReorder} disabled={savingOrder}>{t("cancel")}</button>
+                <button type="button" className="btn btn-primary btn-sm" onClick={saveOrder} disabled={savingOrder}>
+                  {savingOrder ? t("saving") : t("saveOrder")}
+                </button>
+              </>
+            ) : (
+              <>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={startReorder} disabled={visibleItems.length < 2}>{t("reorder")}</button>
+                <button type="button" className="btn btn-primary btn-sm" onClick={openCreate}>{t("addNewItem")}</button>
+              </>
+            )}
           </div>
 
           {reordering && <p className="inventory-hint">{t("dragHint")}</p>}
