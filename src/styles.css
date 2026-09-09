@@ -267,10 +267,12 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .mini-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
 .widget-bestsellers .mini-grid{grid-template-columns:repeat(4,1fr); gap:8px; flex:1; align-content:center;}
 .widget-bestsellers .mini-grid > :nth-child(n+5){display:none;}
-.food-card-small .body{padding:8px 4px 0; text-align:center;}
+/* Left-aligned (not centered) to match the full Menu grid card's name
+   alignment — centered text made a wrapped 2-line name (e.g. "Rainbow
+   Funfetti") look like it had uneven, overly wide side margins, since the
+   shorter second line centers with more empty space on each side. */
+.food-card-small .body{padding:8px 4px 0;}
 .food-card-small h4{font-size:.7rem; margin-bottom:0; line-height:1.2;}
-.food-card-small .card-quick-row{margin-top:2px; justify-content:center;}
-.food-card-small .card-price{font-size:.68rem;}
 
 /* ---------- Features row ---------- */
 .features{padding:0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--cream-alt);}

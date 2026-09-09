@@ -42,9 +42,11 @@ export default function FoodCard({ id, small }) {
         </div>
         <div className="body">
           <h4 className="card-name-trigger">{p.name}</h4>
-          <div className="card-quick-row">
-            <span className="card-price">${p.price.toFixed(2)}</span>
-          </div>
+          {!small && (
+            <div className="card-quick-row">
+              <span className="card-price">${p.price.toFixed(2)}</span>
+            </div>
+          )}
         </div>
       </div>
 
