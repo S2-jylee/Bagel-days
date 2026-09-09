@@ -984,7 +984,7 @@ footer ul li a:hover{color:#F0D9C9;}
 /* Same pattern as the Home best-seller panel, just lower-key — this one
    repeats per category/subcategory view, so it shouldn't compete with it
    for visual weight. */
-.category-best-panel{background:var(--cream-alt); border-color:var(--line); padding:12px 16px; margin-bottom:24px;}
+.category-best-panel{background:var(--cream-alt); border-color:var(--line); padding:12px 16px; margin-top:20px; margin-bottom:24px;}
 .category-best-panel .bestseller-grid{grid-template-columns:repeat(6,1fr); gap:8px; margin-top:10px;}
 .category-best-panel .bestseller-card img, .category-best-panel .bestseller-card .menu-manager-noimg{aspect-ratio:1/1;}
 .category-best-panel .bestseller-card-name{font-size:.68rem;}
