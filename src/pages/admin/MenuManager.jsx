@@ -407,7 +407,13 @@ export default function MenuManager() {
   const visibleItems = Object.values(products)
     .filter((p) => p.categoryId === activeCat && (!activeSubcategory || !p.subcategoryId || p.subcategoryId === activeSubcat))
     .sort((a, b) => a.sortOrder - b.sortOrder);
-  const categoryBestItems = visibleItems.filter((p) => p.isCategoryBest).sort((a, b) => (a.categoryBestOrder ?? 0) - (b.categoryBestOrder ?? 0));
+  // Best Menu is shared across the whole category, not scoped to whichever
+  // subcategory tab happens to be open — pulled from every product in
+  // activeCat (not visibleItems) so it shows and stays editable the same way
+  // regardless of which subcategory tab staff are looking at.
+  const categoryBestItems = Object.values(products)
+    .filter((p) => p.categoryId === activeCat && p.isCategoryBest)
+    .sort((a, b) => (a.categoryBestOrder ?? 0) - (b.categoryBestOrder ?? 0));
   const addonList = Object.values(addons);
   const poolAddons = addonList.filter((a) => (poolTab === "general" ? !a.categoryId : a.categoryId === poolTab));
   const allProductIds = Object.keys(products);
@@ -556,10 +562,11 @@ export default function MenuManager() {
     logActivity({ action: "create", entity: "best_seller", label: p.name, path: `${t("menu")} > ${t("bestSellersHeading")}` });
   }
 
-  // ---- category best (top row of the product grid for this exact
-  // category/subcategory view — scoped separately from the Home best sellers) ----
+  // ---- category best (top row of the product grid, shared across every
+  // subcategory of this category — scoped separately from the Home best
+  // sellers) ----
 
-  const categoryBestPath = `${t("menu")} > ${activeCategory.label}${activeSubcategory ? ` > ${activeSubcategory.label}` : ""}`;
+  const categoryBestPath = `${t("menu")} > ${activeCategory.label}`;
 
   async function toggleCategoryBest(p) {
     if (p.isCategoryBest) {
@@ -604,7 +611,7 @@ export default function MenuManager() {
     logActivity({
       action: "reorder",
       entity: "category_best",
-      label: activeSubcategory ? activeSubcategory.label : activeCategory.label,
+      label: activeCategory.label,
       path: categoryBestPath,
       details: categoryBestOrderedIds.map((id) => products[id]?.name).filter(Boolean).join(" → "),
     });

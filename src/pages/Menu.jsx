@@ -61,24 +61,25 @@ export default function Menu() {
 
   const activeCategory = categories.find((c) => c.id === activeCat) ?? categories[0];
   const activeSubcategory = activeCategory.subcategories?.find((s) => s.id === activeSubcat) ?? null;
-  // Split into a "Best Menu" row (staff-picked per category/subcategory in
-  // Admin, capped at 6) and everything else — kept as two separate id lists
-  // so they render as two visually distinct sections instead of one grid.
+  // Split into a "Best Menu" row (staff-picked per category in Admin, capped
+  // at 6) and everything else — kept as two separate id lists so they render
+  // as two visually distinct sections instead of one grid. Best Menu is
+  // shared across the whole category regardless of which subcategory tab is
+  // open (it's not itself filtered by subcategory) — only the regular list
+  // below it changes per tab.
   const { bestIds, regularIds } = useMemo(() => {
-    // A product with no subcategory set always shows, regardless of which
-    // subcategory tab is active — otherwise it's invisible on every tab
-    // except "no filter", which isn't reachable once a category has any
-    // subcategories (the first one is always selected by default).
-    const all = Object.values(products).filter(
-      (p) => p.isActive !== false && p.categoryId === activeCat && (!activeSubcategory || !p.subcategoryId || p.subcategoryId === activeSubcat)
-    );
-    const best = all
+    const inCategory = Object.values(products).filter((p) => p.isActive !== false && p.categoryId === activeCat);
+    const best = inCategory
       .filter((p) => p.isCategoryBest)
       .sort((a, b) => (a.categoryBestOrder ?? 0) - (b.categoryBestOrder ?? 0))
       .map((p) => p.id);
     const bestSet = new Set(best);
-    const regular = all
-      .filter((p) => !bestSet.has(p.id))
+    // A product with no subcategory set always shows, regardless of which
+    // subcategory tab is active — otherwise it's invisible on every tab
+    // except "no filter", which isn't reachable once a category has any
+    // subcategories (the first one is always selected by default).
+    const regular = inCategory
+      .filter((p) => !bestSet.has(p.id) && (!activeSubcategory || !p.subcategoryId || p.subcategoryId === activeSubcat))
       .sort((a, b) => a.sortOrder - b.sortOrder)
       .map((p) => p.id);
     return { bestIds: best, regularIds: regular };
