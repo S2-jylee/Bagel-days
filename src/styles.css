@@ -1307,15 +1307,16 @@ footer ul li a:hover{color:#F0D9C9;}
 .taxonomy-editor .taxonomy-manage-toggle{
   font-family:'Pretendard', sans-serif; font-weight:600; font-size:.72rem; color:var(--maroon);
   background:none; border:none; text-decoration:underline; cursor:pointer;
-  padding:2px 8px 2px 12px; margin:0; border-radius:6px; transition:background .15s ease;
+  padding:4px 8px; margin:0; border-radius:6px; transition:background .15s ease;
 }
 .taxonomy-editor .taxonomy-manage-toggle:hover{background:var(--cream-alt);}
-/* .menu-maincats button has 12px of left padding before its icon — matching
-   it here (above) aligns "카테고리 관리" with the icon column below it. The
-   pills variant sits inline before its row instead of stacked above it, so
-   it keeps even padding on both sides rather than that left-aligned indent. */
-.taxonomy-editor.taxonomy-editor-pills .taxonomy-manage-toggle{margin:0 4px 0 0; padding:4px 8px;}
-.taxonomy-editor.taxonomy-editor-nav .taxonomy-manage-toggle{padding-top:8px; margin-bottom:18px;}
+.taxonomy-editor.taxonomy-editor-pills .taxonomy-manage-toggle{margin:0 4px 0 0;}
+/* Same padding as the pills variant (above) now, so the hover/underline
+   background box is identically sized on both — the 12px-left icon-column
+   alignment and the extra top offset (to match "Manage Subcategories"
+   text height) are done with margin instead of padding, since margin sits
+   outside the painted background box and doesn't inflate it. */
+.taxonomy-editor.taxonomy-editor-nav .taxonomy-manage-toggle{margin:4px 0 16px 4px;}
 .taxonomy-manage-hint{margin:0 0 8px;}
 .taxonomy-edit-row{display:flex; align-items:center; gap:6px; padding:6px 8px; border-radius:8px; background:var(--cream-alt); cursor:grab;}
 .taxonomy-edit-row.dragging{opacity:.4;}
