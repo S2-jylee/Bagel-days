@@ -17,5 +17,10 @@ export function useStaffAuth() {
 
   const signOut = useCallback(() => supabase.auth.signOut(), []);
 
-  return { session, loading: session === undefined, signIn, signOut };
+  // Accounts created before roles existed (or via the Supabase dashboard,
+  // with no role set) default to "owner" — only an explicit role:"staff"
+  // in app_metadata (set server-side, never by the client) narrows access.
+  const role = session?.user?.app_metadata?.role ?? "owner";
+
+  return { session, role, loading: session === undefined, signIn, signOut };
 }

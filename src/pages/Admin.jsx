@@ -9,8 +9,14 @@ import HistoryTab from "./admin/HistoryTab";
 import { useSeo } from "../lib/seo";
 import { AdminLangProvider, useAdminLang } from "../lib/adminI18n";
 
-function AdminShell({ signOut }) {
+// "staff" role only ever sees Menu — everything else here (tabs, the Add
+// Staff button) is hidden client-side for a clean UI, but the real
+// enforcement is server-side (RLS policies keyed off the JWT's own role
+// claim, checked again inside the invite-staff function) — hiding a button
+// was never going to be the actual security boundary.
+function AdminShell({ role, signOut }) {
   const { lang, setLang, t } = useAdminLang();
+  const isOwner = role === "owner";
   const [tab, setTab] = useState("menu");
   const [inviteOpen, setInviteOpen] = useState(false);
 
@@ -19,26 +25,26 @@ function AdminShell({ signOut }) {
       <div className="admin-shell-bar">
         <div className="admin-tabs">
           <button className={tab === "menu" ? "active" : ""} onClick={() => setTab("menu")}>{t("menuTab")}</button>
-          <button className={tab === "homepage" ? "active" : ""} onClick={() => setTab("homepage")}>{t("homepageTab")}</button>
-          <button className={tab === "orders" ? "active" : ""} onClick={() => setTab("orders")}>{t("orderHistoryTab")}</button>
-          <button className={tab === "history" ? "active" : ""} onClick={() => setTab("history")}>{t("historyTab")}</button>
+          {isOwner && <button className={tab === "homepage" ? "active" : ""} onClick={() => setTab("homepage")}>{t("homepageTab")}</button>}
+          {isOwner && <button className={tab === "orders" ? "active" : ""} onClick={() => setTab("orders")}>{t("orderHistoryTab")}</button>}
+          {isOwner && <button className={tab === "history" ? "active" : ""} onClick={() => setTab("history")}>{t("historyTab")}</button>}
         </div>
         <div className="admin-shell-actions">
           <div className="admin-lang-toggle">
             <button type="button" className={lang === "ko" ? "active" : ""} onClick={() => setLang("ko")}>한국어</button>
             <button type="button" className={lang === "en" ? "active" : ""} onClick={() => setLang("en")}>English</button>
           </div>
-          <button className="btn btn-ghost btn-sm" onClick={() => setInviteOpen(true)}>{t("inviteStaffButton")}</button>
+          {isOwner && <button className="btn btn-ghost btn-sm" onClick={() => setInviteOpen(true)}>{t("inviteStaffButton")}</button>}
           <button className="btn btn-ghost btn-sm" onClick={signOut}>{t("signOut")}</button>
         </div>
       </div>
 
       {tab === "menu" && <MenuManager />}
-      {tab === "homepage" && <HomepageManager />}
-      {tab === "orders" && <OrderHistory />}
-      {tab === "history" && <HistoryTab />}
+      {isOwner && tab === "homepage" && <HomepageManager />}
+      {isOwner && tab === "orders" && <OrderHistory />}
+      {isOwner && tab === "history" && <HistoryTab />}
 
-      {inviteOpen && <InviteStaffModal onClose={() => setInviteOpen(false)} />}
+      {isOwner && inviteOpen && <InviteStaffModal onClose={() => setInviteOpen(false)} />}
     </div>
   );
 }
@@ -51,14 +57,14 @@ export default function Admin() {
     noindex: true,
   });
 
-  const { session, loading, signIn, signOut } = useStaffAuth();
+  const { session, role, loading, signIn, signOut } = useStaffAuth();
 
   if (loading) return null;
   if (!session) return <StaffLogin title="Admin Login" onSignIn={signIn} />;
 
   return (
     <AdminLangProvider>
-      <AdminShell signOut={signOut} />
+      <AdminShell role={role} signOut={signOut} />
     </AdminLangProvider>
   );
 }

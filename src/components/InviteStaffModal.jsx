@@ -10,6 +10,9 @@ export default function InviteStaffModal({ onClose }) {
   const { t } = useAdminLang();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // Defaults to the least-privileged option — an owner has to deliberately
+  // pick "owner" for a new account to get full access.
+  const [role, setRole] = useState("staff");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
@@ -19,7 +22,7 @@ export default function InviteStaffModal({ onClose }) {
     setSaving(true);
     setError("");
     const { error: err } = await supabase.functions.invoke("invite-staff", {
-      body: { email: email.trim(), password },
+      body: { email: email.trim(), password, role },
     });
     setSaving(false);
     if (err) {
@@ -30,7 +33,7 @@ export default function InviteStaffModal({ onClose }) {
       setError(detail?.error || err.message || t("inviteStaffFailed"));
       return;
     }
-    logActivity({ action: "create", entity: "staff", label: email.trim(), path: t("inviteStaffButton") });
+    logActivity({ action: "create", entity: "staff", label: email.trim(), path: t("inviteStaffButton"), details: t(role === "owner" ? "roleOwner" : "roleStaff") });
     setDone(true);
   }
 
@@ -57,6 +60,25 @@ export default function InviteStaffModal({ onClose }) {
                 <label>{t("inviteStaffPasswordLabel")}</label>
                 <input type="text" value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} required />
                 <p className="menu-manager-photo-hint">{t("inviteStaffPasswordHint")}</p>
+              </div>
+              <div className="field full badge-select-field">
+                <label>{t("inviteStaffRoleLabel")}</label>
+                <div className="badge-select">
+                  {[
+                    { value: "staff", label: t("roleStaff"), hint: t("roleStaffHint") },
+                    { value: "owner", label: t("roleOwner"), hint: t("roleOwnerHint") },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className={`badge-select-btn${role === opt.value ? " active" : ""}`}
+                      onClick={() => setRole(opt.value)}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="menu-manager-photo-hint">{role === "owner" ? t("roleOwnerHint") : t("roleStaffHint")}</p>
               </div>
             </div>
 
