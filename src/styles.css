@@ -517,7 +517,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    landscape photo — and sits flush left; any extra width in the box is
    just empty space, not stretched to fill it). */
 .set-banner-mini{
-  display:flex; flex-direction:column-reverse; align-items:flex-start; gap:clamp(3px, 1.6cqw, 8px);
+  display:flex; flex-direction:column-reverse; align-items:flex-start; justify-content:flex-end; gap:clamp(3px, 1.6cqw, 8px);
   background:var(--cream-alt); border-radius:var(--radius); padding:clamp(8px, 7cqw, 26px);
   cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; box-sizing:border-box;
 }
