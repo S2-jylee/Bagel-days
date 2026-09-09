@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useProducts } from "../context/ProductsContext";
 import { IcBag } from "./Icons";
 import { IcChevron } from "./DeliveryButtons";
@@ -40,7 +41,7 @@ export default function FoodCard({ id, small }) {
         </div>
       </div>
 
-      {open && (
+      {open && createPortal(
         <div className="product-modal-overlay" onClick={() => setOpen(false)}>
           <div className="product-modal" onClick={(e) => e.stopPropagation()}>
             <button type="button" className="product-modal-close" onClick={() => setOpen(false)} aria-label="Close">
@@ -80,7 +81,8 @@ export default function FoodCard({ id, small }) {
               </a>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
