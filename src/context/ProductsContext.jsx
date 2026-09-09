@@ -31,6 +31,7 @@ function buildState(products, addons, links) {
       isCategoryBest: p.is_category_best,
       categoryBestOrder: p.category_best_order,
       badge: p.badge,
+      variants: Array.isArray(p.variants) ? p.variants : [],
       addons: (addonsByProduct[p.id] || []).filter(Boolean),
     };
   }

@@ -31,7 +31,7 @@ export default function FoodCard({ id, small }) {
         aria-label={`View ${p.name} details`}
       >
         <div className="thumb">
-          {p.badge && <span className={`food-card-badge food-card-badge-${p.badge}`}>✨ {BADGE_LABELS[p.badge]}</span>}
+          {p.badge && <span className={`food-card-badge food-card-badge-${p.badge}`}>{BADGE_LABELS[p.badge]}</span>}
           <img src={p.img} alt={p.name} />
         </div>
         <div className="body">
@@ -56,6 +56,12 @@ export default function FoodCard({ id, small }) {
                 <h3>{p.name}</h3>
                 <span className="product-modal-price">${p.price.toFixed(2)}</span>
               </div>
+              {p.variants.map((v, i) => (
+                <div className="product-modal-title-row" key={i}>
+                  <h3>{v.label}</h3>
+                  <span className="product-modal-price">${Number(v.price).toFixed(2)}</span>
+                </div>
+              ))}
               <p>{p.desc}</p>
 
               {p.addons.length > 0 && (

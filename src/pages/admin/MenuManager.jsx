@@ -21,7 +21,7 @@ const CATEGORY_ICONS = {
 
 const BUCKET = "product-images";
 const BEST_SELLER_LIMIT = 6;
-const CATEGORY_BEST_LIMIT = 4;
+const CATEGORY_BEST_LIMIT = 6;
 
 // Unicode-aware: keeps letters from any script (Korean names included) instead
 // of stripping everything down to "item" the way an ASCII-only [a-z0-9] filter
@@ -67,6 +67,7 @@ function diffProductDetails(prev, row, categories, t) {
   if ((prev.desc || "") !== (row.description || "")) changes.push(t("description"));
   if ((prev.isActive !== false) !== row.is_active) changes.push(t("showOnMenuSite"));
   if ((prev.badge || null) !== (row.badge || null)) changes.push(t("badgeLabel"));
+  if (JSON.stringify(prev.variants || []) !== JSON.stringify(row.variants)) changes.push(t("addVariantRow"));
   return changes.length > 0 ? changes.join("; ") : undefined;
 }
 
@@ -327,6 +328,7 @@ function emptyForm(category, subcategory) {
     imageUrl: "",
     isActive: true,
     badge: null,
+    variants: [],
     addonIds: new Set(),
   };
 }
@@ -358,7 +360,14 @@ export default function MenuManager() {
   const [savingBestSellerOrder, setSavingBestSellerOrder] = useState(false);
   const [draggingBestSellerId, setDraggingBestSellerId] = useState(null);
   const [bestSellerLimitId, setBestSellerLimitId] = useState(null); // product id currently showing the "max 6" notice
-  const [categoryBestLimitId, setCategoryBestLimitId] = useState(null); // product id currently showing the "max 4" notice
+  const [categoryBestLimitId, setCategoryBestLimitId] = useState(null); // product id currently showing the "max 6" notice
+
+  // ---- category best ordering (drag to reorder the panel below the
+  // toolbar, then Save) — same pattern as best seller ordering above. ----
+  const [categoryBestReordering, setCategoryBestReordering] = useState(false);
+  const [categoryBestOrderedIds, setCategoryBestOrderedIds] = useState([]);
+  const [savingCategoryBestOrder, setSavingCategoryBestOrder] = useState(false);
+  const [draggingCategoryBestId, setDraggingCategoryBestId] = useState(null);
 
   // Leaving the category/subcategory you were reordering discards the
   // unsaved drag state rather than trying to carry it somewhere it no
@@ -381,6 +390,9 @@ export default function MenuManager() {
   const poolAddons = addonList.filter((a) => (poolTab === "general" ? !a.categoryId : a.categoryId === poolTab));
   const allProductIds = Object.keys(products);
   const displayItems = reordering ? orderedIds.map((id) => products[id]).filter(Boolean) : visibleItems;
+  const displayCategoryBestItems = categoryBestReordering
+    ? categoryBestOrderedIds.map((id) => products[id]).filter(Boolean)
+    : categoryBestItems;
   const bestSellerItems = useMemo(
     () => Object.values(products).filter((p) => p.isBestSeller).sort((a, b) => (a.bestSellerOrder ?? 0) - (b.bestSellerOrder ?? 0)),
     [products]
@@ -543,6 +555,44 @@ export default function MenuManager() {
     logActivity({ action: "create", entity: "category_best", label: p.name, path: categoryBestPath });
   }
 
+  function startCategoryBestReorder() {
+    setCategoryBestOrderedIds(categoryBestItems.map((p) => p.id));
+    setCategoryBestReordering(true);
+  }
+
+  function cancelCategoryBestReorder() {
+    setCategoryBestReordering(false);
+    setCategoryBestOrderedIds([]);
+  }
+
+  function handleCategoryBestDragOver(e, overId) {
+    e.preventDefault();
+    if (!draggingCategoryBestId || draggingCategoryBestId === overId) return;
+    setCategoryBestOrderedIds((prev) => moveInList(prev, draggingCategoryBestId, overId));
+  }
+
+  async function saveCategoryBestOrder() {
+    setSavingCategoryBestOrder(true);
+    await Promise.all(categoryBestOrderedIds.map((id, i) => supabase.from("products").update({ category_best_order: i }).eq("id", id)));
+    logActivity({
+      action: "reorder",
+      entity: "category_best",
+      label: activeSubcategory ? activeSubcategory.label : activeCategory.label,
+      path: categoryBestPath,
+      details: categoryBestOrderedIds.map((id) => products[id]?.name).filter(Boolean).join(" → "),
+    });
+    setSavingCategoryBestOrder(false);
+    setCategoryBestReordering(false);
+    setCategoryBestOrderedIds([]);
+  }
+
+  async function removeCategoryBest(id) {
+    const name = products[id]?.name;
+    setCategoryBestOrderedIds((prev) => prev.filter((x) => x !== id));
+    await supabase.from("products").update({ is_category_best: false, category_best_order: null }).eq("id", id);
+    logActivity({ action: "delete", entity: "category_best", label: name, path: categoryBestPath });
+  }
+
   function startBestSellerReorder() {
     setBestSellerOrderedIds(bestSellerItems.map((p) => p.id));
     setBestSellerReordering(true);
@@ -598,6 +648,7 @@ export default function MenuManager() {
       imageUrl: p.imageUrl || "",
       isActive: p.isActive !== false,
       badge: p.badge || null,
+      variants: (p.variants || []).map((v) => ({ label: v.label, price: String(v.price) })),
       addonIds: new Set(p.addons.map((a) => a.id)),
     });
   }
@@ -618,6 +669,21 @@ export default function MenuManager() {
       else next.add(id);
       return { ...f, addonIds: next };
     });
+  }
+
+  // ---- size/variant rows (e.g. "L" at a different price) — shown under
+  // the base name+price on the product's page, same styling as the name. ----
+
+  function addVariantRow() {
+    setForm((f) => ({ ...f, variants: [...f.variants, { label: "", price: "" }] }));
+  }
+
+  function updateVariantRow(index, patch) {
+    setForm((f) => ({ ...f, variants: f.variants.map((v, i) => (i === index ? { ...v, ...patch } : v)) }));
+  }
+
+  function removeVariantRow(index) {
+    setForm((f) => ({ ...f, variants: f.variants.filter((_, i) => i !== index) }));
   }
 
   async function handlePhotoChange(e) {
@@ -656,6 +722,9 @@ export default function MenuManager() {
         subcategory_id: form.subcategoryId,
         is_active: form.isActive,
         badge: form.badge || null,
+        variants: form.variants
+          .filter((v) => v.label.trim() && v.price !== "")
+          .map((v) => ({ label: v.label.trim(), price: Number(v.price) })),
       };
 
       if (form.id) {
@@ -891,6 +960,60 @@ export default function MenuManager() {
             </div>
           </div>
 
+          <div className="bestseller-panel category-best-panel">
+            <div className="bestseller-panel-head">
+              <div className="inventory-fillall-text">
+                <strong>{t("categoryBestHeading")}</strong>
+                <span>{t("categoryBestDesc")}</span>
+              </div>
+              <div className="menu-manager-toolbar-actions">
+                {categoryBestReordering ? (
+                  <>
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={cancelCategoryBestReorder} disabled={savingCategoryBestOrder}>{t("cancel")}</button>
+                    <button type="button" className="btn btn-primary btn-sm" onClick={saveCategoryBestOrder} disabled={savingCategoryBestOrder}>
+                      {savingCategoryBestOrder ? t("saving") : t("saveOrder")}
+                    </button>
+                  </>
+                ) : (
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={startCategoryBestReorder} disabled={categoryBestItems.length < 2}>{t("reorder")}</button>
+                )}
+              </div>
+            </div>
+
+            <div className="bestseller-grid">
+              {displayCategoryBestItems.map((p) => (
+                <div
+                  className={`bestseller-card${categoryBestReordering ? " reordering" : ""}${draggingCategoryBestId === p.id ? " dragging" : ""}`}
+                  key={p.id}
+                  draggable={categoryBestReordering}
+                  onDragStart={(e) => {
+                    e.dataTransfer.effectAllowed = "move";
+                    e.dataTransfer.setData("text/plain", p.id);
+                    setDraggingCategoryBestId(p.id);
+                  }}
+                  onDragOver={(e) => handleCategoryBestDragOver(e, p.id)}
+                  onDrop={(e) => e.preventDefault()}
+                  onDragEnd={() => setDraggingCategoryBestId(null)}
+                >
+                  {categoryBestReordering && <span className="menu-manager-drag-handle" aria-hidden="true"><IcGrip /></span>}
+                  {categoryBestReordering && (
+                    <button
+                      type="button"
+                      className="bestseller-card-remove"
+                      onClick={() => removeCategoryBest(p.id)}
+                      aria-label={`Remove ${p.name} from Best Menu`}
+                    >
+                      &times;
+                    </button>
+                  )}
+                  {p.img ? <img src={p.img} alt={p.name} /> : <div className="menu-manager-noimg" />}
+                  <span className="bestseller-card-name">{p.name}</span>
+                </div>
+              ))}
+              {categoryBestItems.length === 0 && <p className="inventory-hint">{t("noCategoryBestYet")}</p>}
+            </div>
+          </div>
+
           {reordering && <p className="inventory-hint">{t("dragHint")}</p>}
 
           <div className="inventory-list">
@@ -974,6 +1097,9 @@ export default function MenuManager() {
                     <input type="file" accept="image/*" onChange={handlePhotoChange} disabled={uploading} hidden />
                   </label>
                 </div>
+                <button type="button" className="menu-manager-variant-add-btn" onClick={addVariantRow} aria-label={t("addVariantRow")} title={t("addVariantRow")}>
+                  <IcPlus />
+                </button>
               </div>
 
               <div className="form-grid">
@@ -1003,9 +1129,24 @@ export default function MenuManager() {
                     </select>
                   </div>
                 )}
-                <div className="field">
-                  <label>{t("price")}</label>
-                  <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
+                <div className="price-variant-row field full">
+                  <div className="field">
+                    <label>{t("price")}</label>
+                    <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
+                  </div>
+                  {form.variants.flatMap((v, i) => [
+                    <div className="field" key={`variant-label-${i}`}>
+                      <label>{t("variantLabel")}</label>
+                      <input type="text" value={v.label} onChange={(e) => updateVariantRow(i, { label: e.target.value })} />
+                    </div>,
+                    <div className="field" key={`variant-price-${i}`}>
+                      <label>{t("price")}</label>
+                      <div className="variant-price-input-row">
+                        <input type="number" min="0" step="0.01" value={v.price} onChange={(e) => updateVariantRow(i, { price: e.target.value })} />
+                        <button type="button" className="variant-remove-btn" onClick={() => removeVariantRow(i)} aria-label={t("removeVariantRow")} title={t("removeVariantRow")}>×</button>
+                      </div>
+                    </div>,
+                  ])}
                 </div>
                 <div className="field full">
                   <label>{t("description")}</label>

@@ -60,7 +60,7 @@ export default function Menu() {
   const activeCategory = categories.find((c) => c.id === activeCat) ?? categories[0];
   const activeSubcategory = activeCategory.subcategories?.find((s) => s.id === activeSubcat) ?? null;
   // Split into a "Best Menu" row (staff-picked per category/subcategory in
-  // Admin, capped at 4) and everything else — kept as two separate id lists
+  // Admin, capped at 6) and everything else — kept as two separate id lists
   // so they render as two visually distinct sections instead of one grid.
   const { bestIds, regularIds } = useMemo(() => {
     // A product with no subcategory set always shows, regardless of which
@@ -92,6 +92,11 @@ export default function Menu() {
   function selectCategory(cat) {
     setActiveCat(cat.id);
     setActiveSubcat(cat.subcategories?.[0]?.id ?? null);
+  }
+
+  function goToSetCategory() {
+    const setCategory = categories.find((c) => c.id === "set");
+    if (setCategory) selectCategory(setCategory);
   }
 
   return (
@@ -180,12 +185,17 @@ export default function Menu() {
                     </div>
                   )}
 
-                  <div className="set-banner-mini">
+                  <div
+                    className="set-banner-mini"
+                    role="button"
+                    tabIndex={0}
+                    onClick={goToSetCategory}
+                    onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), goToSetCategory())}
+                  >
                     <img src={asset("/assets/images/sandwich-set.jpg")} alt="Bagel set" className="set-banner-mini-img" />
                     <div className="set-banner-mini-text">
                       <h4>Make It A Set</h4>
-                      <p>Any Bagel + Cream Cheese + Coffee</p>
-                      <div className="price">From $12.50</div>
+                      <p>저렴하게 구성된 세트메뉴를 즐겨보세요!</p>
                     </div>
                   </div>
                 </div>
