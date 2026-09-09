@@ -322,6 +322,14 @@ function TaxonomyEditor({
   );
 }
 
+// One row of the Set category's item picker (category -> subcategory ->
+// product cascading selects). Kept separate from the persisted `setItems`
+// (a plain array of product ids) since a row can sit half-filled while
+// staff are still narrowing it down.
+function emptySetRow() {
+  return { categoryId: "", subcategoryId: "", productId: "" };
+}
+
 function emptyForm(category, subcategory) {
   return {
     id: null,
@@ -334,6 +342,7 @@ function emptyForm(category, subcategory) {
     isActive: true,
     badges: [],
     variants: [],
+    setRows: [emptySetRow()],
     addonIds: new Set(),
   };
 }
@@ -648,6 +657,14 @@ export default function MenuManager() {
 
   function openEdit(p) {
     setFormError("");
+    // Rebuild each row from the composed product's *current* category/subcategory
+    // (not whatever it was when the set was first put together) so the cascading
+    // selects land on a valid combination — a product that moved categories since
+    // still resolves correctly here. Once a product no longer exists it's dropped.
+    const existingRows = (p.setItems || [])
+      .map((id) => products[id])
+      .filter(Boolean)
+      .map((sp) => ({ categoryId: sp.categoryId, subcategoryId: sp.subcategoryId || "", productId: sp.id }));
     setForm({
       id: p.id,
       name: p.name,
@@ -659,6 +676,7 @@ export default function MenuManager() {
       isActive: p.isActive !== false,
       badges: p.badges || [],
       variants: (p.variants || []).map((v) => ({ label: v.label, price: String(v.price) })),
+      setRows: [...existingRows, emptySetRow()],
       addonIds: new Set(p.addons.map((a) => a.id)),
     });
   }
@@ -694,6 +712,20 @@ export default function MenuManager() {
 
   function removeVariantRow(index) {
     setForm((f) => ({ ...f, variants: f.variants.filter((_, i) => i !== index) }));
+  }
+
+  // ---- Set category item picker rows (category -> subcategory -> product) ----
+
+  function addSetRow() {
+    setForm((f) => ({ ...f, setRows: [...f.setRows, emptySetRow()] }));
+  }
+
+  function updateSetRow(index, patch) {
+    setForm((f) => ({ ...f, setRows: f.setRows.map((r, i) => (i === index ? { ...r, ...patch } : r)) }));
+  }
+
+  function removeSetRow(index) {
+    setForm((f) => ({ ...f, setRows: f.setRows.filter((_, i) => i !== index) }));
   }
 
   async function handlePhotoChange(e) {
@@ -735,6 +767,7 @@ export default function MenuManager() {
         variants: form.variants
           .filter((v) => v.label.trim() && v.price !== "")
           .map((v) => ({ label: v.label.trim(), price: Number(v.price) })),
+        set_items: form.categoryId === "set" ? form.setRows.map((r) => r.productId).filter(Boolean) : [],
       };
 
       if (form.id) {
@@ -1106,57 +1139,146 @@ export default function MenuManager() {
                       {uploading ? t("uploading") : t("uploadPhoto")}
                       <input type="file" accept="image/*" onChange={handlePhotoChange} disabled={uploading} hidden />
                     </label>
-                    <button type="button" className="btn btn-ghost btn-sm" onClick={addVariantRow}>{t("addVariantRow")}</button>
+                    {form.categoryId !== "set" && (
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={addVariantRow}>{t("addVariantRow")}</button>
+                    )}
                   </div>
                 </div>
               </div>
 
               <div className="form-grid">
-                <div className="field full">
-                  <label>{t("name")}</label>
-                  <input type="text" value={form.name} onChange={(e) => updateForm({ name: e.target.value })} required />
-                </div>
-                <div className="field">
-                  <label>{t("category")}</label>
-                  <select
-                    value={form.categoryId}
-                    onChange={(e) => {
-                      const cat = categories.find((c) => c.id === e.target.value);
-                      updateForm({ categoryId: e.target.value, subcategoryId: cat.subcategories?.[0]?.id ?? null });
-                    }}
-                  >
-                    {categories.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
-                  </select>
-                </div>
-                {categories.find((c) => c.id === form.categoryId)?.subcategories.length > 0 && (
-                  <div className="field">
-                    <label>{t("subcategory")}</label>
-                    <select value={form.subcategoryId ?? ""} onChange={(e) => updateForm({ subcategoryId: e.target.value })}>
-                      {categories.find((c) => c.id === form.categoryId).subcategories.map((s) => (
-                        <option key={s.id} value={s.id}>{s.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-                <div className="price-variant-row field full">
-                  <div className="field">
-                    <label>{t("price")}</label>
-                    <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
-                  </div>
-                  {form.variants.flatMap((v, i) => [
-                    <div className="field" key={`variant-label-${i}`}>
-                      <label>{t("variantLabel")}</label>
-                      <input type="text" value={v.label} onChange={(e) => updateVariantRow(i, { label: e.target.value })} />
-                    </div>,
-                    <div className="field" key={`variant-price-${i}`}>
+                {form.categoryId === "set" ? (
+                  <div className="set-name-price-row field full">
+                    <div className="field">
+                      <label>{t("name")}</label>
+                      <input type="text" value={form.name} onChange={(e) => updateForm({ name: e.target.value })} required />
+                    </div>
+                    <div className="field">
                       <label>{t("price")}</label>
-                      <div className="variant-price-input-row">
-                        <input type="number" min="0" step="0.01" value={v.price} onChange={(e) => updateVariantRow(i, { price: e.target.value })} />
-                        <button type="button" className="variant-remove-btn" onClick={() => removeVariantRow(i)} aria-label={t("removeVariantRow")} title={t("removeVariantRow")}>×</button>
+                      <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="field full">
+                      <label>{t("name")}</label>
+                      <input type="text" value={form.name} onChange={(e) => updateForm({ name: e.target.value })} required />
+                    </div>
+                    <div className="field">
+                      <label>{t("category")}</label>
+                      <select
+                        value={form.categoryId}
+                        onChange={(e) => {
+                          const cat = categories.find((c) => c.id === e.target.value);
+                          updateForm({ categoryId: e.target.value, subcategoryId: cat.subcategories?.[0]?.id ?? null });
+                        }}
+                      >
+                        {categories.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+                      </select>
+                    </div>
+                    {categories.find((c) => c.id === form.categoryId)?.subcategories.length > 0 && (
+                      <div className="field">
+                        <label>{t("subcategory")}</label>
+                        <select value={form.subcategoryId ?? ""} onChange={(e) => updateForm({ subcategoryId: e.target.value })}>
+                          {categories.find((c) => c.id === form.categoryId).subcategories.map((s) => (
+                            <option key={s.id} value={s.id}>{s.label}</option>
+                          ))}
+                        </select>
                       </div>
-                    </div>,
-                  ])}
-                </div>
+                    )}
+                    <div className="price-variant-row field full">
+                      <div className="field">
+                        <label>{t("price")}</label>
+                        <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
+                      </div>
+                      {form.variants.flatMap((v, i) => [
+                        <div className="field" key={`variant-label-${i}`}>
+                          <label>{t("variantLabel")}</label>
+                          <input type="text" value={v.label} onChange={(e) => updateVariantRow(i, { label: e.target.value })} />
+                        </div>,
+                        <div className="field" key={`variant-price-${i}`}>
+                          <label>{t("price")}</label>
+                          <div className="variant-price-input-row">
+                            <input type="number" min="0" step="0.01" value={v.price} onChange={(e) => updateVariantRow(i, { price: e.target.value })} />
+                            <button type="button" className="variant-remove-btn" onClick={() => removeVariantRow(i)} aria-label={t("removeVariantRow")} title={t("removeVariantRow")}>×</button>
+                          </div>
+                        </div>,
+                      ])}
+                    </div>
+                  </>
+                )}
+
+                {form.categoryId === "set" && (() => {
+                  const chosen = form.setRows.map((r) => r.productId).filter(Boolean).map((id) => products[id]).filter(Boolean);
+                  const sum = chosen.reduce((s, p) => s + p.price, 0);
+                  const discount = form.price !== "" ? sum - Number(form.price) : null;
+                  return (
+                    <div className="field full set-builder">
+                      <label>{t("setItemsLabel")}</label>
+                      {form.setRows.map((row, i) => {
+                        const cat = categories.find((c) => c.id === row.categoryId);
+                        const hasSubcats = (cat?.subcategories.length ?? 0) > 0;
+                        const rowProducts = Object.values(products).filter(
+                          (p) => p.categoryId === row.categoryId && (!hasSubcats || p.subcategoryId === row.subcategoryId) && p.id !== form.id
+                        );
+                        const isLast = i === form.setRows.length - 1;
+                        return (
+                          <div className="set-builder-row" key={i}>
+                            <select
+                              value={row.categoryId}
+                              onChange={(e) => updateSetRow(i, { categoryId: e.target.value, subcategoryId: "", productId: "" })}
+                            >
+                              <option value="">{t("setSelectCategory")}</option>
+                              {categories.filter((c) => c.id !== "set").map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+                            </select>
+                            <select
+                              value={row.subcategoryId}
+                              onChange={(e) => updateSetRow(i, { subcategoryId: e.target.value, productId: "" })}
+                              disabled={!hasSubcats}
+                            >
+                              <option value="">{t("setSelectSubcategory")}</option>
+                              {cat?.subcategories.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+                            </select>
+                            <select
+                              value={row.productId}
+                              onChange={(e) => updateSetRow(i, { productId: e.target.value })}
+                              disabled={!row.categoryId || (hasSubcats && !row.subcategoryId)}
+                            >
+                              <option value="">{t("setSelectProduct")}</option>
+                              {rowProducts.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                            </select>
+                            {isLast ? (
+                              <button type="button" className="set-builder-add-btn" onClick={addSetRow} aria-label={t("addSetItem")} title={t("addSetItem")}>
+                                <IcPlus />
+                              </button>
+                            ) : (
+                              <button type="button" className="set-builder-remove-btn" onClick={() => removeSetRow(i)} aria-label={t("removeSetItem")} title={t("removeSetItem")}>
+                                ×
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                      {chosen.length > 0 && (
+                        <div className="set-builder-summary">
+                          <ul className="set-builder-items">
+                            {chosen.map((p) => (
+                              <li key={p.id}><span>{p.name}</span><span className="p">${p.price.toFixed(2)}</span></li>
+                            ))}
+                          </ul>
+                          <div className="set-builder-totals">
+                            <span>{t("setItemCount", chosen.length)}</span>
+                            <span>{t("setItemsTotal")}: ${sum.toFixed(2)}</span>
+                            {discount !== null && (
+                              <span className="set-builder-discount">{t("setDiscount")}: ${discount.toFixed(2)}</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+
                 <div className="field full">
                   <label>{t("description")}</label>
                   <textarea value={form.description} onChange={(e) => updateForm({ description: e.target.value })} />
