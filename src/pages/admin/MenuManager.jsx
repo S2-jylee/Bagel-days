@@ -1205,16 +1205,22 @@ export default function MenuManager() {
 
               <div className="form-grid">
                 {form.categoryId === "set" ? (
-                  <div className="name-price-row field full">
-                    <div className="field">
-                      <label>{t("name")}</label>
-                      <input type="text" value={form.name} onChange={(e) => updateForm({ name: e.target.value })} required />
+                  <>
+                    <div className="name-price-row field full">
+                      <div className="field">
+                        <label>{t("name")}</label>
+                        <input type="text" value={form.name} onChange={(e) => updateForm({ name: e.target.value })} required />
+                      </div>
+                      <div className="field">
+                        <label>{t("price")}</label>
+                        <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
+                      </div>
                     </div>
-                    <div className="field">
-                      <label>{t("price")}</label>
-                      <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
+                    <div className="field full">
+                      <label>{t("description")}</label>
+                      <input type="text" value={form.description} onChange={(e) => updateForm({ description: e.target.value })} />
                     </div>
-                  </div>
+                  </>
                 ) : form.categoryId === "coffee" ? (
                   <>
                     <div className="field full">
@@ -1462,10 +1468,12 @@ export default function MenuManager() {
                   </div>
                 )}
 
-                <div className="field full">
-                  <label>{t("description")}</label>
-                  <textarea value={form.description} onChange={(e) => updateForm({ description: e.target.value })} />
-                </div>
+                {form.categoryId !== "set" && (
+                  <div className="field full">
+                    <label>{t("description")}</label>
+                    <textarea value={form.description} onChange={(e) => updateForm({ description: e.target.value })} />
+                  </div>
+                )}
               </div>
 
               {(() => {

@@ -371,6 +371,10 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   position:relative; background:#fff; border-radius:var(--radius); overflow:hidden auto;
   max-width:420px; width:100%; max-height:90vh; box-shadow:0 20px 50px rgba(0,0,0,.3);
 }
+/* A Set product's modal needs room for a grid of choice cards per section
+   (not just a couple of text lines), so it's allowed to run wider than the
+   standard product modal instead of trying to match it. */
+.product-modal-wide{max-width:640px;}
 .product-modal-close{
   position:absolute; top:12px; right:12px; z-index:1;
   width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.9); border:none;
@@ -417,8 +421,11 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .modal-set-sections{margin-bottom:18px;}
 .modal-set-section{margin-bottom:14px;}
 .modal-set-section:last-child{margin-bottom:0;}
-.modal-set-section h4{font-family:'PT Serif', serif; font-size:.9rem; color:var(--maroon); margin-bottom:4px;}
-.modal-set-section-choices{font-size:.85rem; color:var(--ink); line-height:1.5;}
+.modal-set-section h4{font-family:'PT Serif', serif; font-size:.9rem; color:var(--maroon); margin-bottom:8px;}
+.modal-set-section-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+@media (max-width:600px){
+  .modal-set-section-grid{grid-template-columns:repeat(2,1fr);}
+}
 
 /* ---------- About / story split ---------- */
 .split-section{padding-top:32px;}

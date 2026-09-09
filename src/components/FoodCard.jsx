@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useProducts } from "../context/ProductsContext";
-import { useCategories } from "../context/CategoriesContext";
 import { IcBag } from "./Icons";
 import { IcChevron } from "./DeliveryButtons";
 import { ORDER_NOW_URL } from "../lib/orderNow";
@@ -14,9 +13,37 @@ const IcClose = () => (
 
 const BADGE_LABELS = { signature: "Signature", best: "Best", new: "New" };
 
+// A set section's choices are either specific products or a whole category/
+// subcategory picked as a wildcard ("choose any X") — this resolves either
+// into the real, currently-active products it should display as cards,
+// deduped and in their normal catalog order.
+function resolveSectionProducts(section, products) {
+  const seen = new Set();
+  const result = [];
+  for (const choice of section.choices) {
+    if (choice.type === "product") {
+      const p = products[choice.productId];
+      if (p && p.isActive !== false && !seen.has(p.id)) {
+        seen.add(p.id);
+        result.push(p);
+      }
+    } else if (choice.type === "category") {
+      const matches = Object.values(products).filter(
+        (p) => p.isActive !== false && p.categoryId === choice.categoryId && (!choice.subcategoryId || p.subcategoryId === choice.subcategoryId)
+      );
+      for (const p of matches) {
+        if (!seen.has(p.id)) {
+          seen.add(p.id);
+          result.push(p);
+        }
+      }
+    }
+  }
+  return result.sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
 export default function FoodCard({ id, small }) {
   const { products } = useProducts();
-  const { categories } = useCategories();
   const p = products[id];
   const [open, setOpen] = useState(false);
 
@@ -52,7 +79,7 @@ export default function FoodCard({ id, small }) {
 
       {open && createPortal(
         <div className="product-modal-overlay" onClick={() => setOpen(false)}>
-          <div className="product-modal" onClick={(e) => e.stopPropagation()}>
+          <div className={`product-modal${p.setSections.length > 0 ? " product-modal-wide" : ""}`} onClick={(e) => e.stopPropagation()}>
             <button type="button" className="product-modal-close" onClick={() => setOpen(false)} aria-label="Close">
               <IcClose />
             </button>
@@ -83,20 +110,16 @@ export default function FoodCard({ id, small }) {
               {p.setSections.length > 0 && (
                 <div className="modal-set-sections">
                   {p.setSections.map((section, i) => {
-                    const choiceText = section.choices
-                      .map((c) => {
-                        if (c.type === "product") return products[c.productId]?.name;
-                        const cat = categories.find((cc) => cc.id === c.categoryId);
-                        const scopeLabel = c.subcategoryId ? cat?.subcategories.find((s) => s.id === c.subcategoryId)?.label : cat?.label;
-                        return scopeLabel ? `Choose any ${scopeLabel}` : null;
-                      })
-                      .filter(Boolean)
-                      .join(" · ");
-                    if (!choiceText) return null;
+                    const items = resolveSectionProducts(section, products);
+                    if (items.length === 0) return null;
                     return (
                       <div className="modal-set-section" key={i}>
                         <h4>{section.label}</h4>
-                        <p className="modal-set-section-choices">{choiceText}</p>
+                        <div className="modal-set-section-grid">
+                          {items.map((it) => (
+                            <FoodCard key={it.id} id={it.id} small />
+                          ))}
+                        </div>
                       </div>
                     );
                   })}
