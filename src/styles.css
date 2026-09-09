@@ -473,12 +473,8 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .menu-category.active{display:block;}
 .menu-category h2{font-size:1.5rem; margin-bottom:14px;}
 .menu-category > p{color:var(--body); max-width:52ch; margin-bottom:26px;}
-.menu-section-label{
-  font-family:'PT Serif', serif; font-size:1.05rem; color:var(--maroon);
-  margin:0 0 14px; padding-bottom:8px; border-bottom:2px solid var(--tan);
-}
 .menu-best-section{margin-bottom:28px;}
-.menu-best-section .menu-section-label{border-bottom-color:var(--maroon-light);}
+.menu-section-divider{border:none; border-top:1px solid var(--line); margin:0 0 28px;}
 /* Fixed 6 slots regardless of how many are actually marked category-best
    (up to 6) — otherwise 4 marked would stretch to fill 4 columns while 6
    marked would be narrower, sizing inconsistently depending on count. */

@@ -154,7 +154,6 @@ export default function Menu() {
 
               {bestIds.length > 0 && (
                 <div className="menu-best-section">
-                  <h3 className="menu-section-label">Best Menu</h3>
                   <div className="card-grid menu-best-grid">
                     {bestIds.map((id) => (
                       <FoodCard key={id} id={id} />
@@ -163,7 +162,7 @@ export default function Menu() {
                 </div>
               )}
 
-              {bestIds.length > 0 && <h3 className="menu-section-label">All Items</h3>}
+              {bestIds.length > 0 && <hr className="menu-section-divider" />}
 
               <div className="menu-promo-row">
                 <div className="card-grid">
