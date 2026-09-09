@@ -311,8 +311,8 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   font-family:'Pretendard', sans-serif; font-weight:500; font-size:.68rem; line-height:1; letter-spacing:.02em; color:#fff;
   padding:1px 5px; border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
 }
-.food-card-badge-signature{background:#7c3aed;}
-.food-card-badge-best{background:#16a34a;}
+.food-card-badge-signature{background:#F08A3E;}
+.food-card-badge-best{background:#A7B899;}
 .food-card-small .food-card-badges{bottom:4px; left:4px; right:4px; gap:2px;}
 .food-card-small .food-card-badge{font-size:.52rem; padding:1px 4px; gap:2px;}
 .food-card .body{padding:14px 16px 18px; display:flex; flex-direction:column; flex:1;}
@@ -1146,6 +1146,10 @@ footer ul li a:hover{color:#F0D9C9;}
 .menu-manager-row-actions{display:flex; gap:8px; flex-shrink:0;}
 .menu-manager-delete{color:var(--maroon-light);}
 .menu-manager-toolbar-actions{display:flex; align-items:center; justify-content:flex-end; gap:12px;}
+/* Just the standalone Rearrange/+Add New Item row above the product list —
+   not the shared class's other usages (Best Sellers/Best Menu panel heads),
+   which stay right-aligned next to their own heading text. */
+.menu-manager-toolbar-actions-left{justify-content:flex-start;}
 .menu-manager-star-wrap{position:relative; display:flex; flex-shrink:0;}
 .menu-manager-star{
   display:flex; align-items:center; justify-content:center; width:34px; height:34px; flex-shrink:0;

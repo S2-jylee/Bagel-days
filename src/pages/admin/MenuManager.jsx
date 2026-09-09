@@ -1056,7 +1056,7 @@ export default function MenuManager() {
             </div>
           </div>
 
-          <div className="menu-manager-toolbar-actions">
+          <div className="menu-manager-toolbar-actions menu-manager-toolbar-actions-left">
             {reordering ? (
               <>
                 <button type="button" className="btn btn-ghost btn-sm" onClick={cancelReorder} disabled={savingOrder}>{t("cancel")}</button>
@@ -1066,7 +1066,7 @@ export default function MenuManager() {
               </>
             ) : (
               <>
-                <button type="button" className="btn btn-ghost btn-sm" onClick={startReorder} disabled={visibleItems.length < 2}>{t("reorder")}</button>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={startReorder} disabled={visibleItems.length < 2}>{t("rearrange")}</button>
                 <button type="button" className="btn btn-primary btn-sm" onClick={openCreate}>{t("addNewItem")}</button>
               </>
             )}
