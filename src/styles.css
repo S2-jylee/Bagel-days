@@ -707,6 +707,11 @@ footer ul li a:hover{color:#F0D9C9;}
      again). */
   .menu-promo-row{grid-template-columns:1fr;}
   .menu-promo-row .card-grid{grid-column:span 1;}
+  /* The Best Menu grid's fixed 6 columns were sized to share a row with the
+     promo column (desktop's 6-track layout) — once that column drops below
+     instead of sitting alongside, match the "All Items" grid's own 4 columns
+     below it rather than staying cramped at 6. */
+  .menu-best-grid{grid-template-columns:repeat(4,1fr);}
   /* menu-promo-col takes the full row width here (there's no card-grid
      sharing the row anymore) so its two children — addons-panel and
      set-banner-mini — can sit side by side instead of stacked. Each one
