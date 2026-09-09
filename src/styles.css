@@ -1315,7 +1315,7 @@ footer ul li a:hover{color:#F0D9C9;}
    pills variant sits inline before its row instead of stacked above it, so
    it keeps even padding on both sides rather than that left-aligned indent. */
 .taxonomy-editor.taxonomy-editor-pills .taxonomy-manage-toggle{margin:0 4px 0 0; padding:4px 8px;}
-.taxonomy-editor.taxonomy-editor-nav .taxonomy-manage-toggle{padding-top:8px; margin-bottom:19px;}
+.taxonomy-editor.taxonomy-editor-nav .taxonomy-manage-toggle{padding-top:8px; margin-bottom:18px;}
 .taxonomy-manage-hint{margin:0 0 8px;}
 .taxonomy-edit-row{display:flex; align-items:center; gap:6px; padding:6px 8px; border-radius:8px; background:var(--cream-alt); cursor:grab;}
 .taxonomy-edit-row.dragging{opacity:.4;}
