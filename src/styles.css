@@ -311,8 +311,8 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   font-family:'Pretendard', sans-serif; font-weight:500; font-size:.68rem; letter-spacing:.02em; color:#fff;
   padding:1px 5px; border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
 }
-.food-card-badge-signature{background:linear-gradient(135deg, #8b5cf6, #6d28d9);}
-.food-card-badge-best{background:linear-gradient(135deg, #f5b301, #e8890c);}
+.food-card-badge-signature{background:#7c3aed;}
+.food-card-badge-best{background:#f5a623;}
 .food-card-small .food-card-badges{bottom:4px; left:4px; right:4px; gap:2px;}
 .food-card-small .food-card-badge{font-size:.52rem; padding:1px 4px; gap:2px;}
 .food-card .body{padding:14px 16px 18px; display:flex; flex-direction:column; flex:1;}
