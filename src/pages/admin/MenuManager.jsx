@@ -1003,96 +1003,100 @@ export default function MenuManager() {
             />
           </div>
 
-          <div className="inventory-fillall-bar">
-            <div className="inventory-fillall-text">
-              <strong>{t("addonPool")}</strong>
-              <span>{t("addonPoolDesc")}</span>
-            </div>
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAddonPoolOpen((v) => !v)}>
-              {addonPoolOpen ? t("hide") : t("manage", addonList.length)}
-            </button>
-          </div>
-
-          {addonPoolOpen && (
-            <div className="addon-pool-editor">
-              <div className="addon-pool-tabs">
-                {categories.map((c) => (
-                  <button key={c.id} type="button" className={poolTab === c.id ? "active" : ""} onClick={() => setPoolTab(c.id)}>{c.label}</button>
-                ))}
-                <button type="button" className={poolTab === "general" ? "active" : ""} onClick={() => setPoolTab("general")}>{t("general")}</button>
-              </div>
-              <ul className="addon-pool-list">
-                {poolAddons.map((a) => (
-                  <li key={a.id}>
-                    <span>{a.name}</span>
-                    <span className="mono">${a.price.toFixed(2)}</span>
-                    <button type="button" className="addon-pool-remove" onClick={() => deletePoolAddon(a)} aria-label={`Remove ${a.name}`}>&times;</button>
-                  </li>
-                ))}
-                {poolAddons.length === 0 && <li className="addon-pool-empty">{t("noAddonsYet")}</li>}
-              </ul>
-              <div className="addon-pool-add">
-                <input type="text" placeholder={t("addonName")} value={newAddonName} onChange={(e) => setNewAddonName(e.target.value)} />
-                <input type="number" min="0" step="0.01" placeholder={t("price")} value={newAddonPrice} onChange={(e) => setNewAddonPrice(e.target.value)} />
-                <button type="button" className="btn btn-primary btn-sm" onClick={addPoolAddon} disabled={!newAddonName.trim() || newAddonPrice === ""}>
-                  {t("addToLabel", poolTab === "general" ? t("general") : categories.find((c) => c.id === poolTab)?.label)}
+          {activeCat !== "set" && (
+            <>
+              <div className="inventory-fillall-bar">
+                <div className="inventory-fillall-text">
+                  <strong>{t("addonPool")}</strong>
+                  <span>{t("addonPoolDesc")}</span>
+                </div>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAddonPoolOpen((v) => !v)}>
+                  {addonPoolOpen ? t("hide") : t("manage", addonList.length)}
                 </button>
               </div>
-            </div>
-          )}
 
-          <div className="bestseller-panel category-best-panel">
-            <div className="bestseller-panel-head">
-              <div className="inventory-fillall-text">
-                <strong>{t("categoryBestHeading")}</strong>
-              </div>
-              <div className="menu-manager-toolbar-actions">
-                {categoryBestReordering ? (
-                  <>
-                    <button type="button" className="btn btn-ghost btn-sm" onClick={cancelCategoryBestReorder} disabled={savingCategoryBestOrder}>{t("cancel")}</button>
-                    <button type="button" className="btn btn-primary btn-sm" onClick={saveCategoryBestOrder} disabled={savingCategoryBestOrder}>
-                      {savingCategoryBestOrder ? t("saving") : t("saveOrder")}
+              {addonPoolOpen && (
+                <div className="addon-pool-editor">
+                  <div className="addon-pool-tabs">
+                    {categories.map((c) => (
+                      <button key={c.id} type="button" className={poolTab === c.id ? "active" : ""} onClick={() => setPoolTab(c.id)}>{c.label}</button>
+                    ))}
+                    <button type="button" className={poolTab === "general" ? "active" : ""} onClick={() => setPoolTab("general")}>{t("general")}</button>
+                  </div>
+                  <ul className="addon-pool-list">
+                    {poolAddons.map((a) => (
+                      <li key={a.id}>
+                        <span>{a.name}</span>
+                        <span className="mono">${a.price.toFixed(2)}</span>
+                        <button type="button" className="addon-pool-remove" onClick={() => deletePoolAddon(a)} aria-label={`Remove ${a.name}`}>&times;</button>
+                      </li>
+                    ))}
+                    {poolAddons.length === 0 && <li className="addon-pool-empty">{t("noAddonsYet")}</li>}
+                  </ul>
+                  <div className="addon-pool-add">
+                    <input type="text" placeholder={t("addonName")} value={newAddonName} onChange={(e) => setNewAddonName(e.target.value)} />
+                    <input type="number" min="0" step="0.01" placeholder={t("price")} value={newAddonPrice} onChange={(e) => setNewAddonPrice(e.target.value)} />
+                    <button type="button" className="btn btn-primary btn-sm" onClick={addPoolAddon} disabled={!newAddonName.trim() || newAddonPrice === ""}>
+                      {t("addToLabel", poolTab === "general" ? t("general") : categories.find((c) => c.id === poolTab)?.label)}
                     </button>
-                  </>
-                ) : (
-                  <button type="button" className="btn btn-ghost btn-sm" onClick={startCategoryBestReorder} disabled={categoryBestItems.length < 2}>{t("reorder")}</button>
-                )}
-              </div>
-            </div>
-
-            <div className="bestseller-grid">
-              {displayCategoryBestItems.map((p) => (
-                <div
-                  className={`bestseller-card${categoryBestReordering ? " reordering" : ""}${draggingCategoryBestId === p.id ? " dragging" : ""}`}
-                  key={p.id}
-                  draggable={categoryBestReordering}
-                  onDragStart={(e) => {
-                    e.dataTransfer.effectAllowed = "move";
-                    e.dataTransfer.setData("text/plain", p.id);
-                    setDraggingCategoryBestId(p.id);
-                  }}
-                  onDragOver={(e) => handleCategoryBestDragOver(e, p.id)}
-                  onDrop={(e) => e.preventDefault()}
-                  onDragEnd={() => setDraggingCategoryBestId(null)}
-                >
-                  {categoryBestReordering && <span className="menu-manager-drag-handle" aria-hidden="true"><IcGrip /></span>}
-                  {categoryBestReordering && (
-                    <button
-                      type="button"
-                      className="bestseller-card-remove"
-                      onClick={() => removeCategoryBest(p.id)}
-                      aria-label={`Remove ${p.name} from Best Menu`}
-                    >
-                      &times;
-                    </button>
-                  )}
-                  {p.img ? <img src={p.img} alt={p.name} /> : <div className="menu-manager-noimg" />}
-                  <span className="bestseller-card-name">{p.name}</span>
+                  </div>
                 </div>
-              ))}
-              {categoryBestItems.length === 0 && <p className="inventory-hint">{t("noCategoryBestYet")}</p>}
-            </div>
-          </div>
+              )}
+
+              <div className="bestseller-panel category-best-panel">
+                <div className="bestseller-panel-head">
+                  <div className="inventory-fillall-text">
+                    <strong>{t("categoryBestHeading")}</strong>
+                  </div>
+                  <div className="menu-manager-toolbar-actions">
+                    {categoryBestReordering ? (
+                      <>
+                        <button type="button" className="btn btn-ghost btn-sm" onClick={cancelCategoryBestReorder} disabled={savingCategoryBestOrder}>{t("cancel")}</button>
+                        <button type="button" className="btn btn-primary btn-sm" onClick={saveCategoryBestOrder} disabled={savingCategoryBestOrder}>
+                          {savingCategoryBestOrder ? t("saving") : t("saveOrder")}
+                        </button>
+                      </>
+                    ) : (
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={startCategoryBestReorder} disabled={categoryBestItems.length < 2}>{t("reorder")}</button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="bestseller-grid">
+                  {displayCategoryBestItems.map((p) => (
+                    <div
+                      className={`bestseller-card${categoryBestReordering ? " reordering" : ""}${draggingCategoryBestId === p.id ? " dragging" : ""}`}
+                      key={p.id}
+                      draggable={categoryBestReordering}
+                      onDragStart={(e) => {
+                        e.dataTransfer.effectAllowed = "move";
+                        e.dataTransfer.setData("text/plain", p.id);
+                        setDraggingCategoryBestId(p.id);
+                      }}
+                      onDragOver={(e) => handleCategoryBestDragOver(e, p.id)}
+                      onDrop={(e) => e.preventDefault()}
+                      onDragEnd={() => setDraggingCategoryBestId(null)}
+                    >
+                      {categoryBestReordering && <span className="menu-manager-drag-handle" aria-hidden="true"><IcGrip /></span>}
+                      {categoryBestReordering && (
+                        <button
+                          type="button"
+                          className="bestseller-card-remove"
+                          onClick={() => removeCategoryBest(p.id)}
+                          aria-label={`Remove ${p.name} from Best Menu`}
+                        >
+                          &times;
+                        </button>
+                      )}
+                      {p.img ? <img src={p.img} alt={p.name} /> : <div className="menu-manager-noimg" />}
+                      <span className="bestseller-card-name">{p.name}</span>
+                    </div>
+                  ))}
+                  {categoryBestItems.length === 0 && <p className="inventory-hint">{t("noCategoryBestYet")}</p>}
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="menu-manager-toolbar-actions menu-manager-toolbar-actions-left">
             {reordering ? (
@@ -1151,7 +1155,7 @@ export default function MenuManager() {
                         <span className="menu-manager-star-notice">{t("bestSellersFull")}</span>
                       )}
                     </div>
-                    <div className="menu-manager-star-wrap">
+                    <div className="menu-manager-star-wrap" hidden={activeCat === "set"}>
                       <button
                         type="button"
                         className={`menu-manager-star menu-manager-category-best${p.isCategoryBest ? " active" : ""}`}
