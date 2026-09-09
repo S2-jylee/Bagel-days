@@ -309,12 +309,12 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .food-card-badge{
   display:inline-flex; align-items:center; gap:3px;
   font-family:'Pretendard', sans-serif; font-weight:500; font-size:.68rem; letter-spacing:.02em; color:#fff;
-  padding:1px 5px; border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
+  padding:1px; border-radius:4px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
 }
 .food-card-badge-signature{background:#7c3aed;}
 .food-card-badge-best{background:#f5a623;}
 .food-card-small .food-card-badges{bottom:4px; left:4px; right:4px; gap:2px;}
-.food-card-small .food-card-badge{font-size:.52rem; padding:1px 4px; gap:2px;}
+.food-card-small .food-card-badge{font-size:.52rem; padding:1px; gap:2px;}
 .food-card .body{padding:14px 16px 18px; display:flex; flex-direction:column; flex:1;}
 .food-card h4{font-family:'PT Serif', serif; font-weight:500; font-size:.82rem; color:var(--ink); margin-bottom:0; cursor:pointer;}
 .card-price{display:block; font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon); font-size:.85rem;}
@@ -786,7 +786,7 @@ footer ul li a:hover{color:#F0D9C9;}
   .food-card.food-card-small .body{padding:8px 6px;}
   .food-card.food-card-small h4{font-size:.68rem; line-height:1.25;}
   .food-card-small .card-price{font-size:.7rem;}
-  .card-grid .food-card-badge{font-size:.5rem; padding:1px 3px; letter-spacing:0;}
+  .card-grid .food-card-badge{font-size:.5rem; padding:1px; letter-spacing:0;}
   /* Sit closer to the photo's bottom edge on mobile than the 8px/4px used
      above 600px, and tighter gap/edge margins — a narrow mobile card left
      just barely too little room for "Signature" + "Best" side by side
