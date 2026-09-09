@@ -278,7 +278,6 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    first in the file, silently never applying at all. */
 .food-card.food-card-small .body{padding:8px 6px;}
 .food-card.food-card-small h4{font-size:.68rem; margin-bottom:0; line-height:1.25;}
-.food-card-small .card-quick-row{margin-top:2px;}
 .food-card-small .card-price{font-size:.7rem;}
 
 /* ---------- Features row ---------- */
@@ -314,7 +313,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .food-card-badge-signature{background:linear-gradient(135deg, rgba(139,92,246,.82), rgba(109,40,217,.82));}
 .food-card-badge-best{background:linear-gradient(135deg, rgba(245,179,1,.82), rgba(232,137,12,.82));}
 .food-card-small .food-card-badges{bottom:4px; right:4px; gap:2px;}
-.food-card-small .food-card-badge{font-size:.58rem; padding:1px 5px; gap:2px;}
+.food-card-small .food-card-badge{font-size:.52rem; padding:1px 4px; gap:2px;}
 .food-card .body{padding:14px 16px 18px; display:flex; flex-direction:column; flex:1;}
 .food-card h4{font-family:'PT Serif', serif; font-weight:500; font-size:.82rem; color:var(--ink); margin-bottom:0; cursor:pointer;}
 .card-price{display:block; font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon); font-size:.85rem;}
@@ -322,8 +321,14 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .card-sold-out{font-family:'Pretendard', sans-serif; font-weight:700; font-size:.78rem; letter-spacing:.03em; text-transform:uppercase; color:var(--maroon-light);}
 .food-card.sold-out .thumb img{opacity:.5;}
 .food-card.sold-out h4{color:var(--body);}
-.card-quick-row{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-shrink:0;}
-.food-card:not(.food-card-small) .card-quick-row{margin-top:auto; padding-top:10px;}
+/* margin-top:auto pins the price to the bottom of .body regardless of how
+   many lines the name wraps to, so every card in a row lands at the same
+   height and the price sits at the same Y position across the row — this
+   used to only apply to non-small cards (from when small cards never
+   showed a price at all), which is exactly why the Home widget's card
+   height and price position wobbled per-card once its price was turned
+   back on. Applies to every .food-card now, small or not. */
+.card-quick-row{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-shrink:0; margin-top:auto; padding-top:10px;}
 .quick-add-btn{
   width:30px; height:30px; border-radius:50%; background:var(--maroon); color:#fff; border:none;
   display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer;
@@ -775,7 +780,7 @@ footer ul li a:hover{color:#F0D9C9;}
   .card-grid .food-card h4{font-size:.68rem; line-height:1.25;}
   .card-grid .food-card .body{padding:8px 6px;}
   .card-grid .card-price{font-size:.7rem;}
-  .card-grid .food-card-badge{font-size:.56rem; padding:1px 5px;}
+  .card-grid .food-card-badge{font-size:.5rem; padding:1px 4px;}
   .card-grid .quick-add-btn{width:22px; height:22px;}
   .card-grid .quick-add-btn svg{width:11px; height:11px;}
   .features .wrap{grid-template-columns:1fr;}
