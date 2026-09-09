@@ -511,7 +511,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    width — which already tracks card-grid's width at every breakpoint —
    instead of sitting at one fixed size no matter how much card-grid
    itself has shrunk. */
-.menu-promo-col{grid-column:span 2; display:flex; flex-direction:column; gap:20px; container-type:inline-size;}
+.menu-promo-col{grid-column:span 2; display:flex; flex-direction:column; gap:24px; container-type:inline-size;}
 .menu-promo-col .addons-panel{margin:0;}
 /* Text on top, image below (image keeps its own native ratio — a wide
    landscape photo — and sits flush left; any extra width in the box is
