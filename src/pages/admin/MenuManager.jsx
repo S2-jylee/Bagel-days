@@ -634,7 +634,15 @@ export default function MenuManager() {
         const { error } = await supabase.from("products").update(row).eq("id", form.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("products").insert(row);
+        // Without an explicit sort_order, a new row defaults to wherever the
+        // DB puts it (0, tying it with whichever existing item never had its
+        // order set either) — landing it in the middle of the list instead
+        // of at the end. Append it after every product already in the same
+        // category/subcategory bucket.
+        const siblingCount = Object.values(products).filter(
+          (p) => p.categoryId === row.category_id && p.subcategoryId === row.subcategory_id
+        ).length;
+        const { error } = await supabase.from("products").insert({ ...row, sort_order: siblingCount });
         if (error) throw error;
       }
 

@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useProducts } from "../context/ProductsContext";
+import { IcBag } from "./Icons";
+import { IcChevron } from "./DeliveryButtons";
+import { ORDER_NOW_URL } from "../lib/orderNow";
 
 const IcClose = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -64,6 +67,17 @@ export default function FoodCard({ id, small }) {
                   </ul>
                 </div>
               )}
+
+              <a
+                href={ORDER_NOW_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="delivery-btn delivery-btn-direct btn-block product-modal-order-btn"
+              >
+                <IcBag />
+                <span>Order Now</span>
+                <IcChevron />
+              </a>
             </div>
           </div>
         </div>
