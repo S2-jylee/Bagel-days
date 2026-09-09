@@ -19,6 +19,14 @@ const BADGE_LABELS = { signature: "Signature", best: "Best" };
 // added first.
 const STAR_LABELS = { signature: "S", best: "B" };
 const STAR_ORDER = ["signature", "best"];
+// A softened (not sharp-tipped) 5-point star, precomputed by rounding each
+// vertex of a plain star polygon — clip-path's polygon() can't curve
+// corners, so this needs an actual path with Q (quadratic curve) segments.
+const STAR_PATH =
+  "M 11.18 3.67 Q 12.00 2.00 12.82 3.67 L 14.12 6.29 Q 14.94 7.95 16.78 8.22 L 19.67 8.64 Q 21.51 8.91 20.18 10.21 " +
+  "L 18.09 12.25 Q 16.76 13.55 17.07 15.38 L 17.56 18.26 Q 17.88 20.09 16.23 19.22 L 13.65 17.87 Q 12.00 17.00 10.35 17.87 " +
+  "L 7.77 19.22 Q 6.12 20.09 6.44 18.26 L 6.93 15.38 Q 7.24 13.55 5.91 12.25 L 3.82 10.21 Q 2.49 8.91 4.33 8.64 " +
+  "L 7.22 8.22 Q 9.06 7.95 9.88 6.29 Z";
 
 export default function FoodCard({ id, small }) {
   const { products } = useProducts();
@@ -33,7 +41,10 @@ export default function FoodCard({ id, small }) {
     <>
       <div className="food-card-wrap">
         {starBadges.map((b, i) => (
-          <span key={b} className={`food-card-star food-card-star-${b} food-card-star-pos-${i}`}>{STAR_LABELS[b]}</span>
+          <span key={b} className={`food-card-star food-card-star-${b} food-card-star-pos-${i}`}>
+            <svg viewBox="0 0 24 24" className="food-card-star-shape"><path d={STAR_PATH} /></svg>
+            <span className="food-card-star-label">{STAR_LABELS[b]}</span>
+          </span>
         ))}
         <div
           className={`food-card${small ? " food-card-small" : ""}`}
@@ -55,11 +66,9 @@ export default function FoodCard({ id, small }) {
           </div>
           <div className="body">
             <h4 className="card-name-trigger">{p.name}</h4>
-            {!small && (
-              <div className="card-quick-row">
-                <span className="card-price">${p.price.toFixed(2)}</span>
-              </div>
-            )}
+            <div className="card-quick-row">
+              <span className="card-price">${p.price.toFixed(2)}</span>
+            </div>
           </div>
         </div>
       </div>
