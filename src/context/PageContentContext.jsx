@@ -12,6 +12,7 @@ function buildState(rows) {
       description: r.description,
       images: Array.isArray(r.images) ? r.images : [],
       aboutPhotos: r.about_photos && typeof r.about_photos === "object" ? r.about_photos : {},
+      aboutContent: r.about_content && typeof r.about_content === "object" ? r.about_content : {},
     };
   }
   return pages;
@@ -49,9 +50,10 @@ export function PageContentProvider({ children }) {
   return <PageContentContext.Provider value={state}>{children}</PageContentContext.Provider>;
 }
 
-// { pages: {[page_id]: {title, tagline, description, images, aboutPhotos}}, loading }
-// aboutPhotos is only meaningful for page_id "about": a {slotKey: url} map of
-// named photo slots (not a hero carousel), used by About.jsx.
+// { pages: {[page_id]: {title, tagline, description, images, aboutPhotos, aboutContent}}, loading }
+// aboutPhotos/aboutContent are only meaningful for page_id "about" — named
+// photo slots and text/icon overrides (see src/lib/aboutPhotos.js and
+// aboutContent.js), not a hero carousel, used by About.jsx.
 export function usePageContent() {
   const ctx = useContext(PageContentContext);
   if (!ctx) throw new Error("usePageContent must be used within PageContentProvider");
