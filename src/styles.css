@@ -259,8 +259,8 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   font-size:clamp(.8rem, 3cqw + .575rem, .95rem);
 }
 .widget-order .delivery-btn span{white-space:nowrap;}
-.widget-info-list{margin-bottom:14px;}
-.widget-info-list li{display:flex; gap:10px; font-size:.85rem; margin-bottom:10px; color:var(--body); align-items:flex-start;}
+.widget-info-list{margin-bottom:10px;}
+.widget-info-list li{display:flex; gap:10px; font-size:.85rem; margin-bottom:7px; color:var(--body); align-items:flex-start;}
 .widget-info-list li svg{width:16px; height:16px; color:var(--maroon); flex-shrink:0; margin-top:2px;}
 .widget-phone-link{display:inline-flex; align-items:center; gap:8px; color:var(--body);}
 .widget-phone-link:hover{color:var(--maroon);}
