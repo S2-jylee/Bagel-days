@@ -563,7 +563,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    see EditableCandyCarousel), so this is the only sizing rule it needs. */
 .mascot-panel > .about-candy-carousel:first-child{border-radius:var(--radius); overflow:hidden; height:100%; display:block; position:relative;}
 .mascot-panel > .about-candy-carousel:first-child img{width:100%; height:100%; object-fit:cover; display:block;}
-.mascot-panel-deco{width:100%; max-width:150px; justify-self:center;}
+.mascot-panel-deco{width:100%; max-width:150px; justify-self:center; align-self:center;}
 /* Prev/next arrows + dots, same infinite-loop technique as the hero photo
    carousel — left/right instead of both-on-the-right, since this photo is
    closer to square than a wide hero banner. */
