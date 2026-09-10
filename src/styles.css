@@ -306,10 +306,20 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    together and forced them to wrap onto two lines instead of sitting side
    by side; justify-content still hugs them to the right edge. */
 .food-card-badges{position:absolute; bottom:8px; left:8px; right:8px; z-index:1; display:flex; flex-direction:row; flex-wrap:wrap; justify-content:flex-end; align-items:flex-end; gap:4px;}
+/* Font-size and padding scale fluidly with viewport width (not a single
+   fixed desktop size that only drops at the 600px mobile breakpoint) so
+   Signature+Best keep fitting on one line as the window narrows through
+   "PC but not full-width" sizes instead of staying full-size right up
+   until they suddenly wrap. Each clamp() hits exactly the old desktop
+   value at >=1470px (the widest the layout ever gets) and exactly the
+   old <=600px mobile value at <=600px, so both ends are unchanged — only
+   the range between them is now a smooth ramp instead of a hard cliff. */
 .food-card-badge{
   display:inline-flex; align-items:center; gap:3px;
-  font-family:'Pretendard', sans-serif; font-weight:400; font-size:.68rem; line-height:1; letter-spacing:.02em; color:#fff;
-  padding:6px 11px 4px; border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
+  font-family:'Pretendard', sans-serif; font-weight:400; line-height:1; letter-spacing:.02em; color:#fff;
+  font-size:clamp(.5rem, .331vw + .376rem, .68rem);
+  padding:clamp(1px, .575vw - 2.45px, 6px) clamp(2px, 1.035vw - 4.21px, 11px) clamp(1px, .345vw - 1.07px, 4px);
+  border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
 }
 /* text-shadow (not -webkit-text-stroke) so the outline sits outside each
    letterform instead of straddling it — a centered stroke eats into the
@@ -822,10 +832,10 @@ footer ul li a:hover{color:#F0D9C9;}
   .food-card.food-card-small .body{padding:8px 6px;}
   .food-card.food-card-small h4{font-size:.68rem; line-height:1.25;}
   .food-card-small .card-price{font-size:.7rem;}
-  /* PC/desktop keeps the original wider pill (padding:1px 5px, border-
-     radius:20px, from the base rule above) — this tighter, more
-     rectangular version is mobile-only. */
-  .card-grid .food-card-badge{font-size:.5rem; padding:1px 2px; border-radius:4px; letter-spacing:0;}
+  /* Font-size/padding no longer need overriding here — the base rule's
+     clamp() already reaches these exact values by 600px. Only the shape
+     (square corners, tighter letter-spacing) is mobile-specific. */
+  .card-grid .food-card-badge{border-radius:4px; letter-spacing:0;}
   /* Sit closer to the photo's bottom edge on mobile than the 8px/4px used
      above 600px, and tighter gap/edge margins — a narrow mobile card left
      just barely too little room for "Signature" + "Best" side by side

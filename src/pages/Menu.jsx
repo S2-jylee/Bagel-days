@@ -73,13 +73,16 @@ export default function Menu() {
       .filter((p) => p.isCategoryBest)
       .sort((a, b) => (a.categoryBestOrder ?? 0) - (b.categoryBestOrder ?? 0))
       .map((p) => p.id);
-    const bestSet = new Set(best);
     // A product with no subcategory set always shows, regardless of which
     // subcategory tab is active — otherwise it's invisible on every tab
     // except "no filter", which isn't reachable once a category has any
-    // subcategories (the first one is always selected by default).
+    // subcategories (the first one is always selected by default). Best
+    // Menu items are NOT excluded here — All Items is meant to show every
+    // product in the category regardless of its Best Menu status, so a
+    // best-marked item appears in both sections rather than vanishing
+    // from the regular list once it's promoted.
     const regular = inCategory
-      .filter((p) => !bestSet.has(p.id) && (!activeSubcategory || !p.subcategoryId || p.subcategoryId === activeSubcat))
+      .filter((p) => !activeSubcategory || !p.subcategoryId || p.subcategoryId === activeSubcat)
       .sort((a, b) => a.sortOrder - b.sortOrder)
       .map((p) => p.id);
     return { bestIds: best, regularIds: regular };
