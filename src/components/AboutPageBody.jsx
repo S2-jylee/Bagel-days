@@ -139,7 +139,7 @@ export default function AboutPageBody({
               busy={busySlot === "storyMain"}
             />
           </div>
-          <div>
+          <div className="our-story-text">
             <h2>Our Story</h2>
             <p className="script" style={{ marginTop: 4, marginBottom: 16 }}>Freshly Crafted Every Morning.</p>
             <ul className="story-list">

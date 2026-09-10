@@ -509,7 +509,11 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .story-list li{display:flex; gap:12px; margin-bottom:16px;}
 .story-list .ic{color:var(--maroon); flex-shrink:0; margin-top:3px;}
 .story-list .ic svg{width:20px; height:20px;}
-.about-hero-wrap{text-align:center;}
+/* display:flex so the divider and tagline can swap order on mobile (below)
+   without touching the JSX — both sit at the default order:0 here, so
+   flexbox just keeps them in DOM order (h1, divider, tagline) same as
+   before. */
+.about-hero-wrap{text-align:center; display:flex; flex-direction:column; align-items:center;}
 /* A thin line with a small hollow dot centered on it, under the title —
    the dot is just a bordered circle filled with the page background, so
    it reads as a break in the line rather than a solid marker. */
@@ -930,7 +934,14 @@ footer ul li a:hover{color:#F0D9C9;}
   .nav-social{gap:8px;}
   .nav-actions{gap:8px;}
   .nav-actions > .btn{display:none;}
-  .about-hero-divider{width:130px;}
+  /* Divider moves below the tagline instead of between title and tagline —
+     both default to order:0 (DOM order) above 600px; explicit order here
+     only swaps them at this breakpoint. */
+  .about-hero-divider{width:130px; order:2;}
+  .about-hero-wrap .script{order:1;}
+  /* Only the heading + tagline center — not .story-list below them, which
+     reads better left-aligned as a list. */
+  .our-story-text > h2, .our-story-text > .script{text-align:center;}
   .card-grid{gap:8px;}
   /* Below 600px, back to the original stacked composition (addons-panel
      above set-banner-mini, both full width) — the side-by-side split
