@@ -1,4 +1,4 @@
-import { IcPin, IcClock, IcMap, IcCar, IcCheck, IcHouseHeart } from "../components/Icons";
+import { IcMapPin, IcClockOutline, IcMapPinned, IcCircleParking, IcCheck, IcHouseHeart } from "../components/Icons";
 import { usePageContent } from "../context/PageContentContext";
 import { useSiteSettings } from "../context/SiteSettingsContext";
 import { mapsDirectionsUrl, mapsViewUrl } from "../lib/siteSettings";
@@ -44,7 +44,7 @@ export default function Visit() {
           <div className="loc-cards">
             <div className="loc-card">
               <div className="loc-card-row">
-                <div className="ic"><IcPin /></div>
+                <div className="ic"><IcMapPin /></div>
                 <div className="loc-card-text">
                   <h4>Address</h4>
                   <p>{settings.addressLine1}</p>
@@ -55,7 +55,7 @@ export default function Visit() {
             </div>
             <div className="loc-card">
               <div className="loc-card-row">
-                <div className="ic"><IcClock /></div>
+                <div className="ic"><IcClockOutline /></div>
                 <div className="loc-card-text">
                   <h4>Opening Hours</h4>
                   <p>{settings.hoursDays}</p>
@@ -65,7 +65,7 @@ export default function Visit() {
             </div>
             <div className="loc-card">
               <div className="loc-card-row">
-                <div className="ic"><IcMap /></div>
+                <div className="ic"><IcMapPinned /></div>
                 <div className="loc-card-text">
                   <h4>Find Us</h4>
                   <p>{settings.findUsText}</p>
@@ -76,7 +76,7 @@ export default function Visit() {
           </div>
 
           <div className="getting-here">
-            <div className="ic"><IcCar /></div>
+            <div className="ic"><IcCircleParking /></div>
             <div className="getting-here-text">
               <h4 style={{ color: "var(--ink)", fontSize: "1.05rem", marginBottom: 8 }}>Getting Here</h4>
               <p style={{ fontSize: ".92rem" }}>We're conveniently located in the heart of Fortitude Valley.</p>
