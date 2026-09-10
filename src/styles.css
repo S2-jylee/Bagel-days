@@ -682,12 +682,12 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    above this block, before it caught up to the header. The logo (and
    so the header) is ~6px shorter at <=600px — see that breakpoint's
    own override below. */
-.menu-category-sticky{position:sticky; top:67px; z-index:5; background:var(--cream);}
-/* Trailing padding only when subcat pills are the sticky block's last
-   child (no Best section that category) — with a Best section, the
-   divider is the last child instead and the pinned area should end
-   right at that line, no extra padding below it. */
-.menu-category-sticky:has(> .menu-subcat-pills:last-child){padding-bottom:8px;}
+/* padding-bottom is part of this box's normal size, not just something
+   that shows up while stuck — it's also the actual visual gap between
+   the divider/pills and the product grid below in ordinary (unscrolled)
+   layout, so it has to stay on always rather than being conditional on
+   which child is last. */
+.menu-category-sticky{position:sticky; top:67px; z-index:5; background:var(--cream); padding-bottom:8px;}
 /* margin-bottom:0 (not just halved) — the padding above already adds
    trailing space below the pills, so any margin here on top of that
    was stacking (6px margin + 8px padding = 14px, not the 6px it
