@@ -709,13 +709,14 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    One shared 6-track grid (rather than the product grid and the promo
    column each sizing independently) so the promo column always measures
    out to exactly 2 product-card columns, gap included, at any width. */
-/* margin-top:8px is the real gap below the sticky header (divider or
-   pills, whichever ends it) — living here instead of as trailing
-   padding/margin inside .menu-category-sticky means it scrolls away
-   with this row once you pass it, instead of staying pinned as dead
-   space between the fixed header and wherever this row has scrolled
-   to. Looks identical in ordinary unscrolled layout either way. */
-.menu-promo-row{display:grid; grid-template-columns:repeat(6,1fr); gap:24px; align-items:start; margin-top:8px; margin-bottom:26px;}
+/* margin-top:24px (matching this grid's own row/column gap) is the real
+   gap below the sticky header (divider or pills, whichever ends it) —
+   living here instead of as trailing padding/margin inside
+   .menu-category-sticky means it scrolls away with this row once you
+   pass it, instead of staying pinned as dead space between the fixed
+   header and wherever this row has scrolled to. Looks identical in
+   ordinary unscrolled layout either way. */
+.menu-promo-row{display:grid; grid-template-columns:repeat(6,1fr); gap:24px; align-items:start; margin-top:24px; margin-bottom:26px;}
 .menu-promo-row .card-grid{grid-column:span 4;}
 /* A container-query context: lets addons-panel/set-banner-mini's fonts
    and spacing (cqw units below) scale with THIS box's own rendered
