@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { asset } from "../lib/assetUrl";
+import { useEffect, useState } from "react";
+import { asset, productImageUrl } from "../lib/assetUrl";
 import { aboutIconComponent } from "../lib/aboutContent";
-import { IcPencil } from "./Icons";
+import { IcPencil, IcPlus, IcTrash, IcChevronLeft, IcChevronRight } from "./Icons";
 
 // A click-to-edit text field: plain text by default, a pencil button turns
 // it into an input (or textarea for longer fields) that saves on blur/Enter.
@@ -84,6 +84,73 @@ function EditablePhoto({ src, alt, className, onPick, busy }) {
   );
 }
 
+// Meet Candy's photo, specifically: unlike every other About slot (one
+// fixed photo), this one can hold several — prev/next arrows wrap around
+// infinitely ((i +/- 1 + length) % length, same technique as
+// HeroCarousel) instead of stopping at the ends. In admin mode, a plus
+// button adds another photo and a trash button removes whichever one is
+// currently showing (only once there's more than one, so the slot can
+// never end up with none).
+function EditableCandyCarousel({ photos, className, editable, busy, onAdd, onRemove }) {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (index >= photos.length) setIndex(0);
+  }, [photos.length, index]);
+
+  const clamped = Math.min(index, photos.length - 1);
+  const current = productImageUrl(photos[clamped]);
+
+  return (
+    <span className="about-candy-carousel">
+      <img src={current} alt="Candy the Bagel Days mascot" className={className} />
+      {photos.length > 1 && (
+        <>
+          <button
+            type="button"
+            className="about-candy-arrow about-candy-arrow-prev"
+            onClick={() => setIndex((i) => (i - 1 + photos.length) % photos.length)}
+            aria-label="Previous photo"
+          >
+            <IcChevronLeft />
+          </button>
+          <button
+            type="button"
+            className="about-candy-arrow about-candy-arrow-next"
+            onClick={() => setIndex((i) => (i + 1) % photos.length)}
+            aria-label="Next photo"
+          >
+            <IcChevronRight />
+          </button>
+          <div className="about-candy-dots">
+            {photos.map((_, i) => (
+              <span key={i} className={`about-candy-dot${i === clamped ? " active" : ""}`} />
+            ))}
+          </div>
+        </>
+      )}
+      {editable && (
+        <div className="about-candy-admin-actions">
+          <label className="about-editable-photo-pencil" aria-label="Add a photo">
+            {busy ? <span className="about-editable-photo-busy" /> : <IcPlus />}
+            <input type="file" accept="image/*" hidden disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) onAdd(f); }} />
+          </label>
+          {photos.length > 1 && (
+            <button
+              type="button"
+              className="about-editable-photo-pencil about-candy-remove"
+              onClick={() => onRemove(clamped)}
+              aria-label="Remove this photo"
+            >
+              <IcTrash />
+            </button>
+          )}
+        </div>
+      )}
+    </span>
+  );
+}
+
 // The full About page body (everything the header down), shared between the
 // public page (src/pages/About.jsx, editable=false) and the admin's
 // Homepage > About tab (editable=true) — the same component tree guarantees
@@ -93,6 +160,7 @@ function EditablePhoto({ src, alt, className, onPick, busy }) {
 export default function AboutPageBody({
   storyList,
   candy,
+  candyPhotos,
   specials,
   photoUrl,
   editable = false,
@@ -100,6 +168,8 @@ export default function AboutPageBody({
   onStoryIconPick,
   onStoryTextChange,
   onCandyTextChange,
+  onCandyPhotoAdd,
+  onCandyPhotoRemove,
   onSpecialIconPick,
   onSpecialTextChange,
   onPhotoPick,
@@ -167,11 +237,12 @@ export default function AboutPageBody({
 
         <div className="wrap">
           <div className="mascot-panel">
-            <EditablePhoto
-              src={photoUrl("candy")}
-              alt="Candy the Bagel Days mascot"
-              onPick={onPhotoPick && ((f) => onPhotoPick("candy", f))}
+            <EditableCandyCarousel
+              photos={candyPhotos}
+              editable={editable}
               busy={busySlot === "candy"}
+              onAdd={onCandyPhotoAdd}
+              onRemove={onCandyPhotoRemove}
             />
             <div className="mascot-panel-text">
               <h3 style={{ marginBottom: 12 }}>Meet Candy</h3>

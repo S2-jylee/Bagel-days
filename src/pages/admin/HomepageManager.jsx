@@ -7,7 +7,7 @@ import { resizeImage } from "../../lib/imageResize";
 import { useAdminLang } from "../../lib/adminI18n";
 import { logActivity } from "../../lib/activityLog";
 import { IcChevronLeft, IcChevronRight, IcTrash } from "../../components/Icons";
-import { DEFAULT_ABOUT_PHOTOS } from "../../lib/aboutPhotos";
+import { DEFAULT_ABOUT_PHOTOS, candyPhotoList } from "../../lib/aboutPhotos";
 import { DEFAULT_ABOUT_CONTENT } from "../../lib/aboutContent";
 import AboutPageBody from "../../components/AboutPageBody";
 
@@ -237,6 +237,27 @@ function AboutSection({ content, t }) {
     }
   }
 
+  // Meet Candy's photo is the one slot that holds a list rather than a
+  // single image — append on add; remove is disabled (in AboutPageBody)
+  // once only one photo is left, so this never has to handle emptying it.
+  async function handleCandyAdd(file) {
+    setBusySlot("candy");
+    setError("");
+    try {
+      const url = await uploadSiteImage(file);
+      await savePhotos({ ...photosRef.current, candy: [...candyPhotoList(photosRef.current), url] });
+    } catch (err) {
+      setError(err.message || t("photoUploadFailed"));
+    } finally {
+      setBusySlot(null);
+    }
+  }
+
+  async function handleCandyRemove(index) {
+    const list = candyPhotoList(photosRef.current);
+    await savePhotos({ ...photosRef.current, candy: list.filter((_, i) => i !== index) });
+  }
+
   const storyList = DEFAULT_ABOUT_CONTENT.storyList.map((d, i) => ({ ...d, ...(overrides.storyList?.[i] || {}) }));
   const candy = { ...DEFAULT_ABOUT_CONTENT.candy, ...(overrides.candy || {}) };
   const specials = DEFAULT_ABOUT_CONTENT.specials.map((d, i) => ({ ...d, ...(overrides.specials?.[i] || {}) }));
@@ -250,6 +271,7 @@ function AboutSection({ content, t }) {
         <AboutPageBody
           storyList={storyList}
           candy={candy}
+          candyPhotos={candyPhotoList(photos)}
           specials={specials}
           photoUrl={(slot) => productImageUrl(photos[slot] || DEFAULT_ABOUT_PHOTOS[slot])}
           editable
@@ -257,6 +279,8 @@ function AboutSection({ content, t }) {
           onStoryIconPick={(i, f) => handleIconPick("storyList", i, f)}
           onStoryTextChange={(i, field, v) => saveContent(patchArrayItem("storyList", i, field, v))}
           onCandyTextChange={(field, v) => saveContent({ ...overridesRef.current, candy: { ...(overridesRef.current.candy || {}), [field]: v } })}
+          onCandyPhotoAdd={handleCandyAdd}
+          onCandyPhotoRemove={handleCandyRemove}
           onSpecialIconPick={(i, f) => handleIconPick("specials", i, f)}
           onSpecialTextChange={(i, field, v) => saveContent(patchArrayItem("specials", i, field, v))}
           onPhotoPick={handlePhotoPick}

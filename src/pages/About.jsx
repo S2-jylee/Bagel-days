@@ -1,7 +1,7 @@
 import { productImageUrl } from "../lib/assetUrl";
 import { useSeo } from "../lib/seo";
 import { usePageContent } from "../context/PageContentContext";
-import { DEFAULT_ABOUT_PHOTOS } from "../lib/aboutPhotos";
+import { DEFAULT_ABOUT_PHOTOS, candyPhotoList } from "../lib/aboutPhotos";
 import { DEFAULT_ABOUT_CONTENT } from "../lib/aboutContent";
 import AboutPageBody from "../components/AboutPageBody";
 
@@ -23,6 +23,7 @@ export default function About() {
   const storyList = DEFAULT_ABOUT_CONTENT.storyList.map((d, i) => ({ ...d, ...(overrides.storyList?.[i] || {}) }));
   const candy = { ...DEFAULT_ABOUT_CONTENT.candy, ...(overrides.candy || {}) };
   const specials = DEFAULT_ABOUT_CONTENT.specials.map((d, i) => ({ ...d, ...(overrides.specials?.[i] || {}) }));
+  const candyPhotos = candyPhotoList(aboutPhotos);
 
-  return <AboutPageBody storyList={storyList} candy={candy} specials={specials} photoUrl={photoUrl} />;
+  return <AboutPageBody storyList={storyList} candy={candy} candyPhotos={candyPhotos} specials={specials} photoUrl={photoUrl} />;
 }

@@ -17,3 +17,15 @@ export const ABOUT_PHOTO_SLOTS = [
 ];
 
 export const DEFAULT_ABOUT_PHOTOS = Object.fromEntries(ABOUT_PHOTO_SLOTS.map((s) => [s.key, s.default]));
+
+// "candy" (Meet Candy) is the one slot that can hold several photos to
+// browse through (infinite-looping, like HeroCarousel) instead of just
+// one — this normalizes whatever's stored there (nothing yet, a single
+// legacy string from before this feature, or the intended array) into a
+// non-empty array of photo URLs/paths to render.
+export function candyPhotoList(photos) {
+  const raw = photos?.candy;
+  if (Array.isArray(raw) && raw.length > 0) return raw;
+  if (typeof raw === "string" && raw) return [raw];
+  return [DEFAULT_ABOUT_PHOTOS.candy];
+}
