@@ -98,21 +98,39 @@ function ProductModal({ id, onClose, nested }) {
           {p.setSections.length > 0 && (
             <div className="modal-set-sections">
               {p.setSections.map((section, i) => {
-                const choiceText = section.choices
+                // Same info as the PC chip row below, but as plain text with
+                // no photos (no room for them on a narrow screen) — a named
+                // product is still clickable, opening its own modal nested
+                // on top of this one just like a chip does; a "choose any X"
+                // wildcard has no single product to open, so it stays plain.
+                const choiceParts = section.choices
                   .map((c) => {
-                    if (c.type === "product") return products[c.productId]?.name;
+                    if (c.type === "product") {
+                      const cp = products[c.productId];
+                      return cp ? { type: "product", id: cp.id, label: cp.name } : null;
+                    }
                     const cat = categories.find((cc) => cc.id === c.categoryId);
                     const scopeLabel = c.subcategoryId ? cat?.subcategories.find((s) => s.id === c.subcategoryId)?.label : cat?.label;
-                    return scopeLabel ? `Choose any ${scopeLabel}` : null;
+                    return scopeLabel ? { type: "wildcard", label: `Choose any ${scopeLabel}` } : null;
                   })
-                  .filter(Boolean)
-                  .join(" · ");
-                if (!choiceText) return null;
+                  .filter(Boolean);
+                if (choiceParts.length === 0) return null;
                 const items = resolveSectionProducts(section, products);
                 return (
                   <div className="modal-set-section" key={i}>
                     <h4>{section.label}</h4>
-                    <p className="modal-set-section-choices">{choiceText}</p>
+                    <p className="modal-set-section-choices">
+                      {choiceParts.map((part, pi) => (
+                        <span key={pi}>
+                          {pi > 0 && " · "}
+                          {part.type === "product" ? (
+                            <button type="button" className="set-choice-text-link" onClick={() => setNestedId(part.id)}>{part.label}</button>
+                          ) : (
+                            part.label
+                          )}
+                        </span>
+                      ))}
+                    </p>
                     {items.length > 0 && (
                       <div className="modal-set-section-chips">
                         {items.map((it) => (

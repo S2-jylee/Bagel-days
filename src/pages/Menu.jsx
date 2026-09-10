@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useCategories } from "../context/CategoriesContext";
 import FoodCard from "../components/FoodCard";
 import { useProducts } from "../context/ProductsContext";
@@ -29,7 +29,7 @@ function OrderNowButton({ className = "delivery-btn delivery-btn-direct" }) {
 }
 
 export default function Menu() {
-  const { categories } = useCategories();
+  const { categories, loading: categoriesLoading } = useCategories();
 
   // Category/subcategory names only — actual prices load async from Supabase
   // (see ProductsContext), so a full item-by-item Menu schema isn't reliable here.
@@ -58,6 +58,21 @@ export default function Menu() {
   const [activeCat, setActiveCat] = useState(categories[0].id);
   const [activeSubcat, setActiveSubcat] = useState(categories[0].subcategories?.[0]?.id ?? null);
   const { products, addons } = useProducts();
+
+  // Same fix as admin's MenuManager: activeCat/activeSubcat above
+  // initialize from DEFAULT_CATEGORIES (a static placeholder shown only
+  // until the real, admin-sorted list loads from Supabase), so they could
+  // lock onto that placeholder's first category (Bagels) forever instead
+  // of whichever one is actually first in the real sort order (e.g. Set,
+  // once moved to the top). Sync once, the first time real data arrives.
+  const didSyncInitialCategory = useRef(false);
+  useEffect(() => {
+    if (categoriesLoading || didSyncInitialCategory.current) return;
+    didSyncInitialCategory.current = true;
+    const first = categories[0];
+    setActiveCat(first.id);
+    setActiveSubcat(first.subcategories?.[0]?.id ?? null);
+  }, [categoriesLoading, categories]);
 
   const activeCategory = categories.find((c) => c.id === activeCat) ?? categories[0];
   const activeSubcategory = activeCategory.subcategories?.find((s) => s.id === activeSubcat) ?? null;

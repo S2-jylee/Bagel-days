@@ -472,6 +472,10 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    pill-shaped chips that wrap inline like tags, reading more like "here
    are your options" than a mini product catalog. */
 .modal-set-section-choices{display:none;}
+.set-choice-text-link{
+  background:none; border:none; padding:0; margin:0; font:inherit; color:var(--maroon);
+  text-decoration:underline; cursor:pointer;
+}
 .modal-set-section-chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;}
 .set-choice-chip{
   display:inline-flex; align-items:center; gap:7px; max-width:100%;
