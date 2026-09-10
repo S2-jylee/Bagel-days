@@ -233,13 +233,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 /* ---------- Home page: compact hero + widget row (keeps desktop close to one screen) ---------- */
 .home-hero{padding:34px 0 28px;}
 .home-widgets{padding:15px 0 36px;}
-/* align-items:start (not stretch) — Visit Us is inherently the tallest
-   of the 4 cards (address+hours+phone+button), so stretching every card
-   to match it left growing empty space inside the shorter ones at
-   in-between widths no amount of trimming Visit Us's own content could
-   fully close. Cards now size to their own content; bottoms won't line
-   up perfectly across the row, but no card carries dead space anymore. */
-.widgets-grid{display:grid; grid-template-columns:1.8fr 1fr 1fr 1fr; gap:20px; align-items:start;}
+.widgets-grid{display:grid; grid-template-columns:1.8fr 1fr 1fr 1fr; gap:20px; align-items:stretch;}
 .widget-card{
   background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:22px; min-width:0;
   display:flex; flex-direction:column; justify-content:space-between;
