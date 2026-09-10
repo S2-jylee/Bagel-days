@@ -26,7 +26,7 @@ export default function Home() {
   });
 
   const { products } = useProducts();
-  const { pages } = usePageContent();
+  const { pages, loading: pagesLoading } = usePageContent();
   const content = pages.home || DEFAULT_CONTENT;
   const { settings } = useSiteSettings();
 
@@ -38,6 +38,14 @@ export default function Home() {
       .sort((a, b) => (a.bestSellerOrder ?? 0) - (b.bestSellerOrder ?? 0))
       .map((p) => p.id);
   }, [products]);
+
+  // Rendering immediately with DEFAULT_CONTENT (a bundled placeholder,
+  // from before this page had any admin-editable photos) would flash that
+  // placeholder image on every load, however briefly, until the real
+  // Supabase row arrives — waiting the extra beat for it avoids ever
+  // showing the wrong photo, at the cost of a blank moment instead. All
+  // hooks above still run every render either way (rules of hooks).
+  if (pagesLoading) return null;
 
   return (
     <>

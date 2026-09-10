@@ -18,9 +18,13 @@ export default function Visit() {
     path: "/visit",
   });
 
-  const { pages } = usePageContent();
+  const { pages, loading: pagesLoading } = usePageContent();
   const content = pages.visit || DEFAULT_CONTENT;
   const { settings } = useSiteSettings();
+
+  // Avoid flashing DEFAULT_CONTENT's bundled placeholder photo before the
+  // real Supabase row arrives — see Home.jsx for the same pattern.
+  if (pagesLoading) return null;
 
   return (
     <>

@@ -31,9 +31,18 @@ export function PageContentProvider({ children }) {
     let cancelled = false;
 
     function reload() {
-      fetchAll().then((pages) => {
-        if (!cancelled) setState({ pages, loading: false });
-      });
+      fetchAll()
+        .then((pages) => {
+          if (!cancelled) setState({ pages, loading: false });
+        })
+        // Pages that gate rendering on `loading` (avoiding a flash of
+        // bundled default content before the real row arrives — see
+        // Home.jsx) would otherwise stay blank forever if this request
+        // never resolves (e.g. offline) instead of falling back to those
+        // defaults like they used to.
+        .catch(() => {
+          if (!cancelled) setState({ pages: {}, loading: false });
+        });
     }
     reload();
 

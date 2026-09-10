@@ -22,7 +22,7 @@ export default function Contact() {
     path: "/contact",
   });
 
-  const { pages } = usePageContent();
+  const { pages, loading: pagesLoading } = usePageContent();
   const content = pages.contact || DEFAULT_CONTENT;
   const cateringCardImg = content.contactCardImage
     ? productImageUrl(content.contactCardImage)
@@ -60,6 +60,12 @@ export default function Contact() {
       setSending(false);
     }
   }
+
+  // Avoid flashing DEFAULT_CONTENT's bundled placeholder photo (and the
+  // pre-upload catering-box.png) before the real Supabase row arrives —
+  // see Home.jsx for the same pattern. All hooks above still run every
+  // render either way.
+  if (pagesLoading) return null;
 
   return (
     <>

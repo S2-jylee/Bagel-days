@@ -12,7 +12,7 @@ export default function About() {
     path: "/about",
   });
 
-  const { pages } = usePageContent();
+  const { pages, loading: pagesLoading } = usePageContent();
   const aboutPhotos = pages.about?.aboutPhotos || {};
   const overrides = pages.about?.aboutContent || {};
   // A slot's admin-uploaded URL if set, else the bundled default for it.
@@ -24,6 +24,10 @@ export default function About() {
   const candy = { ...DEFAULT_ABOUT_CONTENT.candy, ...(overrides.candy || {}) };
   const specials = DEFAULT_ABOUT_CONTENT.specials.map((d, i) => ({ ...d, ...(overrides.specials?.[i] || {}) }));
   const candyPhotos = candyPhotoList(aboutPhotos);
+
+  // Avoid flashing the bundled default photos/icons before the real
+  // Supabase row arrives — see Home.jsx for the same pattern.
+  if (pagesLoading) return null;
 
   return <AboutPageBody storyList={storyList} candy={candy} candyPhotos={candyPhotos} specials={specials} photoUrl={photoUrl} />;
 }
