@@ -142,11 +142,10 @@ function EditablePhoto({ src, alt, className, onPick, busy }) {
 // Meet Candy's photo, specifically: unlike every other About slot (one
 // fixed photo), this one can hold several — prev/next arrows wrap around
 // infinitely ((i +/- 1 + length) % length, same technique as
-// HeroCarousel) instead of stopping at the ends. In admin mode, a plus
-// button adds another photo and a trash button removes whichever one is
-// currently showing (only once there's more than one, so the slot can
-// never end up with none).
-function EditableCandyCarousel({ photos, className, editable, busy, onAdd, onRemove }) {
+// HeroCarousel) instead of stopping at the ends. Purely for browsing, in
+// both public and admin — registering/removing photos happens in
+// CandyPhotoManager below the panel instead of as controls on the photo.
+function EditableCandyCarousel({ photos, className }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -184,25 +183,37 @@ function EditableCandyCarousel({ photos, className, editable, busy, onAdd, onRem
           </div>
         </>
       )}
-      {editable && (
-        <div className="about-candy-admin-actions">
-          <label className="about-editable-photo-pencil" aria-label="Add a photo">
-            {busy ? <span className="about-editable-photo-busy" /> : <IcPlus />}
-            <input type="file" accept="image/*" hidden disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) onAdd(f); }} />
-          </label>
+    </span>
+  );
+}
+
+const CANDY_PHOTO_MAX = 8;
+
+// Admin-only: every registered Candy photo as a small thumbnail in a row,
+// each individually removable, with an add tile at the end (pushed further
+// right as more are added) — capped at CANDY_PHOTO_MAX. Separate from the
+// carousel above so browsing (public + admin) and managing (admin only)
+// aren't controls stacked on the same photo.
+function CandyPhotoManager({ photos, busy, onAdd, onRemove }) {
+  return (
+    <div className="about-candy-manager">
+      {photos.map((p, i) => (
+        <div className="about-candy-manager-thumb" key={p + i}>
+          <img src={productImageUrl(p)} alt="" />
           {photos.length > 1 && (
-            <button
-              type="button"
-              className="about-editable-photo-pencil about-candy-remove"
-              onClick={() => onRemove(clamped)}
-              aria-label="Remove this photo"
-            >
+            <button type="button" className="about-candy-manager-remove" onClick={() => onRemove(i)} aria-label="Remove this photo">
               <IcTrash />
             </button>
           )}
         </div>
+      ))}
+      {photos.length < CANDY_PHOTO_MAX && (
+        <label className="about-candy-manager-add" aria-label="Add a photo">
+          {busy ? <span className="about-editable-photo-busy" /> : <IcPlus />}
+          <input type="file" accept="image/*" hidden disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) onAdd(f); }} />
+        </label>
       )}
-    </span>
+    </div>
   );
 }
 
@@ -277,13 +288,7 @@ export default function AboutPageBody({
 
         <div className="wrap">
           <div className="mascot-panel">
-            <EditableCandyCarousel
-              photos={candyPhotos}
-              editable={editable}
-              busy={busySlot === "candy"}
-              onAdd={onCandyPhotoAdd}
-              onRemove={onCandyPhotoRemove}
-            />
+            <EditableCandyCarousel photos={candyPhotos} />
             <div className="mascot-panel-text">
               <h3 style={{ marginBottom: 12 }}>Meet Candy</h3>
               <p><EditableText value={candy.p1} editable={editable} textarea onChange={(v) => onCandyTextChange("p1", v)} /></p>
@@ -292,6 +297,14 @@ export default function AboutPageBody({
             </div>
             <img className="mascot-panel-deco" src={asset("/assets/images/mascot-dog.png")} alt="" />
           </div>
+          {editable && (
+            <CandyPhotoManager
+              photos={candyPhotos}
+              busy={busySlot === "candy"}
+              onAdd={onCandyPhotoAdd}
+              onRemove={onCandyPhotoRemove}
+            />
+          )}
         </div>
       </section>
 

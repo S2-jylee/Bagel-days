@@ -574,9 +574,23 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .about-candy-dots{position:absolute; bottom:10px; left:0; right:0; z-index:3; display:flex; justify-content:center; gap:6px;}
 .about-candy-dot{width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.7); box-shadow:0 1px 3px rgba(0,0,0,.2);}
 .about-candy-dot.active{background:var(--maroon);}
-/* Admin-only add/remove controls, top-right corner (arrows/dots own the
-   rest of the photo's edges). */
-.about-candy-admin-actions{position:absolute; top:6px; right:6px; z-index:4; display:flex; gap:6px;}
+/* Admin-only: registered Candy photos as a thumbnail row below the panel,
+   each removable, with an add tile at the end that gets pushed further
+   right as more are registered (capped at CANDY_PHOTO_MAX in JS). */
+.about-candy-manager{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px;}
+.about-candy-manager-thumb{position:relative; width:64px; height:64px; border-radius:10px; overflow:hidden; border:1px solid var(--line); background:#fff;}
+.about-candy-manager-thumb img{width:100%; height:100%; object-fit:cover; display:block;}
+.about-candy-manager-remove{
+  position:absolute; top:2px; right:2px; width:20px; height:20px; display:flex; align-items:center; justify-content:center;
+  border:none; border-radius:50%; background:rgba(0,0,0,.55); color:#fff; cursor:pointer;
+}
+.about-candy-manager-remove svg{width:12px; height:12px;}
+.about-candy-manager-add{
+  width:64px; height:64px; display:flex; align-items:center; justify-content:center;
+  border:1px dashed var(--maroon-light); border-radius:10px; cursor:pointer; color:var(--maroon);
+}
+.about-candy-manager-add svg{width:20px; height:20px;}
+.about-candy-manager-add:hover{background:var(--cream-alt);}
 
 /* ---------- Special numbered list ---------- */
 .special-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:20px; margin-top:20px;}
