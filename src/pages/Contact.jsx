@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { IcGift, IcMailCheck, IcMail, IcInsta, IcTikTok, IcFacebook, IcPhoneCall, IcExternal } from "../components/Icons";
-import { asset } from "../lib/assetUrl";
+import { asset, productImageUrl } from "../lib/assetUrl";
 import { usePageContent } from "../context/PageContentContext";
 import { useSiteSettings } from "../context/SiteSettingsContext";
 import HeroCarousel from "../components/HeroCarousel";
@@ -24,6 +24,9 @@ export default function Contact() {
 
   const { pages } = usePageContent();
   const content = pages.contact || DEFAULT_CONTENT;
+  const cateringCardImg = content.contactCardImage
+    ? productImageUrl(content.contactCardImage)
+    : asset("/assets/images/catering-box.png");
   const { settings } = useSiteSettings();
   const socialLinks = [
     { ic: IcInsta, label: "Instagram", value: settings.instagramHandle, href: settings.instagramUrl },
@@ -82,7 +85,7 @@ export default function Contact() {
             <div className="contact-card">
               <h4><IcGift /> Catering &amp; Bulk Orders</h4>
               <p>Planning an event or placing a bulk order? Please fill out the contact form, and we'll get back to you as soon as possible.</p>
-              <img src={asset("/assets/images/catering-box.png")} alt="Catering box with sandwiches and a drink, ready for pickup" className="contact-card-img" />
+              <img src={cateringCardImg} alt="Catering box with sandwiches and a drink, ready for pickup" className="contact-card-img" />
             </div>
 
             <div className="contact-card">

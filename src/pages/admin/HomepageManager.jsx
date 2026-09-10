@@ -6,7 +6,7 @@ import { productImageUrl } from "../../lib/assetUrl";
 import { resizeImage } from "../../lib/imageResize";
 import { useAdminLang } from "../../lib/adminI18n";
 import { logActivity } from "../../lib/activityLog";
-import { IcChevronLeft, IcChevronRight, IcTrash } from "../../components/Icons";
+import { IcChevronLeft, IcChevronRight, IcTrash, IcPencil } from "../../components/Icons";
 import { DEFAULT_ABOUT_PHOTOS, candyPhotoList } from "../../lib/aboutPhotos";
 import { DEFAULT_ABOUT_CONTENT } from "../../lib/aboutContent";
 import AboutPageBody from "../../components/AboutPageBody";
@@ -432,6 +432,68 @@ function BusinessInfoSection({ settings, t }) {
   );
 }
 
+// The one photo in Contact's "Catering & Bulk Orders" card — separate from
+// that page's own hero carousel (PageSection's images), so it gets its own
+// small field here instead. Auto-saves on pick, matching every other photo
+// editor in this admin (no separate Save button to miss).
+function ContactCardImageSection({ content, t }) {
+  const [image, setImage] = useState(content.contactCardImage);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handlePick(file) {
+    setBusy(true);
+    setError("");
+    try {
+      const url = await uploadSiteImage(file);
+      const { error: err } = await supabase
+        .from("page_content")
+        .update({ contact_card_image: url, updated_at: new Date().toISOString() })
+        .eq("page_id", "contact");
+      if (err) {
+        setError(err.message || t("saveFailed"));
+        return;
+      }
+      setImage(url);
+      logActivity({ action: "update", entity: "homepage_section", label: t("contactCardImageLabel"), path: t("homepageTab") });
+    } catch (err) {
+      setError(err.message || t("photoUploadFailed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="homepage-section">
+      <div className="field full">
+        <label>{t("contactCardImageLabel")}</label>
+        <div style={{ position: "relative", width: 220, maxWidth: "100%", aspectRatio: "4/3", borderRadius: 8, overflow: "hidden", marginTop: 8 }}>
+          <img
+            src={productImageUrl(image || "/assets/images/catering-box.png")}
+            alt=""
+            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+          />
+          <label className="about-editable-photo-pencil" aria-label={t("contactCardImageLabel")}>
+            {busy ? <span className="about-editable-photo-busy" /> : <IcPencil />}
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              disabled={busy}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = "";
+                if (f) handlePick(f);
+              }}
+            />
+          </label>
+        </div>
+      </div>
+      {error && <p className="form-status err">{error}</p>}
+    </div>
+  );
+}
+
 const SUB_TABS = [
   { id: "home", labelKey: "homeSectionTitle" },
   { id: "about", labelKey: "aboutSectionTitle" },
@@ -471,7 +533,10 @@ export default function HomepageManager() {
         <PageSection key="visit" pageId="visit" sectionLabel={t("visitSectionTitle")} content={pages.visit} showTagline={false} footerNoteKey="visitBusinessInfoNote" t={t} />
       )}
       {subTab === "contact" && pages.contact && (
-        <PageSection key="contact" pageId="contact" sectionLabel={t("contactSectionTitle")} content={pages.contact} footerNoteKey="contactBusinessInfoNote" t={t} />
+        <>
+          <PageSection key="contact" pageId="contact" sectionLabel={t("contactSectionTitle")} content={pages.contact} footerNoteKey="contactBusinessInfoNote" t={t} />
+          <ContactCardImageSection key="contact-card-image" content={pages.contact} t={t} />
+        </>
       )}
       {subTab === "footer" && <BusinessInfoSection key="footer" settings={settings} t={t} />}
     </div>
