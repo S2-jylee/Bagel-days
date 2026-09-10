@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { UberEatsButton, DoorDashButton } from "../components/DeliveryButtons";
 import HeroCarousel from "../components/HeroCarousel";
-import { IcHandCoins, IcCan, IcCoffeeCup, IcPaperBag, IcMapPinThin } from "../components/Icons";
+import { IcHandCoins, IcCan, IcCoffeeCup, IcPaperBag, IcMapPinThin, IcMotorbike } from "../components/Icons";
 import { usePageContent } from "../context/PageContentContext";
 import { useSeo } from "../lib/seo";
 
@@ -53,8 +53,8 @@ export default function Pickup() {
             <h2>Choose Your Way to Order</h2>
           </div>
           <div className="delivery-buttons">
-            <UberEatsButton />
-            <DoorDashButton />
+            <UberEatsButton icon={IcPaperBag} />
+            <DoorDashButton icon={IcMotorbike} />
           </div>
 
           <div className="pickup-highlights">
