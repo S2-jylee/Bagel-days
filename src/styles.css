@@ -436,7 +436,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .product-modal-body .price{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon); font-size:1.1rem;}
 .product-modal-body .add-btn{font-size:.88rem; padding:11px 20px;}
 .add-btn.added{background:#3f7d4d;}
-.modal-addons{margin-bottom:18px;}
+.modal-addons{margin-bottom:18px; padding-top:16px; border-top:1px solid var(--line);}
 .product-modal-order-btn{margin-top:4px;}
 .modal-addons h4{font-family:'PT Serif', serif; font-size:.9rem; color:var(--maroon); margin-bottom:10px;}
 .modal-addon-list{display:flex; flex-direction:column; gap:8px;}
@@ -666,8 +666,13 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    category has one) below the site header while scrolling — only
    .menu-promo-row (the product grid + add-ons/set-banner column) below
    it scrolls underneath. Disabled on tablet/mobile alongside the
-   sidebar category nav's own sticky behavior (see .menu-maincats). */
-.menu-category-sticky{position:sticky; top:96px; z-index:5; background:var(--cream); padding-bottom:8px;}
+   sidebar category nav's own sticky behavior (see .menu-maincats).
+   top:67px is the site header's actual rendered height (14px+14px nav
+   padding + 38px logo + 1px border) — .menu-maincats's own top:96px
+   left extra headroom that's invisible for a plain text nav, but left
+   a gap here that whatever was mid-scroll showed through, right above
+   this block, before it caught up to the header. */
+.menu-category-sticky{position:sticky; top:67px; z-index:5; background:var(--cream); padding-bottom:8px;}
 .menu-category h2{font-size:1.5rem; margin-bottom:14px;}
 .menu-category > p{color:var(--body); max-width:52ch; margin-bottom:26px;}
 .menu-best-section{margin-bottom:28px;}
