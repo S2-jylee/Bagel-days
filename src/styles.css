@@ -344,7 +344,10 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   display:inline-flex; align-items:center; gap:3px;
   font-family:'Pretendard', sans-serif; font-weight:400; line-height:1; letter-spacing:.02em; color:#fff;
   font-size:clamp(.5rem, 3.677cqw + .27rem, .68rem);
-  padding:clamp(1px, 6.38cqw - 5.38px, 6px) clamp(2px, 11.49cqw - 9.49px, 11px) clamp(1px, 3.83cqw - 2.83px, 4px);
+  /* Side padding trimmed (was 11px at full size) — Signature+Best+New all
+     at once needed less horizontal room per pill to stay on one line
+     instead of wrapping to two at a 178px card. */
+  padding:clamp(1px, 6.38cqw - 5.38px, 6px) clamp(2px, 7.69cqw - 5.69px, 8px) clamp(1px, 3.83cqw - 2.83px, 4px);
   border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
 }
 /* text-shadow (not -webkit-text-stroke) so the outline sits outside each
@@ -680,7 +683,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    block's last child — halves the trailing gap below them (26px base,
    used when Best follows) so the pinned area doesn't hang onto extra
    blank space with nothing below it but the pills themselves. */
-.menu-category-sticky > .menu-subcat-pills:last-child{margin-bottom:13px;}
+.menu-category-sticky > .menu-subcat-pills:last-child{margin-bottom:6px;}
 .menu-category h2{font-size:1.5rem; margin-bottom:14px;}
 .menu-category > p{color:var(--body); max-width:52ch; margin-bottom:26px;}
 .menu-best-section{margin-bottom:28px;}
@@ -1684,6 +1687,12 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 .homepage-subtabs button:hover{border-color:var(--maroon-light);}
 .homepage-subtabs button.active{background:var(--maroon); border-color:var(--maroon); color:#fff;}
+/* Lets PageSection place an extra single-photo field (e.g. Contact's card
+   photo) beside Top Photos instead of stacked below it — Top Photos grows
+   to fill the row, the extra field keeps its own compact width. */
+.homepage-photo-row{display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;}
+.homepage-photo-row > .field.full{flex:1 1 320px;}
+.homepage-photo-row > .field:not(.full){flex:0 0 auto;}
 .homepage-photo-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:12px; margin-top:8px;}
 .homepage-photo-thumb{position:relative; border-radius:8px; overflow:hidden; border:1px solid var(--line); background:#fff;}
 .homepage-photo-thumb img{width:100%; aspect-ratio:16/9; object-fit:cover; display:block;}

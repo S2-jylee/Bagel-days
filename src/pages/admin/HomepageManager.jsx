@@ -106,7 +106,7 @@ function PhotoField({ images, onChange, uploading, setUploading, setError, t }) 
 // A page's hero: title (+ optional tagline) + description + photo set, stored
 // as one row in page_content. Visit's hero has no script tagline in its
 // layout, so showTagline=false hides that field for it.
-function PageSection({ pageId, sectionLabel, content, showTagline = true, footerNoteKey, t }) {
+function PageSection({ pageId, sectionLabel, content, showTagline = true, footerNoteKey, extraPhotoField, t }) {
   // Seeded once from the loaded row, then edited locally until Save — not kept
   // in sync with the live subscription, since page_content covers every page
   // in one table: any change (including this section's own Save) would
@@ -152,14 +152,17 @@ function PageSection({ pageId, sectionLabel, content, showTagline = true, footer
         <textarea rows={3} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
       </div>
 
-      <PhotoField
-        images={form.images}
-        onChange={(images) => setForm((f) => ({ ...f, images }))}
-        uploading={uploading}
-        setUploading={setUploading}
-        setError={setError}
-        t={t}
-      />
+      <div className="homepage-photo-row">
+        <PhotoField
+          images={form.images}
+          onChange={(images) => setForm((f) => ({ ...f, images }))}
+          uploading={uploading}
+          setUploading={setUploading}
+          setError={setError}
+          t={t}
+        />
+        {extraPhotoField}
+      </div>
 
       {footerNoteKey && <p className="homepage-hint">{t(footerNoteKey)}</p>}
 
@@ -433,9 +436,10 @@ function BusinessInfoSection({ settings, t }) {
 }
 
 // The one photo in Contact's "Catering & Bulk Orders" card — separate from
-// that page's own hero carousel (PageSection's images), so it gets its own
-// small field here instead. Auto-saves on pick, matching every other photo
-// editor in this admin (no separate Save button to miss).
+// that page's own hero carousel, so it gets its own small field, rendered
+// via PageSection's extraPhotoField prop to sit beside Top Photos rather
+// than as its own separate block. Auto-saves on pick, matching every other
+// photo editor in this admin (no separate Save button to miss).
 function ContactCardImageSection({ content, t }) {
   const [image, setImage] = useState(content.contactCardImage);
   const [busy, setBusy] = useState(false);
@@ -464,30 +468,28 @@ function ContactCardImageSection({ content, t }) {
   }
 
   return (
-    <div className="homepage-section">
-      <div className="field full">
-        <label>{t("contactCardImageLabel")}</label>
-        <div style={{ position: "relative", width: 220, maxWidth: "100%", aspectRatio: "4/3", borderRadius: 8, overflow: "hidden", marginTop: 8 }}>
-          <img
-            src={productImageUrl(image || "/assets/images/catering-box.png")}
-            alt=""
-            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+    <div className="field">
+      <label>{t("contactCardImageLabel")}</label>
+      <div style={{ position: "relative", width: 160, maxWidth: "100%", aspectRatio: "4/3", borderRadius: 8, overflow: "hidden", marginTop: 8 }}>
+        <img
+          src={productImageUrl(image || "/assets/images/catering-box.png")}
+          alt=""
+          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        />
+        <label className="about-editable-photo-pencil" aria-label={t("contactCardImageLabel")}>
+          {busy ? <span className="about-editable-photo-busy" /> : <IcPencil />}
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            disabled={busy}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              e.target.value = "";
+              if (f) handlePick(f);
+            }}
           />
-          <label className="about-editable-photo-pencil" aria-label={t("contactCardImageLabel")}>
-            {busy ? <span className="about-editable-photo-busy" /> : <IcPencil />}
-            <input
-              type="file"
-              accept="image/*"
-              hidden
-              disabled={busy}
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                e.target.value = "";
-                if (f) handlePick(f);
-              }}
-            />
-          </label>
-        </div>
+        </label>
       </div>
       {error && <p className="form-status err">{error}</p>}
     </div>
@@ -533,10 +535,15 @@ export default function HomepageManager() {
         <PageSection key="visit" pageId="visit" sectionLabel={t("visitSectionTitle")} content={pages.visit} showTagline={false} footerNoteKey="visitBusinessInfoNote" t={t} />
       )}
       {subTab === "contact" && pages.contact && (
-        <>
-          <PageSection key="contact" pageId="contact" sectionLabel={t("contactSectionTitle")} content={pages.contact} footerNoteKey="contactBusinessInfoNote" t={t} />
-          <ContactCardImageSection key="contact-card-image" content={pages.contact} t={t} />
-        </>
+        <PageSection
+          key="contact"
+          pageId="contact"
+          sectionLabel={t("contactSectionTitle")}
+          content={pages.contact}
+          footerNoteKey="contactBusinessInfoNote"
+          extraPhotoField={<ContactCardImageSection content={pages.contact} t={t} />}
+          t={t}
+        />
       )}
       {subTab === "footer" && <BusinessInfoSection key="footer" settings={settings} t={t} />}
     </div>
