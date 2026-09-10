@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { supabase } from "../../lib/supabase";
 import { usePageContent } from "../../context/PageContentContext";
 import { useSiteSettings } from "../../context/SiteSettingsContext";
@@ -152,20 +152,33 @@ function PageSection({ pageId, sectionLabel, content, showTagline = true, footer
 // One named photo slot on the About page — a single fixed-position image
 // (not a reorderable list), so this is upload-to-replace plus an optional
 // reset back to the bundled default, rather than PhotoField's add/reorder/
-// remove list UI.
-function AboutPhotoField({ slot, value, onChange, uploading, setUploading, setError, t }) {
+// remove list UI. Saves immediately on upload/reset (like a category's icon
+// picker) instead of needing a separate Save Changes click — a photo grid
+// with its own explicit Save button, sitting inside a page that otherwise
+// has none, was easy to miss and left changes unsaved.
+function AboutPhotoField({ slot, value, onChange, busy, setBusy, setError, t }) {
+  const [justSaved, setJustSaved] = useState(false);
+
+  async function commit(url) {
+    setBusy(true);
+    setError("");
+    const ok = await onChange(url);
+    setBusy(false);
+    if (ok) {
+      setJustSaved(true);
+      setTimeout(() => setJustSaved(false), 1500);
+    }
+  }
+
   async function handleUpload(e) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true);
-    setError("");
     try {
       const url = await uploadSiteImage(file);
-      onChange(url);
+      await commit(url);
     } catch (err) {
       setError(err.message || t("photoUploadFailed"));
     } finally {
-      setUploading(false);
       e.target.value = "";
     }
   }
@@ -177,14 +190,15 @@ function AboutPhotoField({ slot, value, onChange, uploading, setUploading, setEr
         <span className="about-photo-field-label">{t(slot.labelKey)}</span>
         <div className="about-photo-field-actions">
           <label className="btn btn-ghost btn-sm">
-            {uploading ? t("uploading") : t("uploadPhoto")}
-            <input type="file" accept="image/*" onChange={handleUpload} disabled={uploading} hidden />
+            {busy ? t("uploading") : t("uploadPhoto")}
+            <input type="file" accept="image/*" onChange={handleUpload} disabled={busy} hidden />
           </label>
           {value && (
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange(null)}>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => commit(null)} disabled={busy}>
               {t("resetToDefault")}
             </button>
           )}
+          {justSaved && <span className="form-status ok">{t("saved")}</span>}
         </div>
       </div>
     </div>
@@ -199,26 +213,29 @@ function AboutPhotoField({ slot, value, onChange, uploading, setUploading, setEr
 // than being an orderable hero carousel.
 function AboutSection({ content, t }) {
   const [photos, setPhotos] = useState(content.aboutPhotos || {});
-  const [uploading, setUploading] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const photosRef = useRef(photos);
+  const [busySlot, setBusySlot] = useState(null);
   const [error, setError] = useState("");
-  const [savedFlash, setSavedFlash] = useState(false);
 
-  async function handleSave() {
-    setSaving(true);
-    setError("");
+  // Each slot commits straight to the row, merged onto photosRef.current
+  // (kept in sync alongside the photos state) rather than the `photos`
+  // closure, which could still be stale if two fields were changed in
+  // quick succession — the second commit would otherwise overwrite the
+  // first's not-yet-re-rendered value.
+  async function handleSlotChange(key, url) {
+    const next = { ...photosRef.current, [key]: url };
+    photosRef.current = next;
+    setPhotos(next);
     const { error: err } = await supabase
       .from("page_content")
-      .update({ about_photos: photos, updated_at: new Date().toISOString() })
+      .update({ about_photos: next, updated_at: new Date().toISOString() })
       .eq("page_id", "about");
-    setSaving(false);
     if (err) {
       setError(err.message || t("saveFailed"));
-      return;
+      return false;
     }
     logActivity({ action: "update", entity: "homepage_section", label: t("aboutSectionTitle"), path: t("homepageTab") });
-    setSavedFlash(true);
-    setTimeout(() => setSavedFlash(false), 2000);
+    return true;
   }
 
   return (
@@ -231,9 +248,9 @@ function AboutSection({ content, t }) {
             key={slot.key}
             slot={slot}
             value={photos[slot.key]}
-            onChange={(url) => setPhotos((p) => ({ ...p, [slot.key]: url }))}
-            uploading={uploading}
-            setUploading={setUploading}
+            onChange={(url) => handleSlotChange(slot.key, url)}
+            busy={busySlot === slot.key}
+            setBusy={(v) => setBusySlot(v ? slot.key : null)}
             setError={setError}
             t={t}
           />
@@ -241,13 +258,6 @@ function AboutSection({ content, t }) {
       </div>
 
       {error && <p className="form-status err">{error}</p>}
-
-      <div className="menu-manager-form-actions">
-        {savedFlash && <span className="form-status ok">{t("saved")}</span>}
-        <button type="button" className="btn btn-primary btn-sm" onClick={handleSave} disabled={saving || uploading}>
-          {saving ? t("saving") : t("saveChanges")}
-        </button>
-      </div>
     </div>
   );
 }
