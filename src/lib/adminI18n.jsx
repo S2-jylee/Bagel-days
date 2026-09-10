@@ -261,7 +261,7 @@ const STRINGS = {
     manageSubcategories: "서브카테고리 관리",
     newCategoryPlaceholder: "새 카테고리 이름",
     newSubcategoryPlaceholder: "새 서브카테고리 이름",
-    categoryIconHint: "카테고리 아이콘을 클릭하면 원하는 이미지로 바꿀 수 있어요. 권장: 정사각형, 128×128px 이상.",
+    categoryIconHint: "카테고리 아이콘을 클릭하면 원하는 이미지로 바꿀 수 있어요. 권장: 128×128px 이상.",
     categoryHasProducts: "이 카테고리에 있는 상품을 먼저 이동하거나 삭제해주세요.",
     subcategoryHasProducts: "이 서브카테고리에 있는 상품을 먼저 이동하거나 삭제해주세요.",
     deleteCategoryConfirm: (label) => `"${label}"을(를) 삭제하시겠습니까? 되돌릴 수 없습니다.`,
