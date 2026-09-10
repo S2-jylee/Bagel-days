@@ -48,6 +48,62 @@ function EditableText({ value, onChange, editable, tag = "span", className, text
   );
 }
 
+// **wrapped like this** renders as a bold lead-in, everything else plain —
+// lets a story-list item keep that styling while still being stored (and
+// edited) as one single string instead of two separate lead/rest fields.
+function parseStoryText(text) {
+  const parts = [];
+  const re = /\*\*(.+?)\*\*/g;
+  let last = 0;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    parts.push(<strong key={m.index}>{m[1]}</strong>);
+    last = re.lastIndex;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts;
+}
+
+// A story-list item's whole line (bold lead-in + rest) as one editable
+// region — was two separate EditableText fields (lead, rest) nested inside
+// an outer span, each with its own pencil; now a single pencil edits the
+// full **markup**-annotated string in one textarea.
+function EditableStoryText({ value, onChange, editable }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+
+  if (!editable) return <>{parseStoryText(value)}</>;
+
+  function commit() {
+    setEditing(false);
+    if (draft !== value) onChange(draft);
+  }
+
+  if (editing) {
+    return (
+      <textarea
+        autoFocus
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        className="about-editable-input"
+        rows={3}
+        placeholder="Wrap a lead-in phrase in **double asterisks** to bold it"
+      />
+    );
+  }
+
+  return (
+    <span className="about-editable">
+      <span>{parseStoryText(value)}</span>
+      <button type="button" className="about-editable-pencil" onClick={() => setEditing(true)} aria-label="Edit">
+        <IcPencil />
+      </button>
+    </span>
+  );
+}
+
 // A click-to-edit icon: the default line icon, or an admin-uploaded image
 // in its place — same upload-to-override pattern as a category's icon in
 // Menu admin (default SVG unless a custom image URL is set), rather than
@@ -106,7 +162,7 @@ export default function AboutPageBody({
 }) {
   return (
     <>
-      <section className="hero about-hero" style={{ paddingBottom: 0 }}>
+      <section className="hero about-hero">
         <div className="wrap about-hero-wrap">
           <h1>About Us</h1>
           <div className="about-hero-divider"><span /></div>
@@ -139,22 +195,7 @@ export default function AboutPageBody({
                       busy={busySlot === `story-icon-${i}`}
                     />
                   </span>
-                  <span>
-                    <EditableText
-                      value={item.lead}
-                      editable={editable}
-                      tag="strong"
-                      placeholder="(no bold lead-in)"
-                      onChange={(v) => onStoryTextChange(i, "lead", v)}
-                    />{" "}
-                    <EditableText
-                      value={item.rest}
-                      editable={editable}
-                      textarea
-                      placeholder="Description"
-                      onChange={(v) => onStoryTextChange(i, "rest", v)}
-                    />
-                  </span>
+                  <EditableStoryText value={item.text} editable={editable} onChange={(v) => onStoryTextChange(i, "text", v)} />
                 </li>
               ))}
             </ul>

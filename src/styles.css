@@ -519,10 +519,11 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    flexbox just keeps them in DOM order (h1, divider, tagline) same as
    before. */
 .about-hero-wrap{text-align:center; display:flex; flex-direction:column; align-items:center;}
-/* More breathing room above the title than .hero's own 60px — desktop/
-   tablet only; reset back to the original 60px on mobile (below) since
-   that extra space isn't wanted there. */
-.about-hero{padding-top:110px;}
+/* More breathing room above (and now below) the title than .hero's own
+   60px/20px — desktop/tablet only; reset back to the original values on
+   mobile (below), where the section previously had paddingBottom:0 set
+   inline and that's still what's wanted there. */
+.about-hero{padding-top:110px; padding-bottom:50px;}
 /* A thin line with a small hollow dot centered on it, under the title —
    the dot is just a bordered circle filled with the page background, so
    it reads as a break in the line rather than a solid marker. */
@@ -959,7 +960,7 @@ footer ul li a:hover{color:#F0D9C9;}
   .nav-social{gap:8px;}
   .nav-actions{gap:8px;}
   .nav-actions > .btn{display:none;}
-  .about-hero{padding-top:60px;}
+  .about-hero{padding-top:60px; padding-bottom:0;}
   /* Divider moves below the tagline instead of between title and tagline —
      both default to order:0 (DOM order) above 600px; explicit order here
      only swaps them at this breakpoint. */
@@ -1004,7 +1005,7 @@ footer ul li a:hover{color:#F0D9C9;}
      own column instead of sitting above the num/title/description. */
   .special-grid{grid-template-columns:1fr; gap:18px;}
   .special-item{display:flex; align-items:flex-start; gap:12px;}
-  .special-item-text{flex-direction:row; align-items:flex-start; text-align:left; padding:0; border-right:none; min-height:0; flex:1; gap:10px;}
+  .special-item-text{flex-direction:row; align-items:center; text-align:left; padding:0; border-right:none; min-height:0; flex:1; gap:10px;}
   .special-item-copy{align-items:flex-start; text-align:left;}
   .special-item-icon{margin-bottom:0; flex-shrink:0;}
   .special-item .thumb{width:90px; flex-shrink:0; margin-top:0;}
