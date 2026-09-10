@@ -497,6 +497,11 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 
 /* ---------- About / story split ---------- */
 .split-section{padding-top:80px;}
+/* Tablet band only — mobile (<=600px) keeps its own 32px override below,
+   desktop (>980px) keeps the 80px base. */
+@media (min-width:601px) and (max-width:980px){
+  .split-section{padding-top:30px;}
+}
 .split{display:grid; grid-template-columns:.95fr 1.05fr; gap:52px; align-items:center;}
 .split.reverse{grid-template-columns:1.05fr .95fr;}
 .split.reverse .imgcol{order:2;}
