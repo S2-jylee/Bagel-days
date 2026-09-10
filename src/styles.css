@@ -665,13 +665,16 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 /* Pins the category name + subcat pills (+ Best section, when this
    category has one) below the site header while scrolling — only
    .menu-promo-row (the product grid + add-ons/set-banner column) below
-   it scrolls underneath. Disabled on tablet/mobile alongside the
-   sidebar category nav's own sticky behavior (see .menu-maincats).
-   top:67px is the site header's actual rendered height (14px+14px nav
-   padding + 38px logo + 1px border) — .menu-maincats's own top:96px
-   left extra headroom that's invisible for a plain text nav, but left
-   a gap here that whatever was mid-scroll showed through, right above
-   this block, before it caught up to the header. */
+   it scrolls underneath. Stays active down to phone width too (the
+   sidebar nav itself goes non-sticky there, becoming a horizontal tab
+   row instead, but that's unrelated — this block still sticks once
+   scrolled past it). top:67px is the site header's actual rendered
+   height (14px+14px nav padding + 38px logo + 1px border) — reused
+   too high a value from .menu-maincats's own top:96px at first, which
+   left a gap here that whatever was mid-scroll showed through, right
+   above this block, before it caught up to the header. The logo (and
+   so the header) is ~6px shorter at <=600px — see that breakpoint's
+   own override below. */
 .menu-category-sticky{position:sticky; top:67px; z-index:5; background:var(--cream); padding-bottom:8px;}
 .menu-category h2{font-size:1.5rem; margin-bottom:14px;}
 .menu-category > p{color:var(--body); max-width:52ch; margin-bottom:26px;}
@@ -988,7 +991,6 @@ footer ul li a:hover{color:#F0D9C9;}
     flex-direction:row; flex-wrap:wrap; justify-content:center; overflow-x:auto; position:static;
     gap:8px; padding-top:0;
   }
-  .menu-category-sticky{position:static;}
   .menu-maincats-label{display:none;}
   .menu-maincats button{
     white-space:nowrap; padding:9px 16px; border-radius:20px; border:1px solid var(--line);
@@ -1012,6 +1014,9 @@ footer ul li a:hover{color:#F0D9C9;}
   .nav-social{gap:8px;}
   .nav-actions{gap:8px;}
   .nav-actions > .btn{display:none;}
+  /* Logo shrinks (38px -> 32px) at this breakpoint, so the header itself
+     is ~6px shorter here than the 67px .menu-category-sticky assumes. */
+  .menu-category-sticky{top:61px;}
   .about-hero{padding-top:60px; padding-bottom:0;}
   /* Divider moves below the tagline instead of between title and tagline —
      both default to order:0 (DOM order) above 600px; explicit order here
