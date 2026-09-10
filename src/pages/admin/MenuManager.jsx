@@ -142,7 +142,10 @@ async function uploadCategoryIcon(file) {
   // Keep transparency (PNG) instead of flattening onto one fixed color — the
   // icon's button background isn't constant (transparent normally, tan when
   // active), so any single baked-in fill would only match one of those states.
-  const resized = await resizeImage(file, 128, { format: "image/png" });
+  // upscale:true so an uploaded SVG (often declared at a tiny 24x24) renders
+  // crisply at a real icon resolution instead of being rasterized at 24x24
+  // and blurrily stretched by CSS afterward.
+  const resized = await resizeImage(file, 128, { format: "image/png", upscale: true });
   const path = `category-icons/${crypto.randomUUID()}.png`;
   const { error } = await supabase.storage.from("site-images").upload(path, resized, { cacheControl: "3600", upsert: false });
   if (error) throw error;

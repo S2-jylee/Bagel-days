@@ -11,12 +11,21 @@
 // tan when active), so a flat baked-in fill color would only ever match one
 // of those states; a transparent icon blends into all of them like the
 // hand-coded SVG icons already do.
-export function resizeImage(file, maxW, { format = "image/jpeg", quality = 0.9, bgColor = format === "image/jpeg" ? "#ffffff" : null } = {}) {
+//
+// upscale:true lets the canvas render an image LARGER than its source pixel
+// dimensions instead of only ever shrinking it — needed for icon uploads,
+// since an uploaded SVG (e.g. a 24x24-declared Lucide icon) is vector, not a
+// fixed grid of pixels: drawImage re-renders it crisply at whatever target
+// size the canvas asks for, so capping at "never upscale" was leaving these
+// icons rasterized at their tiny declared size (24x24) and then stretched
+// blurry by CSS at display time. Left off (default) for photos, where the
+// source genuinely is a fixed pixel grid and upscaling would only blur it.
+export function resizeImage(file, maxW, { format = "image/jpeg", quality = 0.9, bgColor = format === "image/jpeg" ? "#ffffff" : null, upscale = false } = {}) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
     img.onload = () => {
-      const scale = Math.min(1, maxW / img.width);
+      const scale = upscale ? maxW / img.width : Math.min(1, maxW / img.width);
       const w = Math.round(img.width * scale);
       const h = Math.round(img.height * scale);
       const canvas = document.createElement("canvas");

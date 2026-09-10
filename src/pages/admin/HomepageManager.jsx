@@ -26,7 +26,7 @@ async function uploadSiteImage(file) {
 // uploadCategoryIcon in MenuManager — About's icons sit on a plain background
 // so a baked-in white square around the shape would show as a visible box.
 async function uploadAboutIcon(file) {
-  const resized = await resizeImage(file, 128, { format: "image/png" });
+  const resized = await resizeImage(file, 128, { format: "image/png", upscale: true });
   const path = `about-icons/${crypto.randomUUID()}.png`;
   const { error } = await supabase.storage.from(BUCKET).upload(path, resized, { cacheControl: "3600", upsert: false });
   if (error) throw error;
