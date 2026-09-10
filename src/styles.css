@@ -506,14 +506,19 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .split h2{margin-bottom:16px;}
 .split p{margin-bottom:12px;}
 .story-list{margin-top:6px;}
-.story-list li{display:flex; gap:12px; margin-bottom:16px;}
-.story-list .ic{color:var(--maroon); flex-shrink:0; margin-top:3px;}
+/* align-items:center (was default stretch, with the icon nudged down via
+   margin-top as an approximation) so the icon genuinely sits in the
+   vertical middle of its row instead of near the first line of text. */
+.story-list li{display:flex; align-items:center; gap:12px; margin-bottom:16px;}
+.story-list .ic{color:var(--maroon); flex-shrink:0;}
 /* Relying on the browser's default "bolder" for <strong> wasn't visibly
    bold here — the web-loaded Pretendard weight it resolved to wasn't
    distinct enough from the surrounding text. An explicit weight forces a
    real heavier cut of the font instead. */
 .story-list strong{font-weight:800; color:var(--ink);}
-.story-list .ic svg, .story-list .ic .about-icon-img{width:20px; height:20px; object-fit:contain;}
+/* Matches .special-item-icon's size (30px) instead of story-list's own
+   previous smaller 20px. */
+.story-list .ic svg, .story-list .ic .about-icon-img{width:30px; height:30px; object-fit:contain;}
 /* display:flex so the divider and tagline can swap order on mobile (below)
    without touching the JSX — both sit at the default order:0 here, so
    flexbox just keeps them in DOM order (h1, divider, tagline) same as
