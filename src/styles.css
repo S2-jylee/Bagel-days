@@ -682,23 +682,22 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    above this block, before it caught up to the header. The logo (and
    so the header) is ~6px shorter at <=600px — see that breakpoint's
    own override below. */
-/* padding-bottom is part of this box's normal size, not just something
-   that shows up while stuck — it's also the actual visual gap between
-   the divider/pills and the product grid below in ordinary (unscrolled)
-   layout, so it has to stay on always rather than being conditional on
-   which child is last. */
-.menu-category-sticky{position:sticky; top:67px; z-index:5; background:var(--cream); padding-bottom:8px;}
-/* margin-bottom:0 (not just halved) — the padding above already adds
-   trailing space below the pills, so any margin here on top of that
-   was stacking (6px margin + 8px padding = 14px, not the 6px it
-   looked like at a glance) instead of being the only source of the gap. */
+/* No trailing padding/margin of its own — any space here would be
+   BAKED INTO the sticky box's fixed height, so once stuck it would show
+   as permanent blank space between the divider/pills and wherever the
+   product grid has scrolled to, no matter how far down the page you go
+   (sticky doesn't resize the box, it just pins whatever height it
+   already has). The equivalent gap for ordinary (unscrolled) layout is
+   .menu-promo-row's own margin-top instead — a normal margin on the
+   NEXT element scrolls away with that element once you pass it, so the
+   grid ends up passing right under the divider with no lingering gap. */
+.menu-category-sticky{position:sticky; top:67px; z-index:5; background:var(--cream);}
 .menu-category-sticky > .menu-subcat-pills:last-child{margin-bottom:0;}
 .menu-category h2{font-size:1.5rem; margin-bottom:14px;}
 .menu-category > p{color:var(--body); max-width:52ch; margin-bottom:26px;}
 .menu-best-section{margin-bottom:28px;}
-/* No bottom margin — the sticky block's own padding-bottom (8px) is the
-   only space left after the divider, so the pinned area ends right at
-   it instead of carrying a second large gap underneath. */
+/* No bottom margin of its own — see .menu-promo-row's margin-top for
+   where the equivalent visual gap actually lives now. */
 .menu-section-divider{border:none; border-top:1px solid var(--line); margin:0;}
 /* Fixed 6 slots regardless of how many are actually marked category-best
    (up to 6) — otherwise 4 marked would stretch to fill 4 columns while 6
@@ -710,7 +709,13 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    One shared 6-track grid (rather than the product grid and the promo
    column each sizing independently) so the promo column always measures
    out to exactly 2 product-card columns, gap included, at any width. */
-.menu-promo-row{display:grid; grid-template-columns:repeat(6,1fr); gap:24px; align-items:start; margin-bottom:26px;}
+/* margin-top:8px is the real gap below the sticky header (divider or
+   pills, whichever ends it) — living here instead of as trailing
+   padding/margin inside .menu-category-sticky means it scrolls away
+   with this row once you pass it, instead of staying pinned as dead
+   space between the fixed header and wherever this row has scrolled
+   to. Looks identical in ordinary unscrolled layout either way. */
+.menu-promo-row{display:grid; grid-template-columns:repeat(6,1fr); gap:24px; align-items:start; margin-top:8px; margin-bottom:26px;}
 .menu-promo-row .card-grid{grid-column:span 4;}
 /* A container-query context: lets addons-panel/set-banner-mini's fonts
    and spacing (cqw units below) scale with THIS box's own rendered
