@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { UberEatsButton, DoorDashButton } from "../components/DeliveryButtons";
 import HeroCarousel from "../components/HeroCarousel";
-import { IcHandCoins, IcCan, IcCoffeeCup, IcPaperBag, IcMapPin } from "../components/Icons";
+import { IcHandCoins, IcCan, IcCoffeeCup, IcPaperBag, IcMapPinThin } from "../components/Icons";
 import { usePageContent } from "../context/PageContentContext";
 import { useSeo } from "../lib/seo";
 
@@ -70,7 +70,7 @@ export default function Pickup() {
           <div className="mini-find">
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <div className="ic" style={{ width: 44, height: 44, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--maroon)" }}>
-                <IcMapPin />
+                <IcMapPinThin />
               </div>
               <div>
                 <h4 style={{ color: "var(--ink)", fontSize: "1rem" }}>Need to find us?</h4>
