@@ -183,7 +183,7 @@ export default function AboutPageBody({
               busy={busySlot === "candy"}
             />
             <div className="mascot-panel-text">
-              <h3 style={{ fontSize: "1.6rem", marginBottom: 12 }}>Meet Candy</h3>
+              <h3 style={{ marginBottom: 12 }}>Meet Candy</h3>
               <p><EditableText value={candy.p1} editable={editable} textarea onChange={(v) => onCandyTextChange("p1", v)} /></p>
               <p style={{ marginTop: 10 }}><EditableText value={candy.p2} editable={editable} textarea onChange={(v) => onCandyTextChange("p2", v)} /></p>
               <p style={{ marginTop: 10 }} className="script"><EditableText value={candy.p3} editable={editable} textarea onChange={(v) => onCandyTextChange("p3", v)} /></p>

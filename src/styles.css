@@ -530,6 +530,9 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 /* Our Story: a single photo, the heading + list, then the existing
    stacked-photo duo — three columns instead of the old two (photo+text). */
 .our-story-grid{display:grid; grid-template-columns:.85fr 1.25fr .85fr; gap:36px; align-items:start;}
+/* Matches .section-head h2's size ("What Makes Bagel Days Special") so
+   every section heading on this page reads at the same scale. */
+.our-story-grid h2, .mascot-panel h3{font-size:clamp(1.9rem, 3.4vw, 2.6rem);}
 .our-story-grid h2{margin-bottom:4px;}
 .our-story-photo img{width:100%; aspect-ratio:3/4; object-fit:cover; border-radius:var(--radius);}
 /* Third column added for the small decorative mascot illustration on the
@@ -984,7 +987,14 @@ footer ul li a:hover{color:#F0D9C9;}
   .features .wrap{grid-template-columns:1fr;}
   .pickup-highlights{grid-template-columns:repeat(2,1fr); gap:14px;}
   .pickup-highlight{padding:20px 16px;}
-  .special-grid{grid-template-columns:1fr 1fr;}
+  /* Below 600px: one row per item (icon+text on the left, its photo on
+     the right) instead of a 2-per-row grid — matches the reference
+     mobile layout, where all 5 rows stack in a single column. */
+  .special-grid{grid-template-columns:1fr; gap:18px;}
+  .special-item{display:flex; align-items:flex-start; gap:14px;}
+  .special-item-text{align-items:flex-start; text-align:left; padding:0; flex:1;}
+  .special-item-icon{margin-bottom:6px;}
+  .special-item .thumb{width:110px; flex-shrink:0; margin-top:0;}
   .form-grid{grid-template-columns:1fr;}
   .foot-main{flex-direction:column; gap:18px;}
   .foot-links{flex-wrap:wrap; gap:20px 24px;}
