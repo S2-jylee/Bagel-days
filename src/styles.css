@@ -683,7 +683,14 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    block's last child — halves the trailing gap below them (26px base,
    used when Best follows) so the pinned area doesn't hang onto extra
    blank space with nothing below it but the pills themselves. */
-.menu-category-sticky > .menu-subcat-pills:last-child{margin-bottom:6px;}
+/* margin-bottom:0 (not just halved) — .menu-category-sticky's own
+   padding-bottom (8px) already adds trailing space below whatever the
+   sticky block's last child is, so any margin here on top of that was
+   stacking (6px margin + 8px padding = 14px, not the 6px it looked like
+   at a glance) instead of being the only source of the gap. Zeroing it
+   makes this case end with the same 8px as the with-Best case, which
+   also has no bottom margin of its own on the divider anymore. */
+.menu-category-sticky > .menu-subcat-pills:last-child{margin-bottom:0;}
 .menu-category h2{font-size:1.5rem; margin-bottom:14px;}
 .menu-category > p{color:var(--body); max-width:52ch; margin-bottom:26px;}
 .menu-best-section{margin-bottom:28px;}
