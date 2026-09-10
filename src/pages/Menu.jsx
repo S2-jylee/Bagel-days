@@ -154,33 +154,39 @@ export default function Menu() {
 
           <div className="menu-products">
             <div className="menu-category active">
-              <h2>{activeCategory.label}</h2>
+              {/* Sticks below the site header while scrolling, so the category
+                  name + subcat pills (+ Best section, when this category has
+                  one) stay visible instead of scrolling out of view before
+                  the product grid below it does. */}
+              <div className="menu-category-sticky">
+                <h2>{activeCategory.label}</h2>
 
-              {activeCategory.subcategories.length > 0 && (
-                <div className="menu-subcat-pills">
-                  {activeCategory.subcategories.map((sub) => (
-                    <button
-                      key={sub.id}
-                      className={activeSubcat === sub.id ? "active" : ""}
-                      onClick={() => setActiveSubcat(sub.id)}
-                    >
-                      {sub.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {bestIds.length > 0 && (
-                <div className="menu-best-section">
-                  <div className="card-grid menu-best-grid">
-                    {bestIds.map((id) => (
-                      <FoodCard key={id} id={id} />
+                {activeCategory.subcategories.length > 0 && (
+                  <div className="menu-subcat-pills">
+                    {activeCategory.subcategories.map((sub) => (
+                      <button
+                        key={sub.id}
+                        className={activeSubcat === sub.id ? "active" : ""}
+                        onClick={() => setActiveSubcat(sub.id)}
+                      >
+                        {sub.label}
+                      </button>
                     ))}
                   </div>
-                </div>
-              )}
+                )}
 
-              {bestIds.length > 0 && <hr className="menu-section-divider" />}
+                {bestIds.length > 0 && (
+                  <div className="menu-best-section">
+                    <div className="card-grid menu-best-grid">
+                      {bestIds.map((id) => (
+                        <FoodCard key={id} id={id} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {bestIds.length > 0 && <hr className="menu-section-divider" />}
+              </div>
 
               <div className="menu-promo-row">
                 <div className="card-grid">

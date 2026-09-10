@@ -662,6 +662,12 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 
 .menu-category{display:none;}
 .menu-category.active{display:block;}
+/* Pins the category name + subcat pills (+ Best section, when this
+   category has one) below the site header while scrolling — only
+   .menu-promo-row (the product grid + add-ons/set-banner column) below
+   it scrolls underneath. Disabled on tablet/mobile alongside the
+   sidebar category nav's own sticky behavior (see .menu-maincats). */
+.menu-category-sticky{position:sticky; top:96px; z-index:5; background:var(--cream); padding-bottom:8px;}
 .menu-category h2{font-size:1.5rem; margin-bottom:14px;}
 .menu-category > p{color:var(--body); max-width:52ch; margin-bottom:26px;}
 .menu-best-section{margin-bottom:28px;}
@@ -977,6 +983,7 @@ footer ul li a:hover{color:#F0D9C9;}
     flex-direction:row; flex-wrap:wrap; justify-content:center; overflow-x:auto; position:static;
     gap:8px; padding-top:0;
   }
+  .menu-category-sticky{position:static;}
   .menu-maincats-label{display:none;}
   .menu-maincats button{
     white-space:nowrap; padding:9px 16px; border-radius:20px; border:1px solid var(--line);
