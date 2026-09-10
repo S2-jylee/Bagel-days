@@ -22,10 +22,23 @@ async function uploadSiteImage(file) {
   return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
-// Icons keep transparency (PNG) instead of flattening onto white, matching
-// uploadCategoryIcon in MenuManager — About's icons sit on a plain background
-// so a baked-in white square around the shape would show as a visible box.
+// An uploaded SVG goes to storage as-is instead of being rasterized to a
+// PNG — matching uploadCategoryIcon in MenuManager. No raster size can match
+// true vector rendering, which is what the hand-coded line icons elsewhere
+// on the site use; an <img src="x.svg"> renders the vector content fresh at
+// whatever size it's displayed, so it's exactly as crisp as those icons at
+// any size or screen DPI. Rasterizing (even at a generous canvas size, as
+// this used to do) always looks a little softer by comparison.
 async function uploadAboutIcon(file) {
+  if (file.type === "image/svg+xml" || /\.svg$/i.test(file.name)) {
+    const path = `about-icons/${crypto.randomUUID()}.svg`;
+    const { error } = await supabase.storage.from(BUCKET).upload(path, file, { cacheControl: "3600", upsert: false, contentType: "image/svg+xml" });
+    if (error) throw error;
+    return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+  }
+  // Non-SVG falls back to rasterizing — keep transparency (PNG) instead of
+  // flattening onto white, since About's icons sit on a plain background
+  // where a baked-in white square around the shape would show as a box.
   const resized = await resizeImage(file, 128, { format: "image/png", upscale: true });
   const path = `about-icons/${crypto.randomUUID()}.png`;
   const { error } = await supabase.storage.from(BUCKET).upload(path, resized, { cacheControl: "3600", upsert: false });

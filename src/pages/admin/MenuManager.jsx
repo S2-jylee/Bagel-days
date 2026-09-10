@@ -139,12 +139,24 @@ async function uploadProductImage(file) {
 }
 
 async function uploadCategoryIcon(file) {
-  // Keep transparency (PNG) instead of flattening onto one fixed color — the
-  // icon's button background isn't constant (transparent normally, tan when
-  // active), so any single baked-in fill would only match one of those states.
-  // upscale:true so an uploaded SVG (often declared at a tiny 24x24) renders
-  // crisply at a real icon resolution instead of being rasterized at 24x24
-  // and blurrily stretched by CSS afterward.
+  // An uploaded SVG goes to storage as-is instead of being rasterized to a
+  // PNG — no raster size can match true vector rendering, which is what the
+  // hand-coded line icons on the rest of the site use; an <img src="x.svg">
+  // renders the vector content fresh at whatever size it's displayed, so
+  // it's exactly as crisp as those at 30px, 128px, or any DPI. Rasterizing
+  // (even at a generous canvas size) always looks a little softer by
+  // comparison, since it bakes in a fixed pixel grid at upload time.
+  if (file.type === "image/svg+xml" || /\.svg$/i.test(file.name)) {
+    const path = `category-icons/${crypto.randomUUID()}.svg`;
+    const { error } = await supabase.storage.from("site-images").upload(path, file, { cacheControl: "3600", upsert: false, contentType: "image/svg+xml" });
+    if (error) throw error;
+    return supabase.storage.from("site-images").getPublicUrl(path).data.publicUrl;
+  }
+  // Non-SVG (a photo used as an icon, say) falls back to rasterizing —
+  // keep transparency (PNG) instead of flattening onto one fixed color,
+  // since the icon's button background isn't constant (transparent
+  // normally, tan when active), so any single baked-in fill would only
+  // match one of those states.
   const resized = await resizeImage(file, 128, { format: "image/png", upscale: true });
   const path = `category-icons/${crypto.randomUUID()}.png`;
   const { error } = await supabase.storage.from("site-images").upload(path, resized, { cacheControl: "3600", upsert: false });
