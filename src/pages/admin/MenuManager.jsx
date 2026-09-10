@@ -980,9 +980,11 @@ export default function MenuManager() {
             addPlaceholder={t("newCategoryPlaceholder")}
             manageHint={
               <>
-                {t("categoryIconHint")}{" "}
-                <a href="https://lucide.dev/icons/categories" target="_blank" rel="noopener noreferrer">Download icons</a>
-                {" — Color #5a1f1e · Stroke width 2px"}
+                {t("categoryIconHint")}<br />
+                {t("categoryIconRecommended")}<br />
+                <a href="https://lucide.dev/icons/categories" target="_blank" rel="noopener noreferrer">{t("categoryIconDownloadLink")}</a><br />
+                Color #5a1f1e<br />
+                Stroke width 2px
               </>
             }
             icons={{ ...CATEGORY_ICONS, __fallback: IcTag }}
