@@ -676,10 +676,18 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    so the header) is ~6px shorter at <=600px — see that breakpoint's
    own override below. */
 .menu-category-sticky{position:sticky; top:67px; z-index:5; background:var(--cream); padding-bottom:8px;}
+/* When a category has no Best section, subcat pills are the sticky
+   block's last child — halves the trailing gap below them (26px base,
+   used when Best follows) so the pinned area doesn't hang onto extra
+   blank space with nothing below it but the pills themselves. */
+.menu-category-sticky > .menu-subcat-pills:last-child{margin-bottom:13px;}
 .menu-category h2{font-size:1.5rem; margin-bottom:14px;}
 .menu-category > p{color:var(--body); max-width:52ch; margin-bottom:26px;}
 .menu-best-section{margin-bottom:28px;}
-.menu-section-divider{border:none; border-top:1px solid var(--line); margin:0 0 28px;}
+/* No bottom margin — the sticky block's own padding-bottom (8px) is the
+   only space left after the divider, so the pinned area ends right at
+   it instead of carrying a second large gap underneath. */
+.menu-section-divider{border:none; border-top:1px solid var(--line); margin:0;}
 /* Fixed 6 slots regardless of how many are actually marked category-best
    (up to 6) — otherwise 4 marked would stretch to fill 4 columns while 6
    marked would be narrower, sizing inconsistently depending on count. */
