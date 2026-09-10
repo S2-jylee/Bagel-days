@@ -978,7 +978,13 @@ export default function MenuManager() {
             manageLabel={t("manageCategories")}
             doneLabel={t("done")}
             addPlaceholder={t("newCategoryPlaceholder")}
-            manageHint={t("categoryIconHint")}
+            manageHint={
+              <>
+                {t("categoryIconHint")}{" "}
+                <a href="https://lucide.dev/icons/categories" target="_blank" rel="noopener noreferrer">Download icons</a>
+                {" — Color #5a1f1e · Stroke width 2px · Size Max"}
+              </>
+            }
             icons={{ ...CATEGORY_ICONS, __fallback: IcTag }}
             variant="nav"
           />
