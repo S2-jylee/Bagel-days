@@ -325,17 +325,11 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    font-size's own floor at a reported-broken 987px browser width (~98px
    card), letting Signature+Best overflow onto two lines; floor-ing both
    sooner fixes that with room to spare. */
-/* Vertical text (writing-mode, not a rotation transform) like the tag
-   badges on kiosk menu boards — each letter stacks upright rather than
-   the whole word running sideways. Padding sides are swapped from the
-   old horizontal pill's (top/bottom small, left/right big) to fit this
-   now-tall/narrow shape instead. */
 .food-card-badge{
   display:inline-flex; align-items:center; gap:3px;
   font-family:'Pretendard', sans-serif; font-weight:400; line-height:1; letter-spacing:.02em; color:#fff;
-  writing-mode:vertical-rl; text-orientation:upright;
   font-size:clamp(.5rem, 7.514cqw - .158rem, .68rem);
-  padding:clamp(2px, 23.48cqw - 30.87px, 11px) clamp(1px, 7.83cqw - 9.96px, 4px);
+  padding:clamp(1px, 13.04cqw - 17.26px, 6px) clamp(2px, 23.48cqw - 30.87px, 11px) clamp(1px, 7.83cqw - 9.96px, 4px);
   border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
 }
 /* text-shadow (not -webkit-text-stroke) so the outline sits outside each
