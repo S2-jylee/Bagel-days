@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { supabase } from "../../lib/supabase";
 import { useProducts } from "../../context/ProductsContext";
 import { useCategories } from "../../context/CategoriesContext";
@@ -363,7 +363,7 @@ function emptyForm(category, subcategory) {
 export default function MenuManager() {
   const { t } = useAdminLang();
   const { products, addons } = useProducts();
-  const { categories } = useCategories();
+  const { categories, loading: categoriesLoading } = useCategories();
   const [activeCat, setActiveCat] = useState(categories[0].id);
   const [activeSubcat, setActiveSubcat] = useState(categories[0].subcategories?.[0]?.id ?? null);
   const [form, setForm] = useState(null); // null = closed, object = open (create or edit)
@@ -374,6 +374,23 @@ export default function MenuManager() {
   const [poolTab, setPoolTab] = useState(categories[0].id); // which category's add-ons the pool editor shows; "general" = no category
   const [newAddonName, setNewAddonName] = useState("");
   const [newAddonPrice, setNewAddonPrice] = useState("");
+
+  // The state above initializes from DEFAULT_CATEGORIES (a static
+  // placeholder shown only until the real, admin-sorted list loads from
+  // Supabase) — so activeCat/poolTab could lock onto that placeholder's
+  // first category forever instead of whichever one is actually first in
+  // the real sort order. Sync once, the first time real data arrives;
+  // never again after, so a live reload from an unrelated edit elsewhere
+  // doesn't yank the admin back to the first tab while they're working.
+  const didSyncInitialCategory = useRef(false);
+  useEffect(() => {
+    if (categoriesLoading || didSyncInitialCategory.current) return;
+    didSyncInitialCategory.current = true;
+    const first = categories[0];
+    setActiveCat(first.id);
+    setActiveSubcat(first.subcategories?.[0]?.id ?? null);
+    setPoolTab(first.id);
+  }, [categoriesLoading, categories]);
 
   // ---- manual product ordering (drag to reorder, then Save) ----
   const [reordering, setReordering] = useState(false);
