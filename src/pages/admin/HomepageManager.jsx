@@ -470,26 +470,28 @@ function ContactCardImageSection({ content, t }) {
   return (
     <div className="field">
       <label>{t("contactCardImageLabel")}</label>
-      <div style={{ position: "relative", width: 160, maxWidth: "100%", aspectRatio: "4/3", borderRadius: 8, overflow: "hidden", marginTop: 8 }}>
-        <img
-          src={productImageUrl(image || "/assets/images/catering-box.png")}
-          alt=""
-          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-        />
-        <label className="about-editable-photo-pencil" aria-label={t("contactCardImageLabel")}>
-          {busy ? <span className="about-editable-photo-busy" /> : <IcPencil />}
-          <input
-            type="file"
-            accept="image/*"
-            hidden
-            disabled={busy}
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              e.target.value = "";
-              if (f) handlePick(f);
-            }}
+      <div className="contact-card-photo-center">
+        <div style={{ position: "relative", width: 160, maxWidth: "100%", aspectRatio: "4/3", borderRadius: 8, overflow: "hidden" }}>
+          <img
+            src={productImageUrl(image || "/assets/images/catering-box.png")}
+            alt=""
+            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
           />
-        </label>
+          <label className="about-editable-photo-pencil" aria-label={t("contactCardImageLabel")}>
+            {busy ? <span className="about-editable-photo-busy" /> : <IcPencil />}
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              disabled={busy}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = "";
+                if (f) handlePick(f);
+              }}
+            />
+          </label>
+        </div>
       </div>
       {error && <p className="form-status err">{error}</p>}
     </div>
