@@ -17,7 +17,7 @@ export const IcChevron = () => (
   </svg>
 );
 
-export function UberEatsButton({ href = "https://www.ubereats.com/au/store/bagel-days/TODO", full }) {
+export function UberEatsButton({ href = "https://www.ubereats.com/au/store/bagel-days/TODO", full, icon: Icon = IcBagSimple }) {
   return (
     <a
       href={href}
@@ -25,14 +25,14 @@ export function UberEatsButton({ href = "https://www.ubereats.com/au/store/bagel
       rel="noopener noreferrer"
       className={`delivery-btn delivery-btn-ubereats${full ? " btn-block" : ""}`}
     >
-      <IcBagSimple />
+      <Icon />
       <span>Uber <strong>Eats</strong></span>
       <IcChevron />
     </a>
   );
 }
 
-export function DoorDashButton({ href = "https://www.doordash.com/store/bagel-days-TODO", full }) {
+export function DoorDashButton({ href = "https://www.doordash.com/store/bagel-days-TODO", full, icon: Icon = IcBolt }) {
   return (
     <a
       href={href}
@@ -40,7 +40,7 @@ export function DoorDashButton({ href = "https://www.doordash.com/store/bagel-da
       rel="noopener noreferrer"
       className={`delivery-btn delivery-btn-doordash${full ? " btn-block" : ""}`}
     >
-      <IcBolt />
+      <Icon />
       <span>DoorDash</span>
       <IcChevron />
     </a>

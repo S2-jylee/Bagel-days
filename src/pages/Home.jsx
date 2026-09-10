@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import FoodCard from "../components/FoodCard";
 import HeroCarousel from "../components/HeroCarousel";
 import { UberEatsButton, DoorDashButton } from "../components/DeliveryButtons";
-import { IcApple, IcHandCoins, IcCoffeeCup, IcHeartHandshake, IcPin, IcClock, IcPhone } from "../components/Icons";
+import { IcApple, IcHandCoins, IcCoffeeCup, IcHeartHandshake, IcPin, IcClock, IcPhone, IcPaperBag, IcMotorbike } from "../components/Icons";
 import { asset } from "../lib/assetUrl";
 import { useProducts } from "../context/ProductsContext";
 import { usePageContent } from "../context/PageContentContext";
@@ -99,8 +99,8 @@ export default function Home() {
               <p>Order your favourites and enjoy Bagel Days wherever you are.</p>
             </div>
             <div className="widget-btn-col">
-              <UberEatsButton full />
-              <DoorDashButton full />
+              <UberEatsButton full icon={IcPaperBag} />
+              <DoorDashButton full icon={IcMotorbike} />
             </div>
           </div>
 

@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useCategories } from "../context/CategoriesContext";
 import FoodCard from "../components/FoodCard";
 import { useProducts } from "../context/ProductsContext";
-import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcBowl, IcSet, IcBag, IcTag } from "../components/Icons";
+import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcBowl, IcSet, IcPaperBag, IcTag } from "../components/Icons";
 import { IcChevron } from "../components/DeliveryButtons";
 import { asset } from "../lib/assetUrl";
 import { ORDER_NOW_URL } from "../lib/orderNow";
@@ -21,7 +21,7 @@ const CATEGORY_ICONS = {
 function OrderNowButton({ className = "delivery-btn delivery-btn-direct" }) {
   return (
     <a href={ORDER_NOW_URL} target="_blank" rel="noopener noreferrer" className={className}>
-      <IcBag />
+      <IcPaperBag />
       <span>Order Now</span>
       <IcChevron />
     </a>
