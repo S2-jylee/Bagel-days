@@ -982,7 +982,7 @@ export default function MenuManager() {
               <>
                 {t("categoryIconHint")}{" "}
                 <a href="https://lucide.dev/icons/categories" target="_blank" rel="noopener noreferrer">Download icons</a>
-                {" — Color #5a1f1e · Stroke width 2px · Size Max"}
+                {" — Color #5a1f1e · Stroke width 2px"}
               </>
             }
             icons={{ ...CATEGORY_ICONS, __fallback: IcTag }}
