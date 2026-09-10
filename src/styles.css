@@ -1694,9 +1694,13 @@ footer ul li a:hover{color:#F0D9C9;}
 /* Lets PageSection place an extra single-photo field (e.g. Contact's card
    photo) beside Top Photos instead of stacked below it — Top Photos grows
    to fill the row, the extra field keeps its own compact width. */
-.homepage-photo-row{display:flex; gap:24px; align-items:center; flex-wrap:wrap;}
+.homepage-photo-row{display:flex; gap:24px; align-items:stretch; flex-wrap:wrap;}
 .homepage-photo-row > .field.full{flex:1 1 320px;}
-.homepage-photo-row > .field:not(.full){flex:0 0 auto;}
+/* justify-content:center (not align-items on the row) so the small field's
+   label+image centers within whatever height Top Photos ends up being,
+   even though it's a stretched flex item, not a short one floating in a
+   taller line. */
+.homepage-photo-row > .field:not(.full){flex:0 0 auto; display:flex; flex-direction:column; justify-content:center;}
 .homepage-photo-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:12px; margin-top:8px;}
 .homepage-photo-thumb{position:relative; border-radius:8px; overflow:hidden; border:1px solid var(--line); background:#fff;}
 .homepage-photo-thumb img{width:100%; aspect-ratio:16/9; object-fit:cover; display:block;}
