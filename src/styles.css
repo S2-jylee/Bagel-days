@@ -334,16 +334,17 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    growing share of the viewport, leaving the card (and its badges)
    effectively smaller than viewport alone would suggest. Each value hits
    exactly the old desktop number at a 178px card (the widest a card gets,
-   at the layout's own max-width) and reaches the old mobile-minimum
-   number already by a 140px card — padding was still lagging behind
-   font-size's own floor at a reported-broken 987px browser width (~98px
-   card), letting Signature+Best overflow onto two lines; floor-ing both
-   sooner fixes that with room to spare. */
+   at the layout's own max-width) and the old mobile-minimum number by a
+   100px card (just past where Signature+Best was reported still wrapping,
+   ~98px) — a wider ramp than the 178->140px one tried first, which
+   packed the whole shrink into a narrow band and felt like a sudden
+   cliff across the 1400-981px browser range even though nothing was
+   broken there. */
 .food-card-badge{
   display:inline-flex; align-items:center; gap:3px;
   font-family:'Pretendard', sans-serif; font-weight:400; line-height:1; letter-spacing:.02em; color:#fff;
-  font-size:clamp(.5rem, 7.514cqw - .158rem, .68rem);
-  padding:clamp(1px, 13.04cqw - 17.26px, 6px) clamp(2px, 23.48cqw - 30.87px, 11px) clamp(1px, 7.83cqw - 9.96px, 4px);
+  font-size:clamp(.5rem, 3.677cqw + .27rem, .68rem);
+  padding:clamp(1px, 6.38cqw - 5.38px, 6px) clamp(2px, 11.49cqw - 9.49px, 11px) clamp(1px, 3.83cqw - 2.83px, 4px);
   border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
 }
 /* text-shadow (not -webkit-text-stroke) so the outline sits outside each
