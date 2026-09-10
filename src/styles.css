@@ -1694,7 +1694,7 @@ footer ul li a:hover{color:#F0D9C9;}
 /* Lets PageSection place an extra single-photo field (e.g. Contact's card
    photo) beside Top Photos instead of stacked below it — Top Photos grows
    to fill the row, the extra field keeps its own compact width. */
-.homepage-photo-row{display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;}
+.homepage-photo-row{display:flex; gap:24px; align-items:center; flex-wrap:wrap;}
 .homepage-photo-row > .field.full{flex:1 1 320px;}
 .homepage-photo-row > .field:not(.full){flex:0 0 auto;}
 .homepage-photo-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:12px; margin-top:8px;}
