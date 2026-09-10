@@ -182,9 +182,8 @@ export default function AboutPageBody({
               onPick={onPhotoPick && ((f) => onPhotoPick("candy", f))}
               busy={busySlot === "candy"}
             />
-            <div>
-              <span className="eyebrow">Meet Candy</span>
-              <h3 style={{ fontSize: "1.6rem", marginBottom: 12 }}>Our Beloved Mascot</h3>
+            <div className="mascot-panel-text">
+              <h3 style={{ fontSize: "1.6rem", marginBottom: 12 }}>Meet Candy</h3>
               <p><EditableText value={candy.p1} editable={editable} textarea onChange={(v) => onCandyTextChange("p1", v)} /></p>
               <p style={{ marginTop: 10 }}><EditableText value={candy.p2} editable={editable} textarea onChange={(v) => onCandyTextChange("p2", v)} /></p>
               <p style={{ marginTop: 10 }} className="script"><EditableText value={candy.p3} editable={editable} textarea onChange={(v) => onCandyTextChange("p3", v)} /></p>

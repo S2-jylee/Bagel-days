@@ -508,6 +508,11 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .story-list{margin-top:6px;}
 .story-list li{display:flex; gap:12px; margin-bottom:16px;}
 .story-list .ic{color:var(--maroon); flex-shrink:0; margin-top:3px;}
+/* Relying on the browser's default "bolder" for <strong> wasn't visibly
+   bold here — the web-loaded Pretendard weight it resolved to wasn't
+   distinct enough from the surrounding text. An explicit weight forces a
+   real heavier cut of the font instead. */
+.story-list strong{font-weight:800; color:var(--ink);}
 .story-list .ic svg{width:20px; height:20px;}
 /* display:flex so the divider and tagline can swap order on mobile (below)
    without touching the JSX — both sit at the default order:0 here, so
@@ -529,14 +534,18 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .our-story-photo img{width:100%; aspect-ratio:3/4; object-fit:cover; border-radius:var(--radius);}
 /* Third column added for the small decorative mascot illustration on the
    right (mascot-panel-deco below) — the dog photo (first column) is a
-   real photo now, not the illustrated mascot that used to sit here. */
-.mascot-panel{background:var(--cream-alt); border-radius:var(--radius); padding:40px; display:grid; grid-template-columns:.8fr 1.25fr .45fr; gap:32px; align-items:center; margin-top:64px;}
-.mascot-panel > img:first-child{border-radius:var(--radius); aspect-ratio:1; object-fit:cover; width:100%;}
+   real photo now, not the illustrated mascot that used to sit here.
+   align-items:stretch (the grid default, so no explicit value needed) —
+   was center with the photo fixed to a 1:1 square; now the photo has no
+   fixed ratio of its own and instead fills the row's height exactly,
+   which is set by the text column's own rendered height. */
+.mascot-panel{background:var(--cream-alt); border-radius:var(--radius); padding:40px; display:grid; grid-template-columns:.8fr 1.25fr .45fr; gap:32px; margin-top:64px;}
+.mascot-panel > img:first-child{border-radius:var(--radius); object-fit:cover; width:100%; height:100%;}
 /* Admin preview only: EditablePhoto wraps the candy photo in a span (so its
    pencil button can be positioned relative to it), which the plain
    :first-child rule above no longer matches since that span, not the img,
    is now .mascot-panel's actual first child there. */
-.mascot-panel > .about-editable-photo:first-child{border-radius:var(--radius); aspect-ratio:1; overflow:hidden;}
+.mascot-panel > .about-editable-photo:first-child{border-radius:var(--radius); overflow:hidden; height:100%;}
 .mascot-panel > .about-editable-photo:first-child img{width:100%; height:100%; object-fit:cover;}
 .mascot-panel-deco{width:100%; max-width:150px; justify-self:center;}
 
@@ -869,6 +878,10 @@ footer ul li a:hover{color:#F0D9C9;}
   .split.reverse .imgcol{order:0;}
   .mascot-panel{grid-template-columns:1fr; text-align:center;}
   .mascot-panel-deco{display:none;}
+  /* Stacked single-column layout here — "match the text column's height"
+     no longer applies once the photo isn't sitting beside that text, so
+     it goes back to a fixed ratio instead of height:100% of nothing. */
+  .mascot-panel > img:first-child, .mascot-panel > .about-editable-photo:first-child{aspect-ratio:1; height:auto;}
   .special-grid{grid-template-columns:repeat(2,1fr);}
   /* Dividers only make sense in a single row (desktop's 5-across) — at
      2 columns the grid wraps, so a lone divider on the row's last item
