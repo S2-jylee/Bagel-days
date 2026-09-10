@@ -1591,11 +1591,14 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 .homepage-photo-add:hover{background:var(--cream-alt);}
 /* About's admin editor: the real page (AboutPageBody, same component the
-   public page renders) shown inline, wider than the admin panel's own
-   content column — scrolls horizontally rather than squishing the layout
-   into a width it wasn't designed for. */
-.about-editor-preview{overflow-x:auto; margin-top:12px; border:1px solid var(--line); border-radius:var(--radius); background:var(--cream);}
-.about-editor-preview .wrap{min-width:1100px;}
+   public page renders) shown inline. Its own responsive breakpoints are
+   viewport-width based, not container-width based, so they won't kick in
+   just because the admin's content column is narrower than the full
+   page — but CSS Grid/Flex columns still shrink to fit whatever width is
+   actually available, so no forced min-width here (that previously
+   caused the admin's whole page to gain a horizontal scrollbar instead
+   of the layout just compressing). */
+.about-editor-preview{margin-top:12px; border:1px solid var(--line); border-radius:var(--radius); background:var(--cream);}
 /* Editable text/icon: a pencil sits right after the content, only visible
    in this admin preview (AboutPageBody's editable prop is false on the
    public page, so none of this renders there at all). */
