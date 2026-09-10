@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IcBag, IcChat, IcMail, IcInsta, IcTikTok, IcFacebook, IcPhone, IcExternal } from "../components/Icons";
+import { IcGift, IcMailCheck, IcMail, IcInsta, IcTikTok, IcFacebook, IcPhoneCall, IcExternal } from "../components/Icons";
 import { asset } from "../lib/assetUrl";
 import { usePageContent } from "../context/PageContentContext";
 import { useSiteSettings } from "../context/SiteSettingsContext";
@@ -80,13 +80,13 @@ export default function Contact() {
         <div className="wrap">
           <div className="contact-layout">
             <div className="contact-card">
-              <h4><IcBag /> Catering &amp; Bulk Orders</h4>
+              <h4><IcGift /> Catering &amp; Bulk Orders</h4>
               <p>Planning an event or placing a bulk order? Please fill out the contact form, and we'll get back to you as soon as possible.</p>
               <img src={asset("/assets/images/catering-box.png")} alt="Catering box with sandwiches and a drink, ready for pickup" className="contact-card-img" />
             </div>
 
             <div className="contact-card">
-              <h4><IcChat /> Send Us a Message</h4>
+              <h4><IcMailCheck /> Send Us a Message</h4>
               <form onSubmit={handleSubmit} className="contact-form">
                 <div className="form-grid">
                   <div className="field"><label>First Name</label><input type="text" name="first_name" required /></div>
@@ -103,7 +103,7 @@ export default function Contact() {
             </div>
 
             <div className="contact-card">
-              <h4><IcPhone /> Get in Touch</h4>
+              <h4><IcPhoneCall /> Get in Touch</h4>
               <ul className="get-in-touch">
                 <li>
                   <span className="ic"><IcMail /></span>
