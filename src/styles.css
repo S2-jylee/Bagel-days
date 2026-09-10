@@ -1003,7 +1003,7 @@ footer ul li a:hover{color:#F0D9C9;}
   /* Only the heading + tagline center — not .story-list below them, which
      reads better left-aligned as a list. */
   .our-story-text > h2, .our-story-text > .script{text-align:center;}
-  .our-story-text > .script{margin-bottom:50px;}
+  .our-story-text > .script{margin-bottom:30px;}
   /* Desktop/tablet only above (600-980px inherits the 80px base) — mobile
      keeps the original tighter spacing. */
   .split-section{padding-top:32px;}
