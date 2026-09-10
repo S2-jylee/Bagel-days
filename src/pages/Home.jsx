@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import FoodCard from "../components/FoodCard";
 import HeroCarousel from "../components/HeroCarousel";
 import { UberEatsButton, DoorDashButton } from "../components/DeliveryButtons";
-import { IcLeaf, IcWhisk, IcBean, IcHeart, IcPin, IcClock, IcPhone } from "../components/Icons";
+import { IcApple, IcHandCoins, IcCoffeeCup, IcHeartHandshake, IcPin, IcClock, IcPhone } from "../components/Icons";
 import { asset } from "../lib/assetUrl";
 import { useProducts } from "../context/ProductsContext";
 import { usePageContent } from "../context/PageContentContext";
@@ -124,10 +124,10 @@ export default function Home() {
 
       <section className="features">
         <div className="wrap">
-          <div className="feature"><div className="ic"><IcLeaf /></div><div><h4>Fresh &amp; Natural</h4><p>High quality ingredients for the best flavour.</p></div></div>
-          <div className="feature"><div className="ic"><IcWhisk /></div><div><h4>Handmade Everyday</h4><p>Bagels and cream cheese made fresh each morning.</p></div></div>
-          <div className="feature"><div className="ic"><IcBean /></div><div><h4>Campos Coffee</h4><p>Proudly serving Campos Specialty Coffee.</p></div></div>
-          <div className="feature"><div className="ic"><IcHeart /></div><div><h4>Local &amp; Family Owned</h4><p>A place where good food brings people together.</p></div></div>
+          <div className="feature"><div className="ic"><IcApple /></div><div><h4>Fresh &amp; Natural</h4><p>High quality ingredients for the best flavour.</p></div></div>
+          <div className="feature"><div className="ic"><IcHandCoins /></div><div><h4>Handmade Everyday</h4><p>Bagels and cream cheese made fresh each morning.</p></div></div>
+          <div className="feature"><div className="ic"><IcCoffeeCup /></div><div><h4>Campos Coffee</h4><p>Proudly serving Campos Specialty Coffee.</p></div></div>
+          <div className="feature"><div className="ic"><IcHeartHandshake /></div><div><h4>Local &amp; Family Owned</h4><p>A place where good food brings people together.</p></div></div>
         </div>
       </section>
     </>
