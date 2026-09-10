@@ -30,10 +30,14 @@ export function aboutIconComponent(key) {
 // hardcoded in About.jsx, so the page renders identically until an admin
 // changes something in Homepage > About.
 export const DEFAULT_ABOUT_CONTENT = {
+  // A single field per item (not separate lead/rest) — **wrapped like this**
+  // renders bold, matching the old lead-in styling, but the whole thing is
+  // one editable region in admin instead of two side-by-side pencils. See
+  // parseStoryText in AboutPageBody.jsx.
   storyList: [
-    { icon: "wheat", lead: "Every morning begins with fresh dough.", rest: "At Bagel Days, every bagel is made from scratch using premium ingredients and slowly cold-fermented overnight to develop its signature flavour and chewy texture." },
-    { icon: "pot", lead: "Each bagel is hand-boiled before being baked fresh in the oven,", rest: "creating a crisp golden crust and a soft, chewy centre." },
-    { icon: "cup", lead: "", rest: "To complete the experience, we proudly serve Campos Specialty Coffee alongside a selection of house-made cream cheeses, freshly prepared every day to pair perfectly with our bagels." },
+    { icon: "wheat", text: "**Every morning begins with fresh dough.** At Bagel Days, every bagel is made from scratch using premium ingredients and slowly cold-fermented overnight to develop its signature flavour and chewy texture." },
+    { icon: "pot", text: "**Each bagel is hand-boiled before being baked fresh in the oven,** creating a crisp golden crust and a soft, chewy centre." },
+    { icon: "cup", text: "To complete the experience, we proudly serve Campos Specialty Coffee alongside a selection of house-made cream cheeses, freshly prepared every day to pair perfectly with our bagels." },
   ],
   candy: {
     p1: "Candy, our beloved mascot, is inspired by our own family Bichon Frise. She represents the warmth, happiness, and sense of family that we hope every guest feels when visiting Bagel Days.",

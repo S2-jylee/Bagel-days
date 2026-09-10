@@ -22,6 +22,17 @@ async function uploadSiteImage(file) {
   return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
+// Icons keep transparency (PNG) instead of flattening onto white, matching
+// uploadCategoryIcon in MenuManager — About's icons sit on a plain background
+// so a baked-in white square around the shape would show as a visible box.
+async function uploadAboutIcon(file) {
+  const resized = await resizeImage(file, 128, { format: "image/png" });
+  const path = `about-icons/${crypto.randomUUID()}.png`;
+  const { error } = await supabase.storage.from(BUCKET).upload(path, resized, { cacheControl: "3600", upsert: false });
+  if (error) throw error;
+  return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
+
 // Shared hero photo picker (add/reorder/remove), used by every page's hero
 // section below.
 function PhotoField({ images, onChange, uploading, setUploading, setError, t }) {
@@ -228,7 +239,7 @@ function AboutSection({ content, t }) {
     setBusySlot(busyKey);
     setError("");
     try {
-      const url = await uploadSiteImage(file);
+      const url = await uploadAboutIcon(file);
       await saveContent(patchArrayItem(section, index, "iconUrl", url));
     } catch (err) {
       setError(err.message || t("photoUploadFailed"));
