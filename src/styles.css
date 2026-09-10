@@ -509,17 +509,15 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .story-list li{display:flex; gap:12px; margin-bottom:16px;}
 .story-list .ic{color:var(--maroon); flex-shrink:0; margin-top:3px;}
 .story-list .ic svg{width:20px; height:20px;}
-/* The circular donut+bear badge in the About header — a static brand mark
-   (not admin-editable), positioned over the top-right corner of the
-   centered title block. */
-.about-hero-wrap{position:relative; text-align:center;}
-.about-hero-badge{
-  position:absolute; top:-6px; right:0; width:112px; height:112px; border-radius:50%;
-  border:2px solid var(--maroon); background:#fff;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+.about-hero-wrap{text-align:center;}
+/* A thin line with a small hollow dot centered on it, under the title —
+   the dot is just a bordered circle filled with the page background, so
+   it reads as a break in the line rather than a solid marker. */
+.about-hero-divider{position:relative; width:170px; margin:14px auto 0; border-top:1px solid var(--maroon-light);}
+.about-hero-divider span{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:13px; height:13px; border-radius:50%; border:2px solid var(--maroon); background:var(--cream);
 }
-.about-hero-badge img{width:56px; height:56px; object-fit:contain;}
-.about-hero-badge span{font-family:'PT Serif', serif; font-weight:700; color:var(--maroon); font-size:.68rem; letter-spacing:.01em;}
 /* Our Story: a single photo, the heading + list, then the existing
    stacked-photo duo — three columns instead of the old two (photo+text). */
 .our-story-grid{display:grid; grid-template-columns:.85fr 1.25fr .85fr; gap:36px; align-items:start;}
@@ -932,9 +930,7 @@ footer ul li a:hover{color:#F0D9C9;}
   .nav-social{gap:8px;}
   .nav-actions{gap:8px;}
   .nav-actions > .btn{display:none;}
-  .about-hero-badge{width:76px; height:76px;}
-  .about-hero-badge img{width:38px; height:38px;}
-  .about-hero-badge span{font-size:.52rem;}
+  .about-hero-divider{width:130px;}
   .card-grid{gap:8px;}
   /* Below 600px, back to the original stacked composition (addons-panel
      above set-banner-mini, both full width) — the side-by-side split

@@ -123,14 +123,9 @@ export default function AboutPageBody({
     <>
       <section className="hero about-hero" style={{ paddingBottom: 0 }}>
         <div className="wrap about-hero-wrap">
-          <div className="about-hero-badge">
-            <img src={asset("/assets/images/logo-mark.jpg")} alt="" />
-            <span>Bagel Days</span>
-          </div>
-          <div>
-            <h1>About Us</h1>
-            <p className="script" style={{ fontSize: "1.2rem", marginTop: 10 }}>Freshly Baked, Every Morning.</p>
-          </div>
+          <h1>About Us</h1>
+          <div className="about-hero-divider"><span /></div>
+          <p className="script" style={{ fontSize: "1.2rem", marginTop: 14 }}>Freshly Baked, Every Morning.</p>
         </div>
       </section>
 
