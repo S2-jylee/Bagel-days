@@ -1,4 +1,4 @@
-import { IcMapPin, IcClockOutline, IcMapPinned, IcCircleParking, IcCheck, IcHouseHeart } from "../components/Icons";
+import { IcMapPin, IcClockOutline, IcMapPinned, IcCircleParking, IcCheck, IcHeartThin } from "../components/Icons";
 import { usePageContent } from "../context/PageContentContext";
 import { useSiteSettings } from "../context/SiteSettingsContext";
 import { mapsDirectionsUrl, mapsViewUrl } from "../lib/siteSettings";
@@ -90,7 +90,7 @@ export default function Visit() {
 
           <div className="closing-note">
             <div className="ic" style={{ width: 60, height: 60, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--maroon)", margin: "0 auto 14px" }}>
-              <IcHouseHeart />
+              <IcHeartThin />
             </div>
             <h3 className="script" style={{ fontSize: "1.4rem" }}>We look forward to seeing you soon!</h3>
             <p style={{ marginTop: 10 }}>Thank you for choosing Bagel Days. We can't wait to welcome you with freshly baked bagels and great coffee.</p>
