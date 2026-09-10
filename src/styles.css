@@ -682,13 +682,14 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    above this block, before it caught up to the header. The logo (and
    so the header) is ~6px shorter at <=600px — see that breakpoint's
    own override below. */
-/* padding-bottom:24px lives INSIDE the sticky box on purpose — a margin
-   on the next element (tried this) shrinks away as the grid scrolls up
-   underneath, going to 0 well before the header un-sticks; putting the
-   gap here instead keeps a constant 24px between the pinned
-   divider/pills and the grid the whole time it's stuck, matching the
-   grid's own row gap and what this looked like before that experiment. */
-.menu-category-sticky{position:sticky; top:67px; z-index:5; background:var(--cream); padding-bottom:24px;}
+/* padding-bottom lives INSIDE the sticky box on purpose (not as a margin
+   on the next element) so it stays constant the whole time this header
+   is stuck, instead of shrinking away as the grid scrolls up underneath.
+   Two DIFFERENT values, not one shared number — a Best section ends
+   with the divider flush against the grid (0), no Best ends with the
+   pills keeping a small 6px gap above the grid. */
+.menu-category-sticky{position:sticky; top:67px; z-index:5; background:var(--cream);}
+.menu-category-sticky:has(> .menu-subcat-pills:last-child){padding-bottom:6px;}
 .menu-category-sticky > .menu-subcat-pills:last-child{margin-bottom:0;}
 .menu-category h2{font-size:1.5rem; margin-bottom:14px;}
 .menu-category > p{color:var(--body); max-width:52ch; margin-bottom:26px;}
