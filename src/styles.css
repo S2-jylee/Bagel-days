@@ -505,6 +505,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .img-duo img{aspect-ratio:16/10; height:100%; width:100%; object-fit:cover; border-radius:var(--radius);}
 .split h2{margin-bottom:16px;}
 .split p{margin-bottom:12px;}
+.our-story-tagline{margin-top:4px; margin-bottom:16px;}
 .story-list{margin-top:6px;}
 /* align-items:center (was default stretch, with the icon nudged down via
    margin-top as an approximation) so the icon genuinely sits in the

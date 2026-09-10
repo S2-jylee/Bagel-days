@@ -262,7 +262,7 @@ export default function AboutPageBody({
           </div>
           <div className="our-story-text">
             <h2>Our Story</h2>
-            <p className="script" style={{ marginTop: 4, marginBottom: 16 }}>Freshly Crafted Every Morning.</p>
+            <p className="script our-story-tagline">Freshly Crafted Every Morning.</p>
             <ul className="story-list">
               {storyList.map((item, i) => (
                 <li key={i}>
