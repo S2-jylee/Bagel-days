@@ -462,7 +462,27 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .modal-set-section{margin-bottom:14px;}
 .modal-set-section:last-child{margin-bottom:0;}
 .modal-set-section h4{font-family:'PT Serif', serif; font-size:.9rem; color:var(--maroon); margin-bottom:4px;}
-.modal-set-section-choices{font-size:.85rem; color:var(--ink); line-height:1.5;}
+/* PC only: the plain-text list (kept for mobile, where there's no room
+   for a row of photo chips) is hidden here in favour of a chip per
+   choice — a small circular photo plus its name, so a customer can tell
+   at a glance which bagel or cream cheese is on offer instead of having
+   to recognize it from a name alone. Not the old card-grid treatment
+   (photo box + name below, one per row-column) — these are compact
+   pill-shaped chips that wrap inline like tags, reading more like "here
+   are your options" than a mini product catalog. */
+.modal-set-section-choices{display:none;}
+.modal-set-section-chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;}
+.set-choice-chip{
+  display:inline-flex; align-items:center; gap:7px; max-width:100%;
+  background:var(--cream-alt); border-radius:999px; padding:3px 12px 3px 3px;
+  font-family:'Pretendard', sans-serif; font-size:.78rem; font-weight:500; color:var(--ink);
+}
+.set-choice-chip img{width:26px; height:26px; border-radius:50%; object-fit:cover; flex-shrink:0; background:#fff;}
+.set-choice-chip span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+@media (max-width:600px){
+  .modal-set-section-choices{display:block;}
+  .modal-set-section-chips{display:none;}
+}
 
 /* ---------- About / story split ---------- */
 .split-section{padding-top:32px;}

@@ -14,6 +14,37 @@ const IcClose = () => (
 
 const BADGE_LABELS = { signature: "Signature", best: "Best", new: "New" };
 
+// PC-only enhancement: a section's choices resolved to the real, active
+// products they represent (a "choose any X" wildcard expands to every
+// matching product), deduped and in catalog order — used to show a photo
+// per choice instead of just its name. Mobile keeps the plain-text list
+// (see .modal-set-section-choices below) since there's no room for a row
+// of photo chips on a narrow screen.
+function resolveSectionProducts(section, products) {
+  const seen = new Set();
+  const result = [];
+  for (const choice of section.choices) {
+    if (choice.type === "product") {
+      const p = products[choice.productId];
+      if (p && p.isActive !== false && !seen.has(p.id)) {
+        seen.add(p.id);
+        result.push(p);
+      }
+    } else if (choice.type === "category") {
+      const matches = Object.values(products).filter(
+        (p) => p.isActive !== false && p.categoryId === choice.categoryId && (!choice.subcategoryId || p.subcategoryId === choice.subcategoryId)
+      );
+      for (const p of matches) {
+        if (!seen.has(p.id)) {
+          seen.add(p.id);
+          result.push(p);
+        }
+      }
+    }
+  }
+  return result.sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
 export default function FoodCard({ id, small }) {
   const { products } = useProducts();
   const { categories } = useCategories();
@@ -93,10 +124,21 @@ export default function FoodCard({ id, small }) {
                       .filter(Boolean)
                       .join(" · ");
                     if (!choiceText) return null;
+                    const items = resolveSectionProducts(section, products);
                     return (
                       <div className="modal-set-section" key={i}>
                         <h4>{section.label}</h4>
                         <p className="modal-set-section-choices">{choiceText}</p>
+                        {items.length > 0 && (
+                          <div className="modal-set-section-chips">
+                            {items.map((it) => (
+                              <span className="set-choice-chip" key={it.id}>
+                                <img src={it.img} alt="" />
+                                <span>{it.name}</span>
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
