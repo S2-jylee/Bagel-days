@@ -7,6 +7,7 @@ import { resizeImage } from "../../lib/imageResize";
 import { useAdminLang } from "../../lib/adminI18n";
 import { logActivity } from "../../lib/activityLog";
 import { IcChevronLeft, IcChevronRight, IcTrash } from "../../components/Icons";
+import { ABOUT_PHOTO_SLOTS } from "../../lib/aboutPhotos";
 
 const BUCKET = "site-images";
 const MAX_W = 2400;
@@ -148,6 +149,109 @@ function PageSection({ pageId, sectionLabel, content, showTagline = true, footer
   );
 }
 
+// One named photo slot on the About page — a single fixed-position image
+// (not a reorderable list), so this is upload-to-replace plus an optional
+// reset back to the bundled default, rather than PhotoField's add/reorder/
+// remove list UI.
+function AboutPhotoField({ slot, value, onChange, uploading, setUploading, setError, t }) {
+  async function handleUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    try {
+      const url = await uploadSiteImage(file);
+      onChange(url);
+    } catch (err) {
+      setError(err.message || t("photoUploadFailed"));
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
+
+  return (
+    <div className="about-photo-field">
+      <img src={productImageUrl(value || slot.default)} alt="" />
+      <div className="about-photo-field-body">
+        <span className="about-photo-field-label">{t(slot.labelKey)}</span>
+        <div className="about-photo-field-actions">
+          <label className="btn btn-ghost btn-sm">
+            {uploading ? t("uploading") : t("uploadPhoto")}
+            <input type="file" accept="image/*" onChange={handleUpload} disabled={uploading} hidden />
+          </label>
+          {value && (
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange(null)}>
+              {t("resetToDefault")}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// About's photos: nine fixed named slots (Our Story's three photos, Meet
+// Candy's, and one per "What Makes Bagel Days Special" item) stored as one
+// {slotKey: url} object on the "about" page_content row's about_photos
+// column — not the title/tagline/description/images shape PageSection
+// edits, since About's photos each have a fixed spot in the page rather
+// than being an orderable hero carousel.
+function AboutSection({ content, t }) {
+  const [photos, setPhotos] = useState(content.aboutPhotos || {});
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [savedFlash, setSavedFlash] = useState(false);
+
+  async function handleSave() {
+    setSaving(true);
+    setError("");
+    const { error: err } = await supabase
+      .from("page_content")
+      .update({ about_photos: photos, updated_at: new Date().toISOString() })
+      .eq("page_id", "about");
+    setSaving(false);
+    if (err) {
+      setError(err.message || t("saveFailed"));
+      return;
+    }
+    logActivity({ action: "update", entity: "homepage_section", label: t("aboutSectionTitle"), path: t("homepageTab") });
+    setSavedFlash(true);
+    setTimeout(() => setSavedFlash(false), 2000);
+  }
+
+  return (
+    <div className="homepage-section">
+      <p className="homepage-hint">{t("aboutPhotosIntro")}</p>
+
+      <div className="about-photo-grid">
+        {ABOUT_PHOTO_SLOTS.map((slot) => (
+          <AboutPhotoField
+            key={slot.key}
+            slot={slot}
+            value={photos[slot.key]}
+            onChange={(url) => setPhotos((p) => ({ ...p, [slot.key]: url }))}
+            uploading={uploading}
+            setUploading={setUploading}
+            setError={setError}
+            t={t}
+          />
+        ))}
+      </div>
+
+      {error && <p className="form-status err">{error}</p>}
+
+      <div className="menu-manager-form-actions">
+        {savedFlash && <span className="form-status ok">{t("saved")}</span>}
+        <button type="button" className="btn btn-primary btn-sm" onClick={handleSave} disabled={saving || uploading}>
+          {saving ? t("saving") : t("saveChanges")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // The shared business info (address, hours, find-us blurb, phone, email,
 // socials) behind Home's Visit Us widget, the Visit Us page, Contact Us's
 // Get in Touch, and the Footer — one row, edited from here, so it can't drift
@@ -248,6 +352,7 @@ function BusinessInfoSection({ settings, t }) {
 
 const SUB_TABS = [
   { id: "home", labelKey: "homeSectionTitle" },
+  { id: "about", labelKey: "aboutSectionTitle" },
   { id: "pickup", labelKey: "pickupSectionTitle" },
   { id: "visit", labelKey: "visitSectionTitle" },
   { id: "contact", labelKey: "contactSectionTitle" },
@@ -278,6 +383,7 @@ export default function HomepageManager() {
       </div>
 
       {subTab === "home" && pages.home && <PageSection key="home" pageId="home" sectionLabel={t("homeSectionTitle")} content={pages.home} footerNoteKey="homeBusinessInfoNote" t={t} />}
+      {subTab === "about" && pages.about && <AboutSection key="about" content={pages.about} t={t} />}
       {subTab === "pickup" && pages.pickup && <PageSection key="pickup" pageId="pickup" sectionLabel={t("pickupSectionTitle")} content={pages.pickup} t={t} />}
       {subTab === "visit" && pages.visit && (
         <PageSection key="visit" pageId="visit" sectionLabel={t("visitSectionTitle")} content={pages.visit} showTagline={false} footerNoteKey="visitBusinessInfoNote" t={t} />
