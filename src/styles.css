@@ -343,11 +343,15 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .food-card-badge{
   display:inline-flex; align-items:center; gap:3px;
   font-family:'Pretendard', sans-serif; font-weight:400; line-height:1; letter-spacing:.02em; color:#fff;
-  font-size:clamp(.5rem, 3.677cqw + .27rem, .68rem);
-  /* Side padding trimmed (was 11px at full size) — Signature+Best+New all
-     at once needed less horizontal room per pill to stay on one line
-     instead of wrapping to two at a 178px card. */
-  padding:clamp(1px, 6.38cqw - 5.38px, 6px) clamp(2px, 7.69cqw - 5.69px, 8px) clamp(1px, 3.83cqw - 2.83px, 4px);
+  /* Font-size and side padding both trimmed further (was .68rem/8px at
+     full size) — a 178px card is only the widest a card gets in the
+     product grid's own math, not a guaranteed minimum; at some in-between
+     browser widths (~1152px reported) the actual rendered card lands
+     narrower than that while still at the clamp's saturated max, leaving
+     Signature+Best+New too wide for one line. More headroom here so the
+     three fit even short of a true 178px card. */
+  font-size:clamp(.5rem, 2.4615cqw + .346rem, .62rem);
+  padding:clamp(1px, 6.38cqw - 5.38px, 6px) clamp(2px, 5.13cqw - 3.13px, 6px) clamp(1px, 3.83cqw - 2.83px, 4px);
   border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
 }
 /* text-shadow (not -webkit-text-stroke) so the outline sits outside each
@@ -678,18 +682,16 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    above this block, before it caught up to the header. The logo (and
    so the header) is ~6px shorter at <=600px — see that breakpoint's
    own override below. */
-.menu-category-sticky{position:sticky; top:67px; z-index:5; background:var(--cream); padding-bottom:8px;}
-/* When a category has no Best section, subcat pills are the sticky
-   block's last child — halves the trailing gap below them (26px base,
-   used when Best follows) so the pinned area doesn't hang onto extra
-   blank space with nothing below it but the pills themselves. */
-/* margin-bottom:0 (not just halved) — .menu-category-sticky's own
-   padding-bottom (8px) already adds trailing space below whatever the
-   sticky block's last child is, so any margin here on top of that was
-   stacking (6px margin + 8px padding = 14px, not the 6px it looked like
-   at a glance) instead of being the only source of the gap. Zeroing it
-   makes this case end with the same 8px as the with-Best case, which
-   also has no bottom margin of its own on the divider anymore. */
+.menu-category-sticky{position:sticky; top:67px; z-index:5; background:var(--cream);}
+/* Trailing padding only when subcat pills are the sticky block's last
+   child (no Best section that category) — with a Best section, the
+   divider is the last child instead and the pinned area should end
+   right at that line, no extra padding below it. */
+.menu-category-sticky:has(> .menu-subcat-pills:last-child){padding-bottom:8px;}
+/* margin-bottom:0 (not just halved) — the padding above already adds
+   trailing space below the pills, so any margin here on top of that
+   was stacking (6px margin + 8px padding = 14px, not the 6px it
+   looked like at a glance) instead of being the only source of the gap. */
 .menu-category-sticky > .menu-subcat-pills:last-child{margin-bottom:0;}
 .menu-category h2{font-size:1.5rem; margin-bottom:14px;}
 .menu-category > p{color:var(--body); max-width:52ch; margin-bottom:26px;}
