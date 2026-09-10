@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { UberEatsButton, DoorDashButton } from "../components/DeliveryButtons";
 import HeroCarousel from "../components/HeroCarousel";
-import { IcTub, IcCup, IcBag, IcMapPin } from "../components/Icons";
+import { IcHandCoins, IcCan, IcCoffeeCup, IcPaperBag, IcMapPin } from "../components/Icons";
 import { usePageContent } from "../context/PageContentContext";
 import { useSeo } from "../lib/seo";
 
@@ -12,15 +12,11 @@ const DEFAULT_CONTENT = {
   images: ["/assets/images/hero-main.jpg"],
 };
 
-const IcBagel = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/></svg>
-);
-
 const HIGHLIGHTS = [
-  { ic: IcBagel, title: "Freshly Made", desc: "Every morning, in small batches." },
-  { ic: IcTub, title: "House-Made Cream Cheese", desc: "Prepared fresh, several flavours." },
-  { ic: IcCup, title: "Campos Specialty Coffee", desc: "Brewed to order, every time." },
-  { ic: IcBag, title: "Ready for Takeaway", desc: "Carefully packed, ready to go." },
+  { ic: IcHandCoins, title: "Freshly Made", desc: "Every morning, in small batches." },
+  { ic: IcCan, title: "House-Made Cream Cheese", desc: "Prepared fresh, several flavours." },
+  { ic: IcCoffeeCup, title: "Campos Specialty Coffee", desc: "Brewed to order, every time." },
+  { ic: IcPaperBag, title: "Ready for Takeaway", desc: "Carefully packed, ready to go." },
 ];
 
 export default function Pickup() {
