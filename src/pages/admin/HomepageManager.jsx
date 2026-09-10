@@ -7,7 +7,9 @@ import { resizeImage } from "../../lib/imageResize";
 import { useAdminLang } from "../../lib/adminI18n";
 import { logActivity } from "../../lib/activityLog";
 import { IcChevronLeft, IcChevronRight, IcTrash } from "../../components/Icons";
-import { ABOUT_PHOTO_SLOTS } from "../../lib/aboutPhotos";
+import { DEFAULT_ABOUT_PHOTOS } from "../../lib/aboutPhotos";
+import { DEFAULT_ABOUT_CONTENT } from "../../lib/aboutContent";
+import AboutPageBody from "../../components/AboutPageBody";
 
 const BUCKET = "site-images";
 const MAX_W = 2400;
@@ -149,81 +151,22 @@ function PageSection({ pageId, sectionLabel, content, showTagline = true, footer
   );
 }
 
-// One named photo slot on the About page — a single fixed-position image
-// (not a reorderable list), so this is upload-to-replace plus an optional
-// reset back to the bundled default, rather than PhotoField's add/reorder/
-// remove list UI. Saves immediately on upload/reset (like a category's icon
-// picker) instead of needing a separate Save Changes click — a photo grid
-// with its own explicit Save button, sitting inside a page that otherwise
-// has none, was easy to miss and left changes unsaved.
-function AboutPhotoField({ slot, value, onChange, busy, setBusy, setError, t }) {
-  const [justSaved, setJustSaved] = useState(false);
-
-  async function commit(url) {
-    setBusy(true);
-    setError("");
-    const ok = await onChange(url);
-    setBusy(false);
-    if (ok) {
-      setJustSaved(true);
-      setTimeout(() => setJustSaved(false), 1500);
-    }
-  }
-
-  async function handleUpload(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      const url = await uploadSiteImage(file);
-      await commit(url);
-    } catch (err) {
-      setError(err.message || t("photoUploadFailed"));
-    } finally {
-      e.target.value = "";
-    }
-  }
-
-  return (
-    <div className="about-photo-field">
-      <img src={productImageUrl(value || slot.default)} alt="" />
-      <div className="about-photo-field-body">
-        <span className="about-photo-field-label">{t(slot.labelKey)}</span>
-        <div className="about-photo-field-actions">
-          <label className="btn btn-ghost btn-sm">
-            {busy ? t("uploading") : t("uploadPhoto")}
-            <input type="file" accept="image/*" onChange={handleUpload} disabled={busy} hidden />
-          </label>
-          {value && (
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => commit(null)} disabled={busy}>
-              {t("resetToDefault")}
-            </button>
-          )}
-          {justSaved && <span className="form-status ok">{t("saved")}</span>}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// About's photos: nine fixed named slots (Our Story's three photos, Meet
-// Candy's, and one per "What Makes Bagel Days Special" item) stored as one
-// {slotKey: url} object on the "about" page_content row's about_photos
-// column — not the title/tagline/description/images shape PageSection
-// edits, since About's photos each have a fixed spot in the page rather
-// than being an orderable hero carousel.
+// About's live layout, reused directly from the public page (AboutPageBody)
+// so this preview can't drift out of sync with what visitors actually see —
+// each editable bit (icon, text, photo) gets a small pencil affordance
+// in-place, saving straight to the "about" page_content row immediately on
+// change (like a category's icon picker) rather than needing a separate
+// Save Changes click, which was easy to miss on a page with no other save
+// button in view.
 function AboutSection({ content, t }) {
   const [photos, setPhotos] = useState(content.aboutPhotos || {});
+  const [overrides, setOverrides] = useState(content.aboutContent || {});
   const photosRef = useRef(photos);
+  const overridesRef = useRef(overrides);
   const [busySlot, setBusySlot] = useState(null);
   const [error, setError] = useState("");
 
-  // Each slot commits straight to the row, merged onto photosRef.current
-  // (kept in sync alongside the photos state) rather than the `photos`
-  // closure, which could still be stale if two fields were changed in
-  // quick succession — the second commit would otherwise overwrite the
-  // first's not-yet-re-rendered value.
-  async function handleSlotChange(key, url) {
-    const next = { ...photosRef.current, [key]: url };
+  async function savePhotos(next) {
     photosRef.current = next;
     setPhotos(next);
     const { error: err } = await supabase
@@ -238,26 +181,70 @@ function AboutSection({ content, t }) {
     return true;
   }
 
+  async function saveContent(next) {
+    overridesRef.current = next;
+    setOverrides(next);
+    const { error: err } = await supabase
+      .from("page_content")
+      .update({ about_content: next, updated_at: new Date().toISOString() })
+      .eq("page_id", "about");
+    if (err) {
+      setError(err.message || t("saveFailed"));
+      return false;
+    }
+    logActivity({ action: "update", entity: "homepage_section", label: t("aboutSectionTitle"), path: t("homepageTab") });
+    return true;
+  }
+
+  // Only the one changed field is patched onto that index's existing
+  // override (not a full merged copy) — keeps the stored JSON to just the
+  // deltas from DEFAULT_ABOUT_CONTENT, computed fresh from overridesRef so
+  // two quick edits in a row can't clobber each other.
+  function patchArrayItem(section, index, field, value) {
+    const current = overridesRef.current;
+    const arr = Array.isArray(current[section]) ? [...current[section]] : [];
+    arr[index] = { ...(arr[index] || {}), [field]: value };
+    return { ...current, [section]: arr };
+  }
+
+  async function handlePhotoPick(slot, file) {
+    setBusySlot(slot);
+    setError("");
+    try {
+      const url = await uploadSiteImage(file);
+      await savePhotos({ ...photosRef.current, [slot]: url });
+    } catch (err) {
+      setError(err.message || t("photoUploadFailed"));
+    } finally {
+      setBusySlot(null);
+    }
+  }
+
+  const storyList = DEFAULT_ABOUT_CONTENT.storyList.map((d, i) => ({ ...d, ...(overrides.storyList?.[i] || {}) }));
+  const candy = { ...DEFAULT_ABOUT_CONTENT.candy, ...(overrides.candy || {}) };
+  const specials = DEFAULT_ABOUT_CONTENT.specials.map((d, i) => ({ ...d, ...(overrides.specials?.[i] || {}) }));
+
   return (
-    <div className="homepage-section">
+    <div className="homepage-section about-editor">
       <p className="homepage-hint">{t("aboutPhotosIntro")}</p>
-
-      <div className="about-photo-grid">
-        {ABOUT_PHOTO_SLOTS.map((slot) => (
-          <AboutPhotoField
-            key={slot.key}
-            slot={slot}
-            value={photos[slot.key]}
-            onChange={(url) => handleSlotChange(slot.key, url)}
-            busy={busySlot === slot.key}
-            setBusy={(v) => setBusySlot(v ? slot.key : null)}
-            setError={setError}
-            t={t}
-          />
-        ))}
-      </div>
-
       {error && <p className="form-status err">{error}</p>}
+
+      <div className="about-editor-preview">
+        <AboutPageBody
+          storyList={storyList}
+          candy={candy}
+          specials={specials}
+          photoUrl={(slot) => productImageUrl(photos[slot] || DEFAULT_ABOUT_PHOTOS[slot])}
+          editable
+          busySlot={busySlot}
+          onStoryIconChange={(i, key) => saveContent(patchArrayItem("storyList", i, "icon", key))}
+          onStoryTextChange={(i, field, v) => saveContent(patchArrayItem("storyList", i, field, v))}
+          onCandyTextChange={(field, v) => saveContent({ ...overridesRef.current, candy: { ...(overridesRef.current.candy || {}), [field]: v } })}
+          onSpecialIconChange={(i, key) => saveContent(patchArrayItem("specials", i, "icon", key))}
+          onSpecialTextChange={(i, field, v) => saveContent(patchArrayItem("specials", i, field, v))}
+          onPhotoPick={handlePhotoPick}
+        />
+      </div>
     </div>
   );
 }

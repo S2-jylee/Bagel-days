@@ -530,6 +530,12 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    real photo now, not the illustrated mascot that used to sit here. */
 .mascot-panel{background:var(--cream-alt); border-radius:var(--radius); padding:40px; display:grid; grid-template-columns:.8fr 1.25fr .45fr; gap:32px; align-items:center; margin-top:64px;}
 .mascot-panel > img:first-child{border-radius:var(--radius); aspect-ratio:1; object-fit:cover; width:100%;}
+/* Admin preview only: EditablePhoto wraps the candy photo in a span (so its
+   pencil button can be positioned relative to it), which the plain
+   :first-child rule above no longer matches since that span, not the img,
+   is now .mascot-panel's actual first child there. */
+.mascot-panel > .about-editable-photo:first-child{border-radius:var(--radius); aspect-ratio:1; overflow:hidden;}
+.mascot-panel > .about-editable-photo:first-child img{width:100%; height:100%; object-fit:cover;}
 .mascot-panel-deco{width:100%; max-width:150px; justify-self:center;}
 
 /* ---------- Special numbered list ---------- */
@@ -1584,12 +1590,47 @@ footer ul li a:hover{color:#F0D9C9;}
   font-family:'Pretendard', sans-serif; font-weight:600; font-size:.82rem; color:var(--maroon);
 }
 .homepage-photo-add:hover{background:var(--cream-alt);}
-/* About's photos: one fixed named slot per field (upload-to-replace, plus
-   a reset), not the add/reorder/remove list UI above — laid out as a
-   thumbnail + label + actions row rather than a bare grid of thumbs. */
-.about-photo-grid{display:flex; flex-direction:column; gap:10px; margin-top:8px;}
-.about-photo-field{display:flex; align-items:center; gap:14px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px;}
-.about-photo-field img{width:76px; height:76px; border-radius:6px; object-fit:cover; flex-shrink:0;}
-.about-photo-field-body{display:flex; flex-direction:column; gap:6px; min-width:0;}
-.about-photo-field-label{font-family:'Pretendard', sans-serif; font-weight:600; font-size:.82rem; color:var(--ink);}
-.about-photo-field-actions{display:flex; gap:8px; flex-wrap:wrap;}
+/* About's admin editor: the real page (AboutPageBody, same component the
+   public page renders) shown inline, wider than the admin panel's own
+   content column — scrolls horizontally rather than squishing the layout
+   into a width it wasn't designed for. */
+.about-editor-preview{overflow-x:auto; margin-top:12px; border:1px solid var(--line); border-radius:var(--radius); background:var(--cream);}
+.about-editor-preview .wrap{min-width:1100px;}
+/* Editable text/icon: a pencil sits right after the content, only visible
+   in this admin preview (AboutPageBody's editable prop is false on the
+   public page, so none of this renders there at all). */
+.about-editable{position:relative; display:inline;}
+.about-editable-pencil{
+  display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; margin-left:4px;
+  border:1px solid var(--maroon-light); border-radius:50%; background:#fff; color:var(--maroon); cursor:pointer; vertical-align:middle;
+}
+.about-editable-pencil svg{width:9px; height:9px;}
+.about-editable-empty{color:#999; font-style:italic;}
+.about-editable-input{
+  font:inherit; color:inherit; background:#fff; border:1px solid var(--maroon-light); border-radius:6px; padding:4px 6px;
+  width:100%; min-width:160px;
+}
+textarea.about-editable-input{min-width:260px;}
+/* Icon picker: a row of swatch buttons that pops open below the icon when
+   its pencil is clicked. */
+.about-editable-icon{display:inline-flex; align-items:center; gap:2px;}
+.about-icon-picker{
+  position:absolute; top:100%; left:0; z-index:5; margin-top:4px; display:flex; flex-wrap:wrap; gap:4px; width:180px;
+  background:#fff; border:1px solid var(--line); border-radius:8px; padding:6px; box-shadow:0 6px 18px rgba(0,0,0,.12);
+}
+.about-icon-picker button{
+  width:28px; height:28px; display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--maroon); cursor:pointer;
+}
+.about-icon-picker button svg{width:16px; height:16px;}
+.about-icon-picker button.active{background:var(--tan); border-color:var(--maroon);}
+/* Photo pencil: a small circular button overlaid on the photo's corner. */
+.about-editable-photo{position:relative; display:block; width:100%; height:100%;}
+.about-editable-photo img{width:100%; height:100%; display:block;}
+.about-editable-photo-pencil{
+  position:absolute; bottom:6px; right:6px; width:28px; height:28px; display:flex; align-items:center; justify-content:center;
+  border-radius:50%; background:rgba(255,255,255,.95); color:var(--maroon); cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.25);
+}
+.about-editable-photo-pencil svg{width:14px; height:14px;}
+.about-editable-photo-busy{width:12px; height:12px; border-radius:50%; border:2px solid var(--tan); border-top-color:var(--maroon); animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
