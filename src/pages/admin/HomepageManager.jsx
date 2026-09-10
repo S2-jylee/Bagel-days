@@ -220,6 +220,23 @@ function AboutSection({ content, t }) {
     }
   }
 
+  // Icons upload-to-override the same way a category's icon does in Menu
+  // admin (default line icon unless a custom image is set) — stored as
+  // iconUrl on that array item's override, alongside its text fields.
+  async function handleIconPick(section, index, file) {
+    const busyKey = `${section === "storyList" ? "story" : "special"}-icon-${index}`;
+    setBusySlot(busyKey);
+    setError("");
+    try {
+      const url = await uploadSiteImage(file);
+      await saveContent(patchArrayItem(section, index, "iconUrl", url));
+    } catch (err) {
+      setError(err.message || t("photoUploadFailed"));
+    } finally {
+      setBusySlot(null);
+    }
+  }
+
   const storyList = DEFAULT_ABOUT_CONTENT.storyList.map((d, i) => ({ ...d, ...(overrides.storyList?.[i] || {}) }));
   const candy = { ...DEFAULT_ABOUT_CONTENT.candy, ...(overrides.candy || {}) };
   const specials = DEFAULT_ABOUT_CONTENT.specials.map((d, i) => ({ ...d, ...(overrides.specials?.[i] || {}) }));
@@ -237,10 +254,10 @@ function AboutSection({ content, t }) {
           photoUrl={(slot) => productImageUrl(photos[slot] || DEFAULT_ABOUT_PHOTOS[slot])}
           editable
           busySlot={busySlot}
-          onStoryIconChange={(i, key) => saveContent(patchArrayItem("storyList", i, "icon", key))}
+          onStoryIconPick={(i, f) => handleIconPick("storyList", i, f)}
           onStoryTextChange={(i, field, v) => saveContent(patchArrayItem("storyList", i, field, v))}
           onCandyTextChange={(field, v) => saveContent({ ...overridesRef.current, candy: { ...(overridesRef.current.candy || {}), [field]: v } })}
-          onSpecialIconChange={(i, key) => saveContent(patchArrayItem("specials", i, "icon", key))}
+          onSpecialIconPick={(i, f) => handleIconPick("specials", i, f)}
           onSpecialTextChange={(i, field, v) => saveContent(patchArrayItem("specials", i, field, v))}
           onPhotoPick={handlePhotoPick}
         />

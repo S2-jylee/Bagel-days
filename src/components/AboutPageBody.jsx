@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { asset } from "../lib/assetUrl";
-import { aboutIconComponent, ABOUT_ICON_OPTIONS } from "../lib/aboutContent";
+import { aboutIconComponent } from "../lib/aboutContent";
 import { IcPencil } from "./Icons";
 
 // A click-to-edit text field: plain text by default, a pencil button turns
@@ -48,37 +48,22 @@ function EditableText({ value, onChange, editable, tag = "span", className, text
   );
 }
 
-// A click-to-edit icon: the icon itself, plus (when editable) a pencil that
-// reveals a row of swatches to pick a replacement from ABOUT_ICON_OPTIONS.
-function EditableIcon({ value, onChange, editable }) {
-  const [picking, setPicking] = useState(false);
+// A click-to-edit icon: the default line icon, or an admin-uploaded image
+// in its place — same upload-to-override pattern as a category's icon in
+// Menu admin (default SVG unless a custom image URL is set), rather than
+// picking from a fixed icon palette.
+function EditableIcon({ value, iconUrl, onPick, editable, busy }) {
   const Ic = aboutIconComponent(value);
 
-  if (!editable) return <Ic />;
+  if (!editable) return iconUrl ? <img src={iconUrl} alt="" className="about-icon-img" /> : <Ic />;
 
   return (
     <span className="about-editable about-editable-icon">
-      <Ic />
-      <button type="button" className="about-editable-pencil" onClick={() => setPicking((v) => !v)} aria-label="Change icon">
-        <IcPencil />
-      </button>
-      {picking && (
-        <span className="about-icon-picker">
-          {ABOUT_ICON_OPTIONS.map((opt) => (
-            <button
-              type="button"
-              key={opt.key}
-              className={opt.key === value ? "active" : ""}
-              onClick={() => {
-                onChange(opt.key);
-                setPicking(false);
-              }}
-            >
-              <opt.Icon />
-            </button>
-          ))}
-        </span>
-      )}
+      {iconUrl ? <img src={iconUrl} alt="" className="about-icon-img" /> : <Ic />}
+      <label className="about-editable-pencil" aria-label="Upload icon">
+        {busy ? <span className="about-editable-photo-busy" /> : <IcPencil />}
+        <input type="file" accept="image/*" hidden disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) onPick(f); }} />
+      </label>
     </span>
   );
 }
@@ -112,10 +97,10 @@ export default function AboutPageBody({
   photoUrl,
   editable = false,
   busySlot,
-  onStoryIconChange,
+  onStoryIconPick,
   onStoryTextChange,
   onCandyTextChange,
-  onSpecialIconChange,
+  onSpecialIconPick,
   onSpecialTextChange,
   onPhotoPick,
 }) {
@@ -146,7 +131,13 @@ export default function AboutPageBody({
               {storyList.map((item, i) => (
                 <li key={i}>
                   <span className="ic">
-                    <EditableIcon value={item.icon} editable={editable} onChange={(key) => onStoryIconChange(i, key)} />
+                    <EditableIcon
+                      value={item.icon}
+                      iconUrl={item.iconUrl}
+                      editable={editable}
+                      onPick={onStoryIconPick && ((f) => onStoryIconPick(i, f))}
+                      busy={busySlot === `story-icon-${i}`}
+                    />
                   </span>
                   <span>
                     <EditableText
@@ -203,11 +194,19 @@ export default function AboutPageBody({
               <div className="special-item" key={i}>
                 <div className="special-item-text">
                   <div className="special-item-icon">
-                    <EditableIcon value={s.icon} editable={editable} onChange={(key) => onSpecialIconChange(i, key)} />
+                    <EditableIcon
+                      value={s.icon}
+                      iconUrl={s.iconUrl}
+                      editable={editable}
+                      onPick={onSpecialIconPick && ((f) => onSpecialIconPick(i, f))}
+                      busy={busySlot === `special-icon-${i}`}
+                    />
                   </div>
-                  <EditableText value={s.num} editable={editable} tag="span" className="num" onChange={(v) => onSpecialTextChange(i, "num", v)} />
-                  <EditableText value={s.title} editable={editable} tag="h4" onChange={(v) => onSpecialTextChange(i, "title", v)} />
-                  <EditableText value={s.desc} editable={editable} tag="p" textarea onChange={(v) => onSpecialTextChange(i, "desc", v)} />
+                  <div className="special-item-copy">
+                    <EditableText value={s.num} editable={editable} tag="span" className="num" onChange={(v) => onSpecialTextChange(i, "num", v)} />
+                    <EditableText value={s.title} editable={editable} tag="h4" onChange={(v) => onSpecialTextChange(i, "title", v)} />
+                    <EditableText value={s.desc} editable={editable} tag="p" textarea onChange={(v) => onSpecialTextChange(i, "desc", v)} />
+                  </div>
                 </div>
                 <div className="thumb">
                   <EditablePhoto src={photoUrl(s.slot)} alt={s.title} onPick={onPhotoPick && ((f) => onPhotoPick(s.slot, f))} busy={busySlot === s.slot} />

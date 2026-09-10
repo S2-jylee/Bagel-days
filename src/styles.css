@@ -513,12 +513,16 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    distinct enough from the surrounding text. An explicit weight forces a
    real heavier cut of the font instead. */
 .story-list strong{font-weight:800; color:var(--ink);}
-.story-list .ic svg{width:20px; height:20px;}
+.story-list .ic svg, .story-list .ic .about-icon-img{width:20px; height:20px; object-fit:contain;}
 /* display:flex so the divider and tagline can swap order on mobile (below)
    without touching the JSX — both sit at the default order:0 here, so
    flexbox just keeps them in DOM order (h1, divider, tagline) same as
    before. */
 .about-hero-wrap{text-align:center; display:flex; flex-direction:column; align-items:center;}
+/* More breathing room above the title than .hero's own 60px — desktop/
+   tablet only; reset back to the original 60px on mobile (below) since
+   that extra space isn't wanted there. */
+.about-hero{padding-top:110px;}
 /* A thin line with a small hollow dot centered on it, under the title —
    the dot is just a bordered circle filled with the page background, so
    it reads as a break in the line rather than a solid marker. */
@@ -567,8 +571,13 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
   min-height:150px; padding:0 14px; border-right:1px solid var(--line);
 }
 .special-grid > .special-item:last-child .special-item-text{border-right:none;}
+/* .special-item-copy groups num/h4/p (previously flat inside
+   .special-item-text) so the icon can become a separate column on mobile
+   without also splitting num/h4/p apart from each other. Column layout
+   here matches how they stacked before this split. */
+.special-item-copy{display:flex; flex-direction:column; align-items:center;}
 .special-item-icon{color:var(--maroon); margin-bottom:10px;}
-.special-item-icon svg{width:30px; height:30px;}
+.special-item-icon svg, .special-item-icon .about-icon-img{width:30px; height:30px; object-fit:contain;}
 /* Text first, photo last (matches the About page mockup) — margin moved
    from the thumb's old bottom (when it came first) to its own top. */
 .special-item .thumb{aspect-ratio:4/3; border-radius:var(--radius); overflow:hidden; margin-top:16px;}
@@ -950,6 +959,7 @@ footer ul li a:hover{color:#F0D9C9;}
   .nav-social{gap:8px;}
   .nav-actions{gap:8px;}
   .nav-actions > .btn{display:none;}
+  .about-hero{padding-top:60px;}
   /* Divider moves below the tagline instead of between title and tagline —
      both default to order:0 (DOM order) above 600px; explicit order here
      only swaps them at this breakpoint. */
@@ -987,14 +997,17 @@ footer ul li a:hover{color:#F0D9C9;}
   .features .wrap{grid-template-columns:1fr;}
   .pickup-highlights{grid-template-columns:repeat(2,1fr); gap:14px;}
   .pickup-highlight{padding:20px 16px;}
-  /* Below 600px: one row per item (icon+text on the left, its photo on
-     the right) instead of a 2-per-row grid — matches the reference
-     mobile layout, where all 5 rows stack in a single column. */
+  /* Below 600px: one row per item — icon, then its text, then its photo,
+     three columns side by side — instead of a 2-per-row grid; all 5 rows
+     stack in a single column. .special-item-text switches from column
+     (icon above copy) to row (icon beside copy) so the icon becomes its
+     own column instead of sitting above the num/title/description. */
   .special-grid{grid-template-columns:1fr; gap:18px;}
-  .special-item{display:flex; align-items:flex-start; gap:14px;}
-  .special-item-text{align-items:flex-start; text-align:left; padding:0; flex:1;}
-  .special-item-icon{margin-bottom:6px;}
-  .special-item .thumb{width:110px; flex-shrink:0; margin-top:0;}
+  .special-item{display:flex; align-items:flex-start; gap:12px;}
+  .special-item-text{flex-direction:row; align-items:flex-start; text-align:left; padding:0; border-right:none; min-height:0; flex:1; gap:10px;}
+  .special-item-copy{align-items:flex-start; text-align:left;}
+  .special-item-icon{margin-bottom:0; flex-shrink:0;}
+  .special-item .thumb{width:90px; flex-shrink:0; margin-top:0;}
   .form-grid{grid-template-columns:1fr;}
   .foot-main{flex-direction:column; gap:18px;}
   .foot-links{flex-wrap:wrap; gap:20px 24px;}
@@ -1639,24 +1652,18 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 .about-editable-pencil svg{width:9px; height:9px;}
 .about-editable-empty{color:#999; font-style:italic;}
+/* A warm highlighted fill + visible border + soft outer glow — clicking a
+   pencil should make it obvious exactly which region just became
+   editable, distinct from the page's own cream background. */
 .about-editable-input{
-  font:inherit; color:inherit; background:#fff; border:1px solid var(--maroon-light); border-radius:6px; padding:4px 6px;
-  width:100%; min-width:160px;
+  font:inherit; color:var(--ink); background:#FFF6DE; border:2px solid var(--maroon); border-radius:6px; padding:4px 7px;
+  width:100%; min-width:160px; box-shadow:0 0 0 3px rgba(91,30,30,.12);
 }
 textarea.about-editable-input{min-width:260px;}
-/* Icon picker: a row of swatch buttons that pops open below the icon when
-   its pencil is clicked. */
 .about-editable-icon{display:inline-flex; align-items:center; gap:2px;}
-.about-icon-picker{
-  position:absolute; top:100%; left:0; z-index:5; margin-top:4px; display:flex; flex-wrap:wrap; gap:4px; width:180px;
-  background:#fff; border:1px solid var(--line); border-radius:8px; padding:6px; box-shadow:0 6px 18px rgba(0,0,0,.12);
-}
-.about-icon-picker button{
-  width:28px; height:28px; display:flex; align-items:center; justify-content:center;
-  border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--maroon); cursor:pointer;
-}
-.about-icon-picker button svg{width:16px; height:16px;}
-.about-icon-picker button.active{background:var(--tan); border-color:var(--maroon);}
+/* Icon upload — same override-the-default pattern as a category's icon
+   (Menu admin): default line icon shown until a custom image is set. */
+.about-icon-img{display:block; margin:0 auto;}
 /* Photo pencil: a small circular button overlaid on the photo's corner. */
 .about-editable-photo{position:relative; display:block; width:100%; height:100%;}
 .about-editable-photo img{width:100%; height:100%; display:block;}
