@@ -496,7 +496,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 }
 
 /* ---------- About / story split ---------- */
-.split-section{padding-top:32px;}
+.split-section{padding-top:80px;}
 .split{display:grid; grid-template-columns:.95fr 1.05fr; gap:52px; align-items:center;}
 .split.reverse{grid-template-columns:1.05fr .95fr;}
 .split.reverse .imgcol{order:2;}
@@ -618,7 +618,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    from the thumb's old bottom (when it came first) to its own top. */
 .special-item .thumb{aspect-ratio:4/3; border-radius:var(--radius); overflow:hidden; margin-top:16px;}
 .special-item .thumb img{width:100%; height:100%; object-fit:cover;}
-.special-item .num{font-family:'Pretendard', sans-serif; color:var(--maroon); font-size:.72rem; font-weight:700; letter-spacing:.06em; margin:4px 0 4px;}
+.special-item .num{font-family:'Pretendard', sans-serif; color:var(--maroon); font-size:.9rem; font-weight:700; letter-spacing:.06em; margin:4px 0 4px;}
 .special-item p{font-size:.8rem; color:var(--body);}
 
 /* ---------- Menu page: top tabs + persistent desktop cart ---------- */
@@ -1003,6 +1003,10 @@ footer ul li a:hover{color:#F0D9C9;}
   /* Only the heading + tagline center — not .story-list below them, which
      reads better left-aligned as a list. */
   .our-story-text > h2, .our-story-text > .script{text-align:center;}
+  .our-story-text > .script{margin-bottom:50px;}
+  /* Desktop/tablet only above (600-980px inherits the 80px base) — mobile
+     keeps the original tighter spacing. */
+  .split-section{padding-top:32px;}
   .card-grid{gap:8px;}
   /* Below 600px, back to the original stacked composition (addons-panel
      above set-banner-mini, both full width) — the side-by-side split
