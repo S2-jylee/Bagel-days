@@ -639,6 +639,10 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .pickup-highlight h4{font-family:'PT Serif', serif; font-size:1.02rem; color:var(--ink); margin-bottom:6px;}
 .pickup-highlight p{font-size:.85rem; color:var(--body);}
 .mini-find{background:var(--cream-alt); border-radius:var(--radius); padding:28px; display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; margin:40px 0;}
+/* No width/height on the icon's own <svg> (only a viewBox), so it was
+   filling the entire 44px circle edge-to-edge instead of sitting inside
+   it with some breathing room. */
+.mini-find .ic svg{width:22px; height:22px;}
 
 /* ---------- Location / visit ---------- */
 .loc-cards{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:32px;}
