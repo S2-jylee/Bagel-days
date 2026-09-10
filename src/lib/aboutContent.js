@@ -45,10 +45,10 @@ export const DEFAULT_ABOUT_CONTENT = {
     p3: "From our family to yours, we hope every visit to Bagel Days leaves you with a smile.",
   },
   specials: [
-    { icon: "leaf", num: "1. FRESH DOUGH DAILY", title: "Made from scratch", desc: "Every morning using quality ingredients.", slot: "special1" },
-    { icon: "snowflake", num: "2. SLOW COLD FERMENTATION", title: "Deeper flavour", desc: "Fermented overnight for the perfect chewy texture.", slot: "special2" },
-    { icon: "pot", num: "3. HAND-BOILED & OVEN-BAKED", title: "NY-style texture", desc: "Every bagel is hand-boiled before baking.", slot: "special3" },
-    { icon: "tub", num: "4. HOUSE-MADE CREAM CHEESE", title: "Prepared daily", desc: "In a variety of delicious flavours.", slot: "special4" },
-    { icon: "bean", num: "5. CAMPOS SPECIALTY COFFEE", title: "Perfectly paired", desc: "Proudly serving Campos Specialty Coffee.", slot: "special5" },
+    { icon: "leaf", num: "1. FRESH DOUGH DAILY", desc: "Every morning using quality ingredients.", slot: "special1" },
+    { icon: "snowflake", num: "2. SLOW COLD FERMENTATION", desc: "Fermented overnight for the perfect chewy texture.", slot: "special2" },
+    { icon: "pot", num: "3. HAND-BOILED & OVEN-BAKED", desc: "Every bagel is hand-boiled before baking.", slot: "special3" },
+    { icon: "tub", num: "4. HOUSE-MADE CREAM CHEESE", desc: "In a variety of delicious flavours.", slot: "special4" },
+    { icon: "bean", num: "5. CAMPOS SPECIALTY COFFEE", desc: "Proudly serving Campos Specialty Coffee.", slot: "special5" },
   ],
 };

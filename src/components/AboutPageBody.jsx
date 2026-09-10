@@ -327,13 +327,12 @@ export default function AboutPageBody({
                     />
                   </div>
                   <div className="special-item-copy">
-                    <EditableText value={s.num} editable={editable} tag="span" className="num" onChange={(v) => onSpecialTextChange(i, "num", v)} />
-                    <EditableText value={s.title} editable={editable} tag="h4" onChange={(v) => onSpecialTextChange(i, "title", v)} />
+                    <EditableText value={s.num} editable={editable} tag="h4" className="num" onChange={(v) => onSpecialTextChange(i, "num", v)} />
                     <EditableText value={s.desc} editable={editable} tag="p" textarea onChange={(v) => onSpecialTextChange(i, "desc", v)} />
                   </div>
                 </div>
                 <div className="thumb">
-                  <EditablePhoto src={photoUrl(s.slot)} alt={s.title} onPick={onPhotoPick && ((f) => onPhotoPick(s.slot, f))} busy={busySlot === s.slot} />
+                  <EditablePhoto src={photoUrl(s.slot)} alt={s.num} onPick={onPhotoPick && ((f) => onPhotoPick(s.slot, f))} busy={busySlot === s.slot} />
                 </div>
               </div>
             ))}
