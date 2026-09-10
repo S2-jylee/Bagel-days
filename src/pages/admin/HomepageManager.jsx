@@ -177,34 +177,54 @@ function AboutSection({ content, t }) {
   const [busySlot, setBusySlot] = useState(null);
   const [error, setError] = useState("");
 
+  // Every write to this row (photos or content) is chained through one
+  // queue so requests always reach the DB in the same order they were made
+  // locally. Without this, uploading several icons/photos in quick
+  // succession could have a later save's request land at Supabase before
+  // an earlier one's — the earlier (now-stale) snapshot would then win and
+  // silently overwrite the later edit, which is exactly what happened when
+  // rapid-fire icon re-uploads left some slots pointing at the old blurry
+  // file even though the sharp replacement had already finished uploading.
+  const saveQueueRef = useRef(Promise.resolve());
+
+  function queueSave(fn) {
+    const run = saveQueueRef.current.then(fn, fn);
+    saveQueueRef.current = run;
+    return run;
+  }
+
   async function savePhotos(next) {
     photosRef.current = next;
     setPhotos(next);
-    const { error: err } = await supabase
-      .from("page_content")
-      .update({ about_photos: next, updated_at: new Date().toISOString() })
-      .eq("page_id", "about");
-    if (err) {
-      setError(err.message || t("saveFailed"));
-      return false;
-    }
-    logActivity({ action: "update", entity: "homepage_section", label: t("aboutSectionTitle"), path: t("homepageTab") });
-    return true;
+    return queueSave(async () => {
+      const { error: err } = await supabase
+        .from("page_content")
+        .update({ about_photos: next, updated_at: new Date().toISOString() })
+        .eq("page_id", "about");
+      if (err) {
+        setError(err.message || t("saveFailed"));
+        return false;
+      }
+      logActivity({ action: "update", entity: "homepage_section", label: t("aboutSectionTitle"), path: t("homepageTab") });
+      return true;
+    });
   }
 
   async function saveContent(next) {
     overridesRef.current = next;
     setOverrides(next);
-    const { error: err } = await supabase
-      .from("page_content")
-      .update({ about_content: next, updated_at: new Date().toISOString() })
-      .eq("page_id", "about");
-    if (err) {
-      setError(err.message || t("saveFailed"));
-      return false;
-    }
-    logActivity({ action: "update", entity: "homepage_section", label: t("aboutSectionTitle"), path: t("homepageTab") });
-    return true;
+    return queueSave(async () => {
+      const { error: err } = await supabase
+        .from("page_content")
+        .update({ about_content: next, updated_at: new Date().toISOString() })
+        .eq("page_id", "about");
+      if (err) {
+        setError(err.message || t("saveFailed"));
+        return false;
+      }
+      logActivity({ action: "update", entity: "homepage_section", label: t("aboutSectionTitle"), path: t("homepageTab") });
+      return true;
+    });
   }
 
   // Only the one changed field is patched onto that index's existing
