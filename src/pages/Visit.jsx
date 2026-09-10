@@ -1,8 +1,7 @@
-import { IcPin, IcClock, IcMap, IcCar, IcCheck } from "../components/Icons";
+import { IcPin, IcClock, IcMap, IcCar, IcCheck, IcHouseHeart } from "../components/Icons";
 import { usePageContent } from "../context/PageContentContext";
 import { useSiteSettings } from "../context/SiteSettingsContext";
 import { mapsDirectionsUrl, mapsViewUrl } from "../lib/siteSettings";
-import { asset } from "../lib/assetUrl";
 import HeroCarousel from "../components/HeroCarousel";
 import { useSeo } from "../lib/seo";
 
@@ -90,8 +89,8 @@ export default function Visit() {
           </div>
 
           <div className="closing-note">
-            <div className="ic" style={{ width: 60, height: 60, borderRadius: "50%", background: "#fff", overflow: "hidden", margin: "0 auto 14px" }}>
-              <img src={asset("/assets/images/ic-heart.png")} alt="" width="60" height="60" />
+            <div className="ic" style={{ width: 60, height: 60, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--maroon)", margin: "0 auto 14px" }}>
+              <IcHouseHeart />
             </div>
             <h3 className="script" style={{ fontSize: "1.4rem" }}>We look forward to seeing you soon!</h3>
             <p style={{ marginTop: 10 }}>Thank you for choosing Bagel Days. We can't wait to welcome you with freshly baked bagels and great coffee.</p>
