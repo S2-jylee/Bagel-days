@@ -475,11 +475,17 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .modal-set-section-chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;}
 .set-choice-chip{
   display:inline-flex; align-items:center; gap:7px; max-width:100%;
-  background:var(--cream-alt); border-radius:999px; padding:3px 12px 3px 3px;
+  background:var(--cream-alt); border-radius:999px; padding:3px 12px 3px 3px; border:none; cursor:pointer;
   font-family:'Pretendard', sans-serif; font-size:.78rem; font-weight:500; color:var(--ink);
+  transition:background .15s ease;
 }
+.set-choice-chip:hover{background:var(--tan);}
 .set-choice-chip img{width:26px; height:26px; border-radius:50%; object-fit:cover; flex-shrink:0; background:#fff;}
 .set-choice-chip span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+/* A chip opens that item's own detail modal stacked on top of the Set's —
+   nudged slightly higher than the base overlay's z-index so it's
+   guaranteed to sit above it regardless of DOM order specifics. */
+.product-modal-overlay-nested{z-index:210;}
 @media (max-width:600px){
   .modal-set-section-choices{display:block;}
   .modal-set-section-chips{display:none;}

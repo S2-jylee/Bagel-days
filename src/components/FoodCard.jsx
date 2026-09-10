@@ -45,9 +45,130 @@ function resolveSectionProducts(section, products) {
   return result.sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
-export default function FoodCard({ id, small }) {
+// The full product-detail modal, extracted so it can be opened either as a
+// card's own modal or nested on top of another modal (e.g. clicking a Set's
+// Bagel/Cream Cheese chip opens that item's own detail over the Set's).
+function ProductModal({ id, onClose, nested }) {
   const { products } = useProducts();
   const { categories } = useCategories();
+  const p = products[id];
+  const [nestedId, setNestedId] = useState(null);
+
+  if (!p) return null;
+
+  return createPortal(
+    <div
+      className={`product-modal-overlay${nested ? " product-modal-overlay-nested" : ""}`}
+      onClick={(e) => {
+        // Portals still bubble through the React tree, not the DOM tree —
+        // without this, clicking the nested modal's own backdrop would
+        // also reach the outer Set modal's overlay and close both at once.
+        e.stopPropagation();
+        onClose();
+      }}
+    >
+      <div className="product-modal" onClick={(e) => e.stopPropagation()}>
+        <button type="button" className="product-modal-close" onClick={onClose} aria-label="Close">
+          <IcClose />
+        </button>
+        <div className="product-modal-img"><img src={p.img} alt={p.name} /></div>
+        <div className="product-modal-body">
+          {p.variants.length > 0 ? (
+            <>
+              <h3 className="product-modal-name">{p.name}</h3>
+              <div className="product-modal-title-row">
+                <span className="product-modal-size-label">{p.baseVariantLabel}</span>
+                <span className="product-modal-price">${p.price.toFixed(2)}</span>
+              </div>
+              {p.variants.map((v, i) => (
+                <div className="product-modal-title-row" key={i}>
+                  <span className="product-modal-size-label">{v.label}</span>
+                  <span className="product-modal-price">${Number(v.price).toFixed(2)}</span>
+                </div>
+              ))}
+            </>
+          ) : (
+            <div className="product-modal-title-row">
+              <h3>{p.name}</h3>
+              <span className="product-modal-price">${p.price.toFixed(2)}</span>
+            </div>
+          )}
+          <p className={p.setSections.length > 0 ? "product-modal-desc-bold" : undefined}>{p.desc}</p>
+
+          {p.setSections.length > 0 && (
+            <div className="modal-set-sections">
+              {p.setSections.map((section, i) => {
+                const choiceText = section.choices
+                  .map((c) => {
+                    if (c.type === "product") return products[c.productId]?.name;
+                    const cat = categories.find((cc) => cc.id === c.categoryId);
+                    const scopeLabel = c.subcategoryId ? cat?.subcategories.find((s) => s.id === c.subcategoryId)?.label : cat?.label;
+                    return scopeLabel ? `Choose any ${scopeLabel}` : null;
+                  })
+                  .filter(Boolean)
+                  .join(" · ");
+                if (!choiceText) return null;
+                const items = resolveSectionProducts(section, products);
+                return (
+                  <div className="modal-set-section" key={i}>
+                    <h4>{section.label}</h4>
+                    <p className="modal-set-section-choices">{choiceText}</p>
+                    {items.length > 0 && (
+                      <div className="modal-set-section-chips">
+                        {items.map((it) => (
+                          <button
+                            type="button"
+                            className="set-choice-chip"
+                            key={it.id}
+                            onClick={() => setNestedId(it.id)}
+                          >
+                            <img src={it.img} alt="" />
+                            <span>{it.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {p.addons.length > 0 && (
+            <div className="modal-addons">
+              <h4>Add-ons</h4>
+              <ul className="modal-addon-list-plain">
+                {p.addons.map((a) => (
+                  <li key={a.name}>
+                    <span>{a.name}</span>
+                    <span className="p">${a.price.toFixed(2)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <a
+            href={ORDER_NOW_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="delivery-btn delivery-btn-direct btn-block product-modal-order-btn"
+          >
+            <IcBag />
+            <span>Order Now</span>
+            <IcChevron />
+          </a>
+        </div>
+      </div>
+
+      {nestedId && <ProductModal id={nestedId} onClose={() => setNestedId(null)} nested />}
+    </div>,
+    document.body
+  );
+}
+
+export default function FoodCard({ id, small }) {
+  const { products } = useProducts();
   const p = products[id];
   const [open, setOpen] = useState(false);
 
@@ -81,99 +202,7 @@ export default function FoodCard({ id, small }) {
         </div>
       </div>
 
-      {open && createPortal(
-        <div className="product-modal-overlay" onClick={() => setOpen(false)}>
-          <div className="product-modal" onClick={(e) => e.stopPropagation()}>
-            <button type="button" className="product-modal-close" onClick={() => setOpen(false)} aria-label="Close">
-              <IcClose />
-            </button>
-            <div className="product-modal-img"><img src={p.img} alt={p.name} /></div>
-            <div className="product-modal-body">
-              {p.variants.length > 0 ? (
-                <>
-                  <h3 className="product-modal-name">{p.name}</h3>
-                  <div className="product-modal-title-row">
-                    <span className="product-modal-size-label">{p.baseVariantLabel}</span>
-                    <span className="product-modal-price">${p.price.toFixed(2)}</span>
-                  </div>
-                  {p.variants.map((v, i) => (
-                    <div className="product-modal-title-row" key={i}>
-                      <span className="product-modal-size-label">{v.label}</span>
-                      <span className="product-modal-price">${Number(v.price).toFixed(2)}</span>
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <div className="product-modal-title-row">
-                  <h3>{p.name}</h3>
-                  <span className="product-modal-price">${p.price.toFixed(2)}</span>
-                </div>
-              )}
-              <p className={p.setSections.length > 0 ? "product-modal-desc-bold" : undefined}>{p.desc}</p>
-
-              {p.setSections.length > 0 && (
-                <div className="modal-set-sections">
-                  {p.setSections.map((section, i) => {
-                    const choiceText = section.choices
-                      .map((c) => {
-                        if (c.type === "product") return products[c.productId]?.name;
-                        const cat = categories.find((cc) => cc.id === c.categoryId);
-                        const scopeLabel = c.subcategoryId ? cat?.subcategories.find((s) => s.id === c.subcategoryId)?.label : cat?.label;
-                        return scopeLabel ? `Choose any ${scopeLabel}` : null;
-                      })
-                      .filter(Boolean)
-                      .join(" · ");
-                    if (!choiceText) return null;
-                    const items = resolveSectionProducts(section, products);
-                    return (
-                      <div className="modal-set-section" key={i}>
-                        <h4>{section.label}</h4>
-                        <p className="modal-set-section-choices">{choiceText}</p>
-                        {items.length > 0 && (
-                          <div className="modal-set-section-chips">
-                            {items.map((it) => (
-                              <span className="set-choice-chip" key={it.id}>
-                                <img src={it.img} alt="" />
-                                <span>{it.name}</span>
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {p.addons.length > 0 && (
-                <div className="modal-addons">
-                  <h4>Add-ons</h4>
-                  <ul className="modal-addon-list-plain">
-                    {p.addons.map((a) => (
-                      <li key={a.name}>
-                        <span>{a.name}</span>
-                        <span className="p">${a.price.toFixed(2)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              <a
-                href={ORDER_NOW_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="delivery-btn delivery-btn-direct btn-block product-modal-order-btn"
-              >
-                <IcBag />
-                <span>Order Now</span>
-                <IcChevron />
-              </a>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      {open && <ProductModal id={id} onClose={() => setOpen(false)} />}
     </>
   );
 }
