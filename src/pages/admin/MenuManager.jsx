@@ -389,6 +389,9 @@ export default function MenuManager() {
   const [poolTab, setPoolTab] = useState(categories[0].id); // which category's add-ons the pool editor shows; "general" = no category
   const [newAddonName, setNewAddonName] = useState("");
   const [newAddonPrice, setNewAddonPrice] = useState("");
+  const [editingAddonId, setEditingAddonId] = useState(null);
+  const [editAddonName, setEditAddonName] = useState("");
+  const [editAddonPrice, setEditAddonPrice] = useState("");
 
   // The state above initializes from DEFAULT_CATEGORIES (a static
   // placeholder shown only until the real, admin-sorted list loads from
@@ -931,6 +934,27 @@ export default function MenuManager() {
     logActivity({ action: "delete", entity: "addon", label: a.name, path: t("menu") });
   }
 
+  function startEditAddon(a) {
+    setEditingAddonId(a.id);
+    setEditAddonName(a.name);
+    setEditAddonPrice(String(a.price));
+  }
+
+  async function commitEditAddon(a) {
+    const name = editAddonName.trim();
+    const price = Number(editAddonPrice);
+    setEditingAddonId(null);
+    if (!name || editAddonPrice === "" || Number.isNaN(price) || (name === a.name && price === a.price)) return;
+    await supabase.from("addons").update({ name, price }).eq("id", a.id);
+    logActivity({
+      action: "update",
+      entity: "addon",
+      label: name === a.name ? name : `${a.name} → ${name}`,
+      path: t("menu"),
+      details: price === a.price ? undefined : `$${a.price.toFixed(2)} → $${price.toFixed(2)}`,
+    });
+  }
+
   return (
     <div>
       <div className="admin-section-header">
@@ -1068,13 +1092,43 @@ export default function MenuManager() {
                     <button type="button" className={poolTab === "general" ? "active" : ""} onClick={() => setPoolTab("general")}>{t("general")}</button>
                   </div>
                   <ul className="addon-pool-list">
-                    {poolAddons.map((a) => (
-                      <li key={a.id}>
-                        <span>{a.name}</span>
-                        <span className="mono">${a.price.toFixed(2)}</span>
-                        <button type="button" className="addon-pool-remove" onClick={() => deletePoolAddon(a)} aria-label={`Remove ${a.name}`}>&times;</button>
-                      </li>
-                    ))}
+                    {poolAddons.map((a) =>
+                      editingAddonId === a.id ? (
+                        <li key={a.id} className="addon-pool-edit-row">
+                          <input
+                            type="text"
+                            className="taxonomy-edit-input"
+                            value={editAddonName}
+                            onChange={(e) => setEditAddonName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") commitEditAddon(a);
+                              if (e.key === "Escape") setEditingAddonId(null);
+                            }}
+                            autoFocus
+                          />
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            className="addon-pool-edit-price"
+                            value={editAddonPrice}
+                            onChange={(e) => setEditAddonPrice(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") commitEditAddon(a);
+                              if (e.key === "Escape") setEditingAddonId(null);
+                            }}
+                          />
+                          <button type="button" onClick={() => commitEditAddon(a)} aria-label="Save"><IcCheck /></button>
+                        </li>
+                      ) : (
+                        <li key={a.id}>
+                          <span>{a.name}</span>
+                          <span className="mono">${a.price.toFixed(2)}</span>
+                          <button type="button" className="addon-pool-edit" onClick={() => startEditAddon(a)} aria-label={`Edit ${a.name}`}><IcPencil /></button>
+                          <button type="button" className="addon-pool-remove" onClick={() => deletePoolAddon(a)} aria-label={`Remove ${a.name}`}>&times;</button>
+                        </li>
+                      )
+                    )}
                     {poolAddons.length === 0 && <li className="addon-pool-empty">{t("noAddonsYet")}</li>}
                   </ul>
                   <div className="addon-pool-add">

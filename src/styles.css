@@ -1417,6 +1417,20 @@ footer ul li a:hover{color:#F0D9C9;}
 .addon-pool-empty{color:var(--body); border-bottom:none !important;}
 .addon-pool-remove{width:22px; height:22px; border-radius:50%; border:1px solid var(--line); background:#fff; color:var(--maroon); cursor:pointer; font-size:1rem; line-height:1; flex-shrink:0;}
 .addon-pool-remove:hover{background:var(--cream-alt);}
+.addon-pool-edit{
+  width:22px; height:22px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  border-radius:50%; border:1px solid var(--line); background:#fff; color:var(--maroon); cursor:pointer;
+}
+.addon-pool-edit:hover{background:var(--cream-alt);}
+.addon-pool-edit svg{width:12px; height:12px;}
+.addon-pool-edit-row .taxonomy-edit-input{flex:1;}
+.addon-pool-edit-price{width:80px; padding:4px 8px; font-family:'Pretendard', sans-serif; font-size:.85rem; border:1px solid var(--line); border-radius:6px;}
+.addon-pool-edit-row > button{
+  width:22px; height:22px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  border:none; border-radius:50%; background:#fff; color:var(--maroon); cursor:pointer;
+}
+.addon-pool-edit-row > button:hover{background:var(--cream-alt);}
+.addon-pool-edit-row > button svg{width:13px; height:13px;}
 .addon-pool-add{display:flex; gap:8px; flex-wrap:wrap;}
 .addon-pool-add input[type=text]{flex:1; min-width:140px; padding:9px 10px; border:1px solid var(--line); border-radius:6px; font-family:'Pretendard',sans-serif; font-size:.85rem; background:#fff; color:var(--ink);}
 .addon-pool-add input[type=number]{width:90px; padding:9px 10px; border:1px solid var(--line); border-radius:6px; font-family:'Pretendard',sans-serif; font-size:.85rem; background:#fff; color:var(--ink);}
