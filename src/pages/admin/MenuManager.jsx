@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import { supabase } from "../../lib/supabase";
-import { useProducts } from "../../context/ProductsContext";
+import { useProducts, groupAddons } from "../../context/ProductsContext";
 import { useCategories } from "../../context/CategoriesContext";
 import { productImageUrl } from "../../lib/assetUrl";
 import { resizeImage } from "../../lib/imageResize";
@@ -89,6 +90,29 @@ function moveInList(list, draggingId, overId) {
   return next;
 }
 
+// Same reorder math as moveInList, but for arrays of objects identified by a
+// `.key` field — used by the addon group modal, where groups and each
+// group's options are freshly-composed objects (not yet real DB ids for a
+// group/option still being created) rather than a flat list of ids into
+// some other lookup map.
+function moveByKey(list, draggingKey, overKey) {
+  const from = list.findIndex((x) => x.key === draggingKey);
+  const to = list.findIndex((x) => x.key === overKey);
+  if (from === -1 || to === -1) return list;
+  const next = [...list];
+  const [item] = next.splice(from, 1);
+  next.splice(to, 0, item);
+  return next;
+}
+
+function emptyAddonOption() {
+  return { key: crypto.randomUUID(), id: null, name: "", price: "" };
+}
+
+function emptyAddonGroup() {
+  return { key: crypto.randomUUID(), id: null, title: "", options: [emptyAddonOption()] };
+}
+
 // Matches the original catalog photos' native 800x600 (4:3) ratio, so legacy
 // and freshly-uploaded photos both display at the same proportions.
 const CANVAS_W = 1200;
@@ -174,7 +198,7 @@ async function uploadCategoryIcon(file) {
 // immediately since there's no larger form around it to batch into.
 function TaxonomyEditor({
   items, selectedId, onSelect, onAdd, onRename, onDelete, onReorder, onIconChange, canDelete, deleteBlockedTitle,
-  manageLabel, doneLabel, addPlaceholder, manageHint, icons, variant = "nav",
+  manageLabel, doneLabel, addPlaceholder, manageHint, icons, variant = "nav", toggleContainerRef,
 }) {
   const [managing, setManaging] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -183,6 +207,17 @@ function TaxonomyEditor({
   const [order, setOrder] = useState(items.map((it) => it.id));
   const [draggingId, setDraggingId] = useState(null);
   const [uploadingIconId, setUploadingIconId] = useState(null);
+
+  // toggleContainerRef (when passed) lets a caller relocate just the
+  // "Manage" toggle button next to its own heading elsewhere in the page
+  // (e.g. beside the products list's h2) instead of above the pills, while
+  // the pills themselves stay right here. The ref's node doesn't exist yet
+  // on this component's first render (refs attach after commit), so this
+  // re-renders once it does rather than portaling into a stale null target.
+  const [toggleContainer, setToggleContainer] = useState(null);
+  useEffect(() => {
+    if (toggleContainerRef?.current) setToggleContainer(toggleContainerRef.current);
+  }, [toggleContainerRef]);
 
   // Re-derive display order whenever the underlying list changes (add,
   // delete, or a reorder landing from elsewhere) — drag only touches this
@@ -238,18 +273,23 @@ function TaxonomyEditor({
     onReorder(orderedItems);
   }
 
+  const toggleButton = (
+    <button
+      type="button"
+      className="taxonomy-manage-toggle"
+      onClick={() => {
+        setManaging((m) => !m);
+        setEditingId(null);
+      }}
+    >
+      <span className="taxonomy-manage-icon"><IcPencil /></span>
+      {managing ? doneLabel : manageLabel}
+    </button>
+  );
+
   return (
     <div className={`taxonomy-editor taxonomy-editor-${variant}`}>
-      <button
-        type="button"
-        className="taxonomy-manage-toggle"
-        onClick={() => {
-          setManaging((m) => !m);
-          setEditingId(null);
-        }}
-      >
-        {managing ? doneLabel : manageLabel}
-      </button>
+      {toggleContainer ? createPortal(toggleButton, toggleContainer) : toggleButton}
 
       {managing && manageHint && <p className="menu-manager-photo-hint taxonomy-manage-hint">{manageHint}</p>}
 
@@ -358,18 +398,21 @@ function emptyForm(category, subcategory) {
     id: null,
     name: "",
     price: "",
-    // Coffee & Drink items are priced per size rather than having one plain
-    // price — this pairs with `price` to make the first size row, and seeding
-    // one extra (empty) variant row here gets the required 2-row minimum on
-    // screen from the start instead of staff having to click "Add Size" first.
+    // Coffee & Drink items can optionally be priced per size instead of
+    // having one plain price — hasSizeOptions is purely a UI reveal flag
+    // (not saved to the DB) for the size-label row that "+ Add Option"
+    // shows; it's kept separate from variants.length so that click reveals
+    // exactly one new row (the base label) instead of also implicitly
+    // adding a variants[] entry at the same time.
     baseVariantLabel: "",
+    hasSizeOptions: false,
     description: "",
     categoryId: category,
     subcategoryId: subcategory,
     imageUrl: "",
     isActive: true,
     badges: [],
-    variants: category === "coffee" ? [{ label: "", price: "" }] : [],
+    variants: [],
     setSections: category === "set" ? [emptySetSection()] : [],
     addonIds: new Set(),
   };
@@ -381,24 +424,119 @@ export default function MenuManager() {
   const { categories, loading: categoriesLoading } = useCategories();
   const [activeCat, setActiveCat] = useState(categories[0].id);
   const [activeSubcat, setActiveSubcat] = useState(categories[0].subcategories?.[0]?.id ?? null);
+  // Where the subcategory TaxonomyEditor's "Manage Subcategories" toggle
+  // portals to, so it sits beside the products list's own h2 instead of
+  // floating above the subcategory pills below.
+  const subcategoryToggleSlot = useRef(null);
   const [form, setForm] = useState(null); // null = closed, object = open (create or edit)
+
+  // A modal's overlay closes on a click that lands directly on the
+  // backdrop. Plain onClick isn't enough: dragging to select text inside
+  // the panel (a title, an option name) can end with the mouse released
+  // outside the panel's edges — the resulting click's target is the
+  // backdrop even though the drag started inside the form. Requiring the
+  // mousedown to ALSO have started on the backdrop itself distinguishes a
+  // real "click outside" from a text-selection drag that only ended there.
+  const overlayMouseDownOnSelf = useRef(false);
+  function handleOverlayMouseDown(e) {
+    overlayMouseDownOnSelf.current = e.target === e.currentTarget;
+  }
+  function handleOverlayClick(e, close) {
+    if (overlayMouseDownOnSelf.current && e.target === e.currentTarget) close();
+  }
+
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [formError, setFormError] = useState("");
   const [addonPoolOpen, setAddonPoolOpen] = useState(false);
-  const [poolTab, setPoolTab] = useState(categories[0].id); // which category's add-ons the pool editor shows; "general" = no category
-  const [newAddonName, setNewAddonName] = useState("");
-  const [newAddonPrice, setNewAddonPrice] = useState("");
-  const [editingAddonId, setEditingAddonId] = useState(null);
-  const [editAddonName, setEditAddonName] = useState("");
-  const [editAddonPrice, setEditAddonPrice] = useState("");
+
+  // The pool shown is whichever category is active, so leaving it behind
+  // for another category should collapse it too — otherwise it stays open
+  // showing (once re-derived) that other category's groups without staff
+  // ever having asked to manage them there.
+  useEffect(() => {
+    setAddonPoolOpen(false);
+  }, [activeCat]);
+
+  // ---- addon group modal — create or edit this category's add-on groups
+  // (e.g. "Milk Change" holding Oat/Soy/Almond/...) together in one form.
+  // "editingGroups" toggles reordering for both the groups and each
+  // group's own options.
+  //
+  // This is a hand-rolled mousedown/mousemove drag, NOT the native HTML5
+  // draggable/dragover/drop used elsewhere in this file (see moveInList) —
+  // deliberately. Every other reorderable list here is flat (one draggable
+  // row = one drop target), but a group's options nest inside the group
+  // itself, so reordering needs two independent levels at once. Native
+  // drag-and-drop across nested draggables is a known trouble spot
+  // (browsers vary on which ancestor becomes the drag source, cursors can
+  // default to "copy" instead of "move", and small icon-only handles don't
+  // reliably initiate a native drag in every engine) — after that surfaced
+  // as a real, unreproducible-in-isolation failure, tracking the drag with
+  // plain mouse events sidesteps the native DnD contract entirely instead
+  // of chasing another browser-specific workaround.
+  const [addonModal, setAddonModal] = useState(null); // null closed, else { groups: [{ key, id, title, options: [{ key, id, name, price }] }] }
+  const [editingGroups, setEditingGroups] = useState(false);
+  const [dragState, setDragState] = useState(null); // null, { type: "group", key }, or { type: "option", groupKey, key }
+  const dragNodeRefs = useRef(new Map()); // "group:<key>" / "option:<groupKey>:<key>" -> DOM node, for hit-testing under the cursor
+  const [savingAddonModal, setSavingAddonModal] = useState(false);
+  const [addonModalError, setAddonModalError] = useState("");
+
+  function setDragNodeRef(refKey, el) {
+    if (el) dragNodeRefs.current.set(refKey, el);
+    else dragNodeRefs.current.delete(refKey);
+  }
+
+  // Live-updates addonModal as the pointer crosses into a sibling's
+  // vertical span, then clears on mouseup — attached to the window (not
+  // the row) since the pointer moves off the original element immediately.
+  useEffect(() => {
+    if (!dragState) return;
+
+    function handleMouseMove(e) {
+      const prefix = dragState.type === "group" ? "group:" : `option:${dragState.groupKey}:`;
+      for (const [refKey, node] of dragNodeRefs.current) {
+        if (!refKey.startsWith(prefix)) continue;
+        const key = refKey.slice(prefix.length);
+        if (key === dragState.key) continue;
+        const rect = node.getBoundingClientRect();
+        if (e.clientY < rect.top || e.clientY > rect.bottom) continue;
+        if (dragState.type === "group") {
+          setAddonModal((m) => ({ ...m, groups: moveByKey(m.groups, dragState.key, key) }));
+        } else {
+          setAddonModal((m) => ({
+            ...m,
+            groups: m.groups.map((g) =>
+              g.key === dragState.groupKey ? { ...g, options: moveByKey(g.options, dragState.key, key) } : g
+            ),
+          }));
+        }
+        break;
+      }
+    }
+    function handleMouseUp() {
+      setDragState(null);
+    }
+    // Native drag-and-drop suppresses text selection on its own; a plain
+    // mousemove-driven drag doesn't, so without this, dragging across the
+    // title/option inputs' text would select it instead of just reordering.
+    const prevUserSelect = document.body.style.userSelect;
+    document.body.style.userSelect = "none";
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      document.body.style.userSelect = prevUserSelect;
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [dragState]);
 
   // The state above initializes from DEFAULT_CATEGORIES (a static
   // placeholder shown only until the real, admin-sorted list loads from
-  // Supabase) — so activeCat/poolTab could lock onto that placeholder's
-  // first category forever instead of whichever one is actually first in
-  // the real sort order. Sync once, the first time real data arrives;
-  // never again after, so a live reload from an unrelated edit elsewhere
+  // Supabase) — so activeCat could lock onto that placeholder's first
+  // category forever instead of whichever one is actually first in the
+  // real sort order. Sync once, the first time real data arrives; never
+  // again after, so a live reload from an unrelated edit elsewhere
   // doesn't yank the admin back to the first tab while they're working.
   const didSyncInitialCategory = useRef(false);
   useEffect(() => {
@@ -407,7 +545,6 @@ export default function MenuManager() {
     const first = categories[0];
     setActiveCat(first.id);
     setActiveSubcat(first.subcategories?.[0]?.id ?? null);
-    setPoolTab(first.id);
   }, [categoriesLoading, categories]);
 
   // ---- manual product ordering (drag to reorder, then Save) ----
@@ -455,7 +592,7 @@ export default function MenuManager() {
     .filter((p) => p.categoryId === activeCat && p.isCategoryBest)
     .sort((a, b) => (a.categoryBestOrder ?? 0) - (b.categoryBestOrder ?? 0));
   const addonList = Object.values(addons);
-  const poolAddons = addonList.filter((a) => (poolTab === "general" ? !a.categoryId : a.categoryId === poolTab));
+  const poolGroups = groupAddons(addonList.filter((a) => a.categoryId === activeCat));
   const allProductIds = Object.keys(products);
   const displayItems = reordering ? orderedIds.map((id) => products[id]).filter(Boolean) : visibleItems;
   const displayCategoryBestItems = categoryBestReordering
@@ -718,16 +855,14 @@ export default function MenuManager() {
       name: p.name,
       price: String(p.price),
       baseVariantLabel: p.baseVariantLabel || "",
+      hasSizeOptions: variants.length > 0,
       description: p.desc,
       categoryId: p.categoryId,
       subcategoryId: p.subcategoryId,
       imageUrl: p.imageUrl || "",
       isActive: p.isActive !== false,
       badges: p.badges || [],
-      // A coffee item saved before this feature (or with every size later
-      // removed) would otherwise show just one row here — pad it back up to
-      // the required 2-row minimum.
-      variants: p.categoryId === "coffee" && variants.length === 0 ? [{ label: "", price: "" }] : variants,
+      variants,
       setSections:
         p.categoryId === "set"
           ? (p.setSections || []).length > 0
@@ -911,48 +1046,155 @@ export default function MenuManager() {
     logActivity({ action: "delete", entity: "product", label: p.name, path: `${t("menu")} > ${cat?.label ?? p.categoryId}${sub ? ` > ${sub.label}` : ""}` });
   }
 
-  async function addPoolAddon() {
-    if (!newAddonName.trim() || newAddonPrice === "") return;
-    const category_id = poolTab === "general" ? null : poolTab;
-    const name = newAddonName.trim();
-    const price = Number(newAddonPrice);
-    await supabase.from("addons").insert({ name, price, category_id });
-    logActivity({
-      action: "create",
-      entity: "addon",
-      label: name,
-      path: `${t("menu")} > ${poolTab === "general" ? t("general") : categories.find((c) => c.id === poolTab)?.label}`,
-      details: `$${price.toFixed(2)}`,
+  // The modal always edits the *whole* set of this category's add-on
+  // groups at once — "Register" opens it with a blank group appended
+  // (ready to type into immediately), and a row's own "Edit" opens the
+  // exact same modal already holding every group in this category tab,
+  // so either entry point can add, edit, remove, or drag-reorder any of
+  // them in one place.
+  function openAddonModal() {
+    const groups = poolGroups.map((g) => ({
+      key: g.groupId,
+      id: g.groupId,
+      title: g.title,
+      options: g.options.map((o) => ({ key: o.id, id: o.id, name: o.name, price: String(o.price) })),
+    }));
+    // Only start with a blank group when there's nothing yet — once real
+    // groups exist, opening the modal should show exactly those, not tack
+    // an extra empty one on every time. Adding another group from here on
+    // is what the "+ Create Option Group" button inside the modal is for.
+    if (groups.length === 0) groups.push(emptyAddonGroup());
+    // Snapshot which ids existed when the modal opened, separately from
+    // `groups` (which removeGroupFromModal/removeOptionFromGroup mutate as
+    // the admin edits) — saveAddonModal diffs against this snapshot to find
+    // what got removed, since by save time the removed rows are already
+    // gone from `groups` and there'd be nothing left to compare against.
+    setAddonModal({
+      groups,
+      originalGroupIds: new Set(groups.filter((g) => g.id).map((g) => g.id)),
+      originalOptionIds: new Set(groups.flatMap((g) => g.options).filter((o) => o.id).map((o) => o.id)),
     });
-    setNewAddonName("");
-    setNewAddonPrice("");
+    setEditingGroups(false);
+    setAddonModalError("");
   }
 
-  async function deletePoolAddon(a) {
-    if (!window.confirm(t("removeAddonConfirm", a.name))) return;
-    await supabase.from("addons").delete().eq("id", a.id);
-    logActivity({ action: "delete", entity: "addon", label: a.name, path: t("menu") });
+  function closeAddonModal() {
+    setAddonModal(null);
+    setEditingGroups(false);
+    setAddonModalError("");
   }
 
-  function startEditAddon(a) {
-    setEditingAddonId(a.id);
-    setEditAddonName(a.name);
-    setEditAddonPrice(String(a.price));
+  function addGroupToModal() {
+    setAddonModal((m) => ({ ...m, groups: [...m.groups, emptyAddonGroup()] }));
   }
 
-  async function commitEditAddon(a) {
-    const name = editAddonName.trim();
-    const price = Number(editAddonPrice);
-    setEditingAddonId(null);
-    if (!name || editAddonPrice === "" || Number.isNaN(price) || (name === a.name && price === a.price)) return;
-    await supabase.from("addons").update({ name, price }).eq("id", a.id);
+  function removeGroupFromModal(groupKey) {
+    setAddonModal((m) => ({ ...m, groups: m.groups.filter((g) => g.key !== groupKey) }));
+  }
+
+  function updateGroupTitle(groupKey, title) {
+    setAddonModal((m) => ({ ...m, groups: m.groups.map((g) => (g.key === groupKey ? { ...g, title } : g)) }));
+  }
+
+  function addOptionToGroup(groupKey) {
+    setAddonModal((m) => ({
+      ...m,
+      groups: m.groups.map((g) => (g.key === groupKey ? { ...g, options: [...g.options, emptyAddonOption()] } : g)),
+    }));
+  }
+
+  function removeOptionFromGroup(groupKey, optionKey) {
+    setAddonModal((m) => ({
+      ...m,
+      groups: m.groups.map((g) => (g.key === groupKey ? { ...g, options: g.options.filter((o) => o.key !== optionKey) } : g)),
+    }));
+  }
+
+  function updateOption(groupKey, optionKey, patch) {
+    setAddonModal((m) => ({
+      ...m,
+      groups: m.groups.map((g) =>
+        g.key === groupKey ? { ...g, options: g.options.map((o) => (o.key === optionKey ? { ...o, ...patch } : o)) } : g
+      ),
+    }));
+  }
+
+
+  async function saveAddonModal() {
+    // Drop any group left titleless, or with no complete option rows —
+    // an admin who opens the modal, adds nothing, and saves shouldn't get
+    // an empty group cluttering the pool.
+    const cleanGroups = addonModal.groups
+      .map((g) => ({
+        ...g,
+        title: g.title.trim(),
+        options: g.options.map((o) => ({ ...o, name: o.name.trim() })).filter((o) => o.name && o.price !== "" && !Number.isNaN(Number(o.price))),
+      }))
+      .filter((g) => g.title && g.options.length > 0);
+
+    if (cleanGroups.length === 0) {
+      setAddonModalError(t("addonGroupNeedsOption"));
+      return;
+    }
+
+    setAddonModalError("");
+    setSavingAddonModal(true);
+
+    const keptGroupIds = new Set(cleanGroups.filter((g) => g.id).map((g) => g.id));
+    const keptOptionIds = new Set(cleanGroups.flatMap((g) => g.options.filter((o) => o.id).map((o) => o.id)));
+
+    // Anything that existed when the modal opened but isn't in the cleaned
+    // list anymore was removed in the form — delete it. Diffed against the
+    // snapshot taken on open, not the current (already-mutated) groups
+    // array, since a removed row is gone from that array the moment it's
+    // removed and there'd be nothing left to compare against by save time.
+    // A removed group's options cascade-delete with it, so removedOptionIds
+    // only needs options removed from a group that's otherwise being kept.
+    const removedGroupIds = [...addonModal.originalGroupIds].filter((id) => !keptGroupIds.has(id));
+    const removedOptionIds = [...addonModal.originalOptionIds].filter((id) => !keptOptionIds.has(id));
+
+    await Promise.all([
+      ...removedGroupIds.map((id) => supabase.from("addon_groups").delete().eq("id", id)),
+      ...removedOptionIds.map((id) => supabase.from("addons").delete().eq("id", id)),
+    ]);
+
+    for (let i = 0; i < cleanGroups.length; i++) {
+      const g = cleanGroups[i];
+      let groupId = g.id;
+      if (groupId) {
+        await supabase.from("addon_groups").update({ title: g.title, sort_order: i }).eq("id", groupId);
+      } else {
+        const { data, error } = await supabase
+          .from("addon_groups")
+          .insert({ title: g.title, category_id: activeCat, sort_order: i })
+          .select("id")
+          .single();
+        if (error) {
+          setAddonModalError(error.message);
+          setSavingAddonModal(false);
+          return;
+        }
+        groupId = data.id;
+      }
+      await Promise.all(
+        g.options.map((o, j) =>
+          o.id
+            ? supabase.from("addons").update({ name: o.name, price: Number(o.price), sort_order: j }).eq("id", o.id)
+            : supabase.from("addons").insert({ name: o.name, price: Number(o.price), sort_order: j, group_id: groupId })
+        )
+      );
+    }
+
     logActivity({
-      action: "update",
-      entity: "addon",
-      label: name === a.name ? name : `${a.name} → ${name}`,
+      action: addonModal.groups.some((g) => g.id) ? "update" : "create",
+      entity: "addon_group",
+      label: activeCategory.label,
       path: t("menu"),
-      details: price === a.price ? undefined : `$${a.price.toFixed(2)} → $${price.toFixed(2)}`,
+      details: cleanGroups.map((g) => g.title).join(" → "),
     });
+
+    setSavingAddonModal(false);
+    closeAddonModal();
   }
 
   return (
@@ -981,38 +1223,41 @@ export default function MenuManager() {
           </div>
         </div>
 
-        <div className="bestseller-grid">
-          {displayBestSellerItems.map((p) => (
-            <div
-              className={`bestseller-card${bestSellerReordering ? " reordering" : ""}${draggingBestSellerId === p.id ? " dragging" : ""}`}
-              key={p.id}
-              draggable={bestSellerReordering}
-              onDragStart={(e) => {
-                e.dataTransfer.effectAllowed = "move";
-                e.dataTransfer.setData("text/plain", p.id);
-                setDraggingBestSellerId(p.id);
-              }}
-              onDragOver={(e) => handleBestSellerDragOver(e, p.id)}
-              onDrop={(e) => e.preventDefault()}
-              onDragEnd={() => setDraggingBestSellerId(null)}
-            >
-              {bestSellerReordering && <span className="menu-manager-drag-handle" aria-hidden="true"><IcGrip /></span>}
-              {bestSellerReordering && (
-                <button
-                  type="button"
-                  className="bestseller-card-remove"
-                  onClick={() => removeBestSeller(p.id)}
-                  aria-label={`Remove ${p.name} from Best Sellers`}
-                >
-                  &times;
-                </button>
-              )}
-              {p.img ? <img src={p.img} alt={p.name} /> : <div className="menu-manager-noimg" />}
-              <span className="bestseller-card-name">{p.name}</span>
-            </div>
-          ))}
-          {bestSellerItems.length === 0 && <p className="inventory-hint">{t("noBestSellersYet")}</p>}
-        </div>
+        {bestSellerItems.length === 0 ? (
+          <p className="inventory-hint">{t("noBestSellersYet")}</p>
+        ) : (
+          <div className="bestseller-grid">
+            {displayBestSellerItems.map((p) => (
+              <div
+                className={`bestseller-card${bestSellerReordering ? " reordering" : ""}${draggingBestSellerId === p.id ? " dragging" : ""}`}
+                key={p.id}
+                draggable={bestSellerReordering}
+                onDragStart={(e) => {
+                  e.dataTransfer.effectAllowed = "move";
+                  e.dataTransfer.setData("text/plain", p.id);
+                  setDraggingBestSellerId(p.id);
+                }}
+                onDragOver={(e) => handleBestSellerDragOver(e, p.id)}
+                onDrop={(e) => e.preventDefault()}
+                onDragEnd={() => setDraggingBestSellerId(null)}
+              >
+                {bestSellerReordering && <span className="menu-manager-drag-handle" aria-hidden="true"><IcGrip /></span>}
+                {bestSellerReordering && (
+                  <button
+                    type="button"
+                    className="bestseller-card-remove"
+                    onClick={() => removeBestSeller(p.id)}
+                    aria-label={`Remove ${p.name} from Best Sellers`}
+                  >
+                    &times;
+                  </button>
+                )}
+                {p.img ? <img src={p.img} alt={p.name} /> : <div className="menu-manager-noimg" />}
+                <span className="bestseller-card-name">{p.name}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <p className="inventory-hint">{t("editHint")}</p>
@@ -1049,7 +1294,10 @@ export default function MenuManager() {
         </nav>
 
         <div className="inventory-products">
-          <h2>{activeCategory.label}</h2>
+          <div className="inventory-products-head">
+            <h2>{activeCategory.label}</h2>
+            {activeCat !== "set" && <div ref={subcategoryToggleSlot} className="inventory-products-toggle-slot" />}
+          </div>
 
           {activeCat !== "set" && (
             <div className="menu-manager-toolbar">
@@ -1063,6 +1311,7 @@ export default function MenuManager() {
                 onReorder={handleReorderSubcategories}
                 canDelete={(id) => !subcategoryHasProducts(id)}
                 deleteBlockedTitle={t("subcategoryHasProducts")}
+                toggleContainerRef={subcategoryToggleSlot}
                 manageLabel={t("manageSubcategories")}
                 doneLabel={t("done")}
                 addPlaceholder={t("newSubcategoryPlaceholder")}
@@ -1079,64 +1328,141 @@ export default function MenuManager() {
                   <span>{t("addonPoolDesc")}</span>
                 </div>
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAddonPoolOpen((v) => !v)}>
-                  {addonPoolOpen ? t("hide") : t("manage", addonList.length)}
+                  {addonPoolOpen ? t("hide") : t("manage", poolGroups.length)}
                 </button>
               </div>
 
               {addonPoolOpen && (
                 <div className="addon-pool-editor">
-                  <div className="addon-pool-tabs">
-                    {categories.map((c) => (
-                      <button key={c.id} type="button" className={poolTab === c.id ? "active" : ""} onClick={() => setPoolTab(c.id)}>{c.label}</button>
-                    ))}
-                    <button type="button" className={poolTab === "general" ? "active" : ""} onClick={() => setPoolTab("general")}>{t("general")}</button>
+                  <div className="addon-pool-tabs-row">
+                    <button type="button" className="btn btn-primary btn-sm" onClick={openAddonModal}>{t("addonRegisterButton")}</button>
                   </div>
                   <ul className="addon-pool-list">
-                    {poolAddons.map((a) =>
-                      editingAddonId === a.id ? (
-                        <li key={a.id} className="addon-pool-edit-row">
+                    {poolGroups.map((g) => (
+                      <li key={g.groupId} className="addon-pool-group-row">
+                        <div className="addon-pool-group-info">
+                          <span className="addon-pool-group-title">{g.title}</span>
+                          <ul className="addon-pool-group-options">
+                            {g.options.map((o) => (
+                              <li key={o.id}>
+                                <span>{o.name}</span>
+                                <span className="mono">${o.price.toFixed(2)}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </li>
+                    ))}
+                    {poolGroups.length === 0 && <li className="addon-pool-empty">{t("noAddonsYet")}</li>}
+                  </ul>
+                </div>
+              )}
+
+              {addonModal && (
+                <div className="admin-form-overlay" onMouseDown={handleOverlayMouseDown} onClick={(e) => handleOverlayClick(e, closeAddonModal)}>
+                  <div className="admin-form-panel" onClick={(e) => e.stopPropagation()}>
+                    <button type="button" className="admin-form-close" onClick={closeAddonModal} aria-label={t("close")}>×</button>
+                    <h3>{activeCategory.label} {t("addonGroupModalTitle")}</h3>
+
+                    {addonModal.groups.map((g) => (
+                      <div
+                        className={`addon-group-block${dragState?.type === "group" && dragState.key === g.key ? " dragging" : ""}`}
+                        key={g.key}
+                        ref={(el) => setDragNodeRef(`group:${g.key}`, el)}
+                      >
+                        <div className="addon-group-head">
+                          {editingGroups && (
+                            <span
+                              className="taxonomy-drag-handle"
+                              aria-hidden="true"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                setDragState({ type: "group", key: g.key });
+                              }}
+                            >
+                              <IcGrip />
+                            </span>
+                          )}
                           <input
                             type="text"
-                            className="taxonomy-edit-input"
-                            value={editAddonName}
-                            onChange={(e) => setEditAddonName(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") commitEditAddon(a);
-                              if (e.key === "Escape") setEditingAddonId(null);
-                            }}
-                            autoFocus
+                            className="addon-group-title-input"
+                            placeholder={t("addonGroupTitlePlaceholder")}
+                            value={g.title}
+                            onChange={(e) => updateGroupTitle(g.key, e.target.value)}
                           />
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            className="addon-pool-edit-price"
-                            value={editAddonPrice}
-                            onChange={(e) => setEditAddonPrice(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") commitEditAddon(a);
-                              if (e.key === "Escape") setEditingAddonId(null);
-                            }}
-                          />
-                          <button type="button" onClick={() => commitEditAddon(a)} aria-label="Save"><IcCheck /></button>
-                        </li>
-                      ) : (
-                        <li key={a.id}>
-                          <span>{a.name}</span>
-                          <span className="mono">${a.price.toFixed(2)}</span>
-                          <button type="button" className="addon-pool-edit" onClick={() => startEditAddon(a)} aria-label={`Edit ${a.name}`}><IcPencil /></button>
-                          <button type="button" className="addon-pool-remove" onClick={() => deletePoolAddon(a)} aria-label={`Remove ${a.name}`}>&times;</button>
-                        </li>
-                      )
-                    )}
-                    {poolAddons.length === 0 && <li className="addon-pool-empty">{t("noAddonsYet")}</li>}
-                  </ul>
-                  <div className="addon-pool-add">
-                    <input type="text" placeholder={t("addonName")} value={newAddonName} onChange={(e) => setNewAddonName(e.target.value)} />
-                    <input type="number" min="0" step="0.01" placeholder={t("price")} value={newAddonPrice} onChange={(e) => setNewAddonPrice(e.target.value)} />
-                    <button type="button" className="btn btn-primary btn-sm" onClick={addPoolAddon} disabled={!newAddonName.trim() || newAddonPrice === ""}>
-                      {t("addToLabel", poolTab === "general" ? t("general") : categories.find((c) => c.id === poolTab)?.label)}
-                    </button>
+                          <button
+                            type="button"
+                            className="addon-group-remove-btn"
+                            onClick={() => removeGroupFromModal(g.key)}
+                            aria-label={t("removeAddonGroupRow")}
+                            title={t("removeAddonGroupRow")}
+                            disabled={addonModal.groups.length < 2}
+                          >
+                            ×
+                          </button>
+                        </div>
+                        {g.options.map((o) => (
+                          <div
+                            className={`option-row${editingGroups ? " reordering" : ""}${dragState?.type === "option" && dragState.key === o.key ? " dragging" : ""}`}
+                            key={o.key}
+                            ref={(el) => setDragNodeRef(`option:${g.key}:${o.key}`, el)}
+                          >
+                            {editingGroups && (
+                              <span
+                                className="taxonomy-drag-handle"
+                                aria-hidden="true"
+                                onMouseDown={(e) => {
+                                  e.preventDefault();
+                                  setDragState({ type: "option", groupKey: g.key, key: o.key });
+                                }}
+                              >
+                                <IcGrip />
+                              </span>
+                            )}
+                            <div className="field">
+                              <input
+                                type="text"
+                                placeholder={t("addonName")}
+                                value={o.name}
+                                onChange={(e) => updateOption(g.key, o.key, { name: e.target.value })}
+                              />
+                            </div>
+                            <div className="field">
+                              <div className="variant-price-input-row">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  placeholder={t("price")}
+                                  value={o.price}
+                                  onChange={(e) => updateOption(g.key, o.key, { price: e.target.value })}
+                                />
+                                <button type="button" className="variant-remove-btn" onClick={() => removeOptionFromGroup(g.key, o.key)} aria-label={t("removeAddonOptionRow")} title={t("removeAddonOptionRow")}>
+                                  ×
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        <button type="button" className="btn btn-ghost btn-sm" onClick={() => addOptionToGroup(g.key)}>{t("addAddonOption")}</button>
+                      </div>
+                    ))}
+
+                    {addonModalError && <p className="form-status err">{addonModalError}</p>}
+
+                    <div className="menu-manager-form-actions addon-modal-actions">
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={addGroupToModal}>{t("addSetSection")}</button>
+                      <button type="button" className={`btn btn-ghost btn-sm${editingGroups ? " active" : ""}`} onClick={() => setEditingGroups((v) => !v)}>
+                        {t("rearrange")}
+                      </button>
+                    </div>
+
+                    <div className="menu-manager-form-actions">
+                      <button type="button" className="btn btn-ghost" onClick={closeAddonModal} disabled={savingAddonModal}>{t("cancel")}</button>
+                      <button type="button" className="btn btn-primary" onClick={saveAddonModal} disabled={savingAddonModal}>
+                        {savingAddonModal ? t("saving") : t("addonRegisterButton")}
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1160,38 +1486,41 @@ export default function MenuManager() {
                   </div>
                 </div>
 
-                <div className="bestseller-grid">
-                  {displayCategoryBestItems.map((p) => (
-                    <div
-                      className={`bestseller-card${categoryBestReordering ? " reordering" : ""}${draggingCategoryBestId === p.id ? " dragging" : ""}`}
-                      key={p.id}
-                      draggable={categoryBestReordering}
-                      onDragStart={(e) => {
-                        e.dataTransfer.effectAllowed = "move";
-                        e.dataTransfer.setData("text/plain", p.id);
-                        setDraggingCategoryBestId(p.id);
-                      }}
-                      onDragOver={(e) => handleCategoryBestDragOver(e, p.id)}
-                      onDrop={(e) => e.preventDefault()}
-                      onDragEnd={() => setDraggingCategoryBestId(null)}
-                    >
-                      {categoryBestReordering && <span className="menu-manager-drag-handle" aria-hidden="true"><IcGrip /></span>}
-                      {categoryBestReordering && (
-                        <button
-                          type="button"
-                          className="bestseller-card-remove"
-                          onClick={() => removeCategoryBest(p.id)}
-                          aria-label={`Remove ${p.name} from Best Menu`}
-                        >
-                          &times;
-                        </button>
-                      )}
-                      {p.img ? <img src={p.img} alt={p.name} /> : <div className="menu-manager-noimg" />}
-                      <span className="bestseller-card-name">{p.name}</span>
-                    </div>
-                  ))}
-                  {categoryBestItems.length === 0 && <p className="inventory-hint">{t("noCategoryBestYet")}</p>}
-                </div>
+                {categoryBestItems.length === 0 ? (
+                  <p className="inventory-hint">{t("noCategoryBestYet")}</p>
+                ) : (
+                  <div className="bestseller-grid">
+                    {displayCategoryBestItems.map((p) => (
+                      <div
+                        className={`bestseller-card${categoryBestReordering ? " reordering" : ""}${draggingCategoryBestId === p.id ? " dragging" : ""}`}
+                        key={p.id}
+                        draggable={categoryBestReordering}
+                        onDragStart={(e) => {
+                          e.dataTransfer.effectAllowed = "move";
+                          e.dataTransfer.setData("text/plain", p.id);
+                          setDraggingCategoryBestId(p.id);
+                        }}
+                        onDragOver={(e) => handleCategoryBestDragOver(e, p.id)}
+                        onDrop={(e) => e.preventDefault()}
+                        onDragEnd={() => setDraggingCategoryBestId(null)}
+                      >
+                        {categoryBestReordering && <span className="menu-manager-drag-handle" aria-hidden="true"><IcGrip /></span>}
+                        {categoryBestReordering && (
+                          <button
+                            type="button"
+                            className="bestseller-card-remove"
+                            onClick={() => removeCategoryBest(p.id)}
+                            aria-label={`Remove ${p.name} from Best Menu`}
+                          >
+                            &times;
+                          </button>
+                        )}
+                        {p.img ? <img src={p.img} alt={p.name} /> : <div className="menu-manager-noimg" />}
+                        <span className="bestseller-card-name">{p.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -1281,8 +1610,9 @@ export default function MenuManager() {
       </div>
 
       {form && (
-        <div className="admin-form-overlay" onClick={closeForm}>
+        <div className="admin-form-overlay" onMouseDown={handleOverlayMouseDown} onClick={(e) => handleOverlayClick(e, closeForm)}>
           <div className="admin-form-panel" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="admin-form-close" onClick={closeForm} aria-label={t("close")}>×</button>
             <h3>{form.id ? t("editItemTitle") : t("addNewItemTitle")}</h3>
             <form onSubmit={handleSubmit}>
               <div className="menu-manager-photo-row">
@@ -1321,9 +1651,15 @@ export default function MenuManager() {
                   </>
                 ) : form.categoryId === "coffee" ? (
                   <>
-                    <div className="field full">
-                      <label>{t("name")}</label>
-                      <input type="text" value={form.name} onChange={(e) => updateForm({ name: e.target.value })} required />
+                    <div className="name-price-row field full">
+                      <div className="field">
+                        <label>{t("name")}</label>
+                        <input type="text" value={form.name} onChange={(e) => updateForm({ name: e.target.value })} required />
+                      </div>
+                      <div className="field">
+                        <label>{t("price")}</label>
+                        <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
+                      </div>
                     </div>
                     <div className="field">
                       <label>{t("category")}</label>
@@ -1335,7 +1671,6 @@ export default function MenuManager() {
                           updateForm({
                             categoryId: nextCategoryId,
                             subcategoryId: cat.subcategories?.[0]?.id ?? null,
-                            variants: nextCategoryId === "coffee" && form.variants.length === 0 ? [{ label: "", price: "" }] : form.variants,
                           });
                         }}
                       >
@@ -1352,34 +1687,39 @@ export default function MenuManager() {
                         </select>
                       </div>
                     )}
-                    <div className="field full option-rows">
-                      <div className="option-row">
-                        <div className="field">
-                          <label>{t("variantLabel")}</label>
-                          <input type="text" value={form.baseVariantLabel} onChange={(e) => updateForm({ baseVariantLabel: e.target.value })} required />
-                        </div>
-                        <div className="field">
-                          <label>{t("price")}</label>
-                          <input type="number" min="0" step="0.01" value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
-                        </div>
+                    {!form.hasSizeOptions ? (
+                      <div className="field full">
+                        <button type="button" className="btn btn-ghost btn-sm" onClick={() => updateForm({ hasSizeOptions: true })}>{t("addVariantRow")}</button>
                       </div>
-                      {form.variants.map((v, i) => (
-                        <div className="option-row" key={i}>
+                    ) : (
+                      <div className="field full option-rows coffee-size-rows">
+                        <div className="option-row">
                           <div className="field">
-                            <label>{t("variantLabel")}</label>
-                            <input type="text" value={v.label} onChange={(e) => updateVariantRow(i, { label: e.target.value })} required />
+                            <input type="text" placeholder={t("variantLabel")} value={form.baseVariantLabel} onChange={(e) => updateForm({ baseVariantLabel: e.target.value })} required />
                           </div>
                           <div className="field">
-                            <label>{t("price")}</label>
                             <div className="variant-price-input-row">
-                              <input type="number" min="0" step="0.01" value={v.price} onChange={(e) => updateVariantRow(i, { price: e.target.value })} required />
-                              <button type="button" className="variant-remove-btn" onClick={() => removeVariantRow(i)} aria-label={t("removeVariantRow")} title={t("removeVariantRow")}>×</button>
+                              <input type="number" min="0" step="0.01" placeholder={t("price")} value={form.price} onChange={(e) => updateForm({ price: e.target.value })} required />
+                              <button type="button" className="variant-add-btn" onClick={addVariantRow} aria-label={t("addVariantRow")} title={t("addVariantRow")}>+</button>
                             </div>
                           </div>
                         </div>
-                      ))}
-                      <button type="button" className="btn btn-ghost btn-sm" onClick={addVariantRow}>{t("addVariantRow")}</button>
-                    </div>
+                        {form.variants.map((v, i) => (
+                          <div className="option-row" key={i}>
+                            <div className="field">
+                              <input type="text" placeholder={t("variantLabel")} value={v.label} onChange={(e) => updateVariantRow(i, { label: e.target.value })} required />
+                            </div>
+                            <div className="field">
+                              <div className="variant-price-input-row">
+                                <input type="number" min="0" step="0.01" placeholder={t("price")} value={v.price} onChange={(e) => updateVariantRow(i, { price: e.target.value })} required />
+                                <button type="button" className="variant-add-btn" onClick={addVariantRow} aria-label={t("addVariantRow")} title={t("addVariantRow")}>+</button>
+                                <button type="button" className="variant-remove-btn" onClick={() => removeVariantRow(i)} aria-label={t("removeVariantRow")} title={t("removeVariantRow")}>×</button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </>
                 ) : (
                   <>
@@ -1403,7 +1743,6 @@ export default function MenuManager() {
                           updateForm({
                             categoryId: nextCategoryId,
                             subcategoryId: cat.subcategories?.[0]?.id ?? null,
-                            variants: nextCategoryId === "coffee" && form.variants.length === 0 ? [{ label: "", price: "" }] : form.variants,
                           });
                         }}
                       >
@@ -1561,24 +1900,28 @@ export default function MenuManager() {
               </div>
 
               {(() => {
-                // Only offer add-ons that make sense for this item's category (e.g. don't
-                // show "Extra Cream Cheese" on a coffee item) — plus anything with no
-                // category set, which counts as a general/universal add-on.
-                const relevantAddons = addonList.filter((a) => !a.categoryId || a.categoryId === form.categoryId);
-                return relevantAddons.length > 0 && (
+                // Only offer add-on groups that make sense for this item's category
+                // (e.g. don't show "Milk Change" on a bagel item).
+                const relevantGroups = groupAddons(addonList.filter((a) => a.categoryId === form.categoryId));
+                return relevantGroups.length > 0 && (
                 <div className="modal-addons">
                   <h4>{t("addonsAvailable")}</h4>
-                  <div className="modal-addon-list">
-                    {relevantAddons.map((a) => {
-                      const active = form.addonIds.has(a.id);
-                      return (
-                        <button key={a.id} type="button" className={`modal-addon-btn${active ? " active" : ""}`} onClick={() => toggleAddon(a.id)}>
-                          <span>{active ? <IcCheck /> : <IcPlus />} {a.name}</span>
-                          <span className="p">${a.price.toFixed(2)}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  {relevantGroups.map((g) => (
+                    <div className="modal-addons-group" key={g.groupId}>
+                      <h5>{g.title}</h5>
+                      <div className="modal-addon-list">
+                        {g.options.map((a) => {
+                          const active = form.addonIds.has(a.id);
+                          return (
+                            <button key={a.id} type="button" className={`modal-addon-btn${active ? " active" : ""}`} onClick={() => toggleAddon(a.id)}>
+                              <span>{active ? <IcCheck /> : <IcPlus />} {a.name}</span>
+                              <span className="p">${a.price.toFixed(2)}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
                 </div>
                 );
               })()}

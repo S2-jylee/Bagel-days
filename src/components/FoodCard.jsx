@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { useProducts } from "../context/ProductsContext";
+import { useProducts, groupAddons } from "../context/ProductsContext";
 import { useCategories } from "../context/CategoriesContext";
 import { IcBag } from "./Icons";
 import { IcChevron } from "./DeliveryButtons";
@@ -155,14 +155,19 @@ function ProductModal({ id, onClose, nested }) {
           {p.addons.length > 0 && (
             <div className="modal-addons">
               <h4>Add-ons</h4>
-              <ul className="modal-addon-list-plain">
-                {p.addons.map((a) => (
-                  <li key={a.name}>
-                    <span>{a.name}</span>
-                    <span className="p">${a.price.toFixed(2)}</span>
-                  </li>
-                ))}
-              </ul>
+              {groupAddons(p.addons).map((g) => (
+                <div className="modal-addons-group" key={g.groupId}>
+                  <h5>{g.title}</h5>
+                  <ul className="modal-addon-list-plain">
+                    {g.options.map((a) => (
+                      <li key={a.id}>
+                        <span>{a.name}</span>
+                        <span className="p">${a.price.toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           )}
 

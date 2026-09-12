@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "../lib/supabase";
 import { useAdminLang } from "../lib/adminI18n";
 import { logActivity } from "../lib/activityLog";
@@ -33,6 +33,13 @@ export default function StaffManageModal({ currentUserId, onClose }) {
   const [role, setRole] = useState("staff");
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
+
+  // The overlay closes on a click that lands directly on the backdrop.
+  // Plain onClick isn't enough: dragging to select text inside the panel
+  // can end with the mouse released outside it, and that click's target is
+  // the backdrop even though the drag started inside the form — requiring
+  // the mousedown to ALSO have started on the backdrop rules that out.
+  const overlayMouseDownOnSelf = useRef(false);
 
   useEffect(() => {
     loadStaff();
@@ -84,8 +91,13 @@ export default function StaffManageModal({ currentUserId, onClose }) {
   }
 
   return (
-    <div className="admin-form-overlay" onClick={onClose}>
+    <div
+      className="admin-form-overlay"
+      onMouseDown={(e) => { overlayMouseDownOnSelf.current = e.target === e.currentTarget; }}
+      onClick={(e) => { if (overlayMouseDownOnSelf.current && e.target === e.currentTarget) onClose(); }}
+    >
       <div className="admin-form-panel" onClick={(e) => e.stopPropagation()}>
+        <button type="button" className="admin-form-close" onClick={onClose} aria-label={t("close")}>×</button>
         <h3>{t("staffListTitle")}</h3>
 
         {staff === null && !listError && <p className="inventory-hint">{t("loading")}</p>}

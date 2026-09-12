@@ -446,6 +446,11 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .modal-addons{margin-bottom:18px; padding-top:16px; border-top:1px solid var(--line);}
 .product-modal-order-btn{margin-top:4px;}
 .modal-addons h4{font-family:'PT Serif', serif; font-size:.9rem; color:var(--maroon); margin-bottom:10px;}
+.modal-addons-group{margin-bottom:14px;}
+.modal-addons-group:last-child{margin-bottom:0;}
+.modal-addons-group h5{font-family:'PT Serif', serif; font-weight:700; font-size:.88rem; color:var(--maroon); margin-bottom:6px;}
+.modal-addons-group .modal-addon-list-plain{padding-left:12px; border-left:2px solid var(--line);}
+.modal-addons-group .modal-addon-list-plain li{font-size:.8rem; color:var(--body);}
 .modal-addon-list{display:flex; flex-direction:column; gap:8px;}
 .modal-addon-btn{
   display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; text-align:left;
@@ -684,17 +689,16 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    own override below. */
 /* padding-bottom lives INSIDE the sticky box on purpose (not as a margin
    on the next element) so it stays constant the whole time this header
-   is stuck, instead of shrinking away as the grid scrolls up underneath.
-   Two DIFFERENT values, not one shared number — a Best section ends
-   with the divider flush against the grid (0), no Best ends with the
-   pills keeping a small 6px gap above the grid. */
+   is stuck, instead of shrinking away as the grid scrolls up underneath —
+   only applies when pills are present, keeping a small 6px gap above
+   whatever scrolls up next (Best section or, lacking one, the grid). */
 .menu-category-sticky{position:sticky; top:67px; z-index:5; background:var(--cream);}
 .menu-category-sticky:has(> .menu-subcat-pills:last-child){padding-bottom:6px;}
 .menu-category-sticky > .menu-subcat-pills:last-child{margin-bottom:0;}
 .menu-category h2{font-size:1.5rem; margin-bottom:14px;}
 .menu-category > p{color:var(--body); max-width:52ch; margin-bottom:26px;}
 .menu-best-section{margin-bottom:28px;}
-.menu-section-divider{border:none; border-top:1px solid var(--line); margin:0;}
+.menu-section-divider{border:none; border-top:1px solid var(--line); margin:0 0 26px;}
 /* Fixed 6 slots regardless of how many are actually marked category-best
    (up to 6) — otherwise 4 marked would stretch to fill 4 columns while 6
    marked would be narrower, sizing inconsistently depending on count. */
@@ -760,8 +764,19 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .addons-panel{background:var(--cream-alt); border-radius:var(--radius); padding:clamp(8px, 3.7cqw, 16px) clamp(10px, 4.2cqw, 18px); margin:0 0 26px;}
 .addons-panel h4{font-family:'PT Serif', serif; font-size:clamp(.85rem, 4.2cqw, 1.1rem); color:var(--maroon); margin-bottom:2px;}
 .addons-panel-hint{font-family:'Pretendard', sans-serif; font-size:clamp(.68rem, 3.3cqw, .85rem); color:var(--body); margin-bottom:clamp(4px, 2.1cqw, 10px);}
+.addons-panel-group{margin-bottom:clamp(10px, 3.2cqw, 16px);}
+.addons-panel-group:last-child{margin-bottom:0;}
+.addons-panel-group h5{
+  font-family:'PT Serif', serif; font-weight:700;
+  font-size:clamp(.8rem, 3.9cqw, .98rem); color:var(--maroon); margin-bottom:clamp(3px, 1.4cqw, 6px);
+}
 .addons-panel ul{display:flex; flex-direction:column; gap:clamp(3px, 1.6cqw, 8px);}
+/* Indented and left-bordered so each group's options read as clearly
+   subordinate to its (now larger) title above, rather than blending into
+   one undifferentiated list. */
+.addons-panel-group ul{padding-left:clamp(8px, 2.6cqw, 14px); border-left:2px solid var(--line);}
 .addons-panel li{display:flex; justify-content:space-between; gap:10px; font-size:clamp(.72rem, 3.6cqw, .95rem); color:var(--ink); padding:clamp(2px, 1.1cqw, 6px) 0; border-bottom:1px solid var(--line);}
+.addons-panel-group li{font-size:clamp(.66rem, 3.2cqw, .85rem); color:var(--body);}
 .addons-panel li span:first-child{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .addons-panel li:last-child{border-bottom:none;}
 .addons-panel .p{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon);}
@@ -1308,7 +1323,8 @@ footer ul li a:hover{color:#F0D9C9;}
 
 .inventory-layout{display:grid; grid-template-columns:200px 1fr; gap:40px; align-items:start;}
 .inventory-products{padding-top:18px;}
-.inventory-products h2{font-size:1.5rem; margin-bottom:14px;}
+.inventory-products-head{display:flex; align-items:baseline; gap:14px; margin-bottom:14px;}
+.inventory-products h2{font-size:1.5rem;}
 .inventory-hint{
   font-family:'Pretendard', sans-serif; font-weight:700; font-size:1rem; color:#000;
   margin:0 0 20px 240px;
@@ -1402,39 +1418,64 @@ footer ul li a:hover{color:#F0D9C9;}
 
 /* ---------- Menu manager (admin) ---------- */
 .addon-pool-editor{background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; margin:-14px 0 24px;}
-.addon-pool-tabs{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--line);}
-.addon-pool-tabs button{
-  font-family:'Pretendard', sans-serif; font-weight:600; font-size:.78rem;
-  padding:7px 14px; border-radius:20px; border:1px solid var(--line); background:#fff; color:var(--body); cursor:pointer;
-  transition:background .15s ease, color .15s ease, border-color .15s ease;
-}
-.addon-pool-tabs button:hover{border-color:var(--maroon-light);}
-.addon-pool-tabs button.active{background:var(--maroon); border-color:var(--maroon); color:#fff;}
+.addon-pool-tabs-row{display:flex; align-items:center; justify-content:flex-end; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--line);}
 .addon-pool-list{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
 .addon-pool-list li{display:flex; align-items:center; gap:10px; font-family:'Pretendard', sans-serif; font-size:.85rem; color:var(--ink); padding:6px 0; border-bottom:1px solid var(--line);}
 .addon-pool-list li:last-child{border-bottom:none;}
-.addon-pool-list li span:first-child{flex:1;}
 .addon-pool-empty{color:var(--body); border-bottom:none !important;}
-.addon-pool-remove{width:22px; height:22px; border-radius:50%; border:1px solid var(--line); background:#fff; color:var(--maroon); cursor:pointer; font-size:1rem; line-height:1; flex-shrink:0;}
-.addon-pool-remove:hover{background:var(--cream-alt);}
-.addon-pool-edit{
-  width:22px; height:22px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-  border-radius:50%; border:1px solid var(--line); background:#fff; color:var(--maroon); cursor:pointer;
+.addon-pool-group-info{flex:1; min-width:0; display:flex; flex-direction:column; gap:4px;}
+.addon-pool-group-title{font-weight:700;}
+/* One option per line (not a comma/dot-joined string) — packed into a
+   single run of text, a group with several options became unreadable,
+   each one blurring into the next with no clear boundary. */
+.addon-pool-group-options{display:flex; flex-direction:column; gap:1px; padding-left:10px; border-left:2px solid var(--line);}
+.addon-pool-group-options li{display:flex; justify-content:space-between; gap:10px; font-size:.78rem; line-height:1.6; color:var(--body);}
+.addon-pool-group-options li .mono{color:var(--maroon); font-weight:600;}
+
+/* Add-on group modal — one .addon-group-block per group (title + its
+   option rows), reusing the product form's .option-row/.field/
+   .variant-price-input-row for each option so name+price+remove match the
+   per-size-pricing rows exactly.
+   The whole card stays a single draggable-drop-target; only its handle
+   icon (not the card, not the title input) is itself draggable="true" —
+   giving each option row its OWN draggable div too, nested inside a
+   draggable card, would leave the browser to guess which one a drag
+   starting on an option's handle belongs to. Scoping draggable to just
+   the small handle icon sidesteps that ambiguity entirely: the group's
+   drag source and every option's drag source are unrelated elements
+   (siblings, not ancestor/descendant), while onDragOver/onDrop stay on
+   the card itself so dropping anywhere on it (not just on the handle)
+   still resolves the reorder. */
+.addon-group-block{border:1px solid var(--line); border-radius:8px; padding:12px; margin-bottom:14px; background:var(--cream-alt);}
+.addon-group-block.dragging{opacity:.4;}
+.addon-group-head{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+/* Padding (not a bigger icon) widens the actual grabbable hit target —
+   the base .taxonomy-drag-handle box is only 16px, easy to miss by a
+   pixel or two and land the mousedown on the head's padding instead,
+   where nothing is draggable. */
+.addon-group-head .taxonomy-drag-handle{cursor:grab; padding:4px; margin:-4px;}
+.addon-group-title-input{
+  flex:1; font-weight:700; padding:9px 10px; border:1px solid var(--line); border-radius:6px;
+  font-family:'Pretendard',sans-serif; font-size:.9rem; background:#fff; color:var(--ink);
 }
-.addon-pool-edit:hover{background:var(--cream-alt);}
-.addon-pool-edit svg{width:12px; height:12px;}
-.addon-pool-edit-row .taxonomy-edit-input{flex:1;}
-.addon-pool-edit-price{width:80px; padding:4px 8px; font-family:'Pretendard', sans-serif; font-size:.85rem; border:1px solid var(--line); border-radius:6px;}
-.addon-pool-edit-row > button{
-  width:22px; height:22px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-  border:none; border-radius:50%; background:#fff; color:var(--maroon); cursor:pointer;
+.addon-group-remove-btn{
+  flex-shrink:0; width:30px; height:30px; display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--body); cursor:pointer; font-size:1.1rem; line-height:1;
+  transition:border-color .15s ease, color .15s ease;
 }
-.addon-pool-edit-row > button:hover{background:var(--cream-alt);}
-.addon-pool-edit-row > button svg{width:13px; height:13px;}
-.addon-pool-add{display:flex; gap:8px; flex-wrap:wrap;}
-.addon-pool-add input[type=text]{flex:1; min-width:140px; padding:9px 10px; border:1px solid var(--line); border-radius:6px; font-family:'Pretendard',sans-serif; font-size:.85rem; background:#fff; color:var(--ink);}
-.addon-pool-add input[type=number]{width:90px; padding:9px 10px; border:1px solid var(--line); border-radius:6px; font-family:'Pretendard',sans-serif; font-size:.85rem; background:#fff; color:var(--ink);}
-.addon-pool-add select{padding:9px 10px; border:1px solid var(--line); border-radius:6px; font-family:'Pretendard',sans-serif; font-size:.85rem; background:#fff; color:var(--ink);}
+.addon-group-remove-btn:hover:not(:disabled){border-color:var(--maroon-light); color:var(--maroon);}
+.addon-group-remove-btn:disabled{opacity:.35; cursor:not-allowed;}
+.addon-group-block .option-row{margin-bottom:0;}
+.addon-group-block .option-row.reordering{cursor:grab;}
+.addon-group-block .option-row.dragging{opacity:.4;}
+/* .menu-manager-form-actions.addon-modal-actions (not two separate class
+   selectors) so this reliably beats .menu-manager-form-actions's own
+   justify-content:flex-end regardless of which rule happens to come later
+   in the file — two equal-specificity single-class selectors on the same
+   element are a tie the cascade breaks by source order, which silently
+   flipped this back to flex-end since that rule sits further down. */
+.menu-manager-form-actions.addon-modal-actions{justify-content:flex-start; margin-bottom:14px;}
+.addon-modal-actions .active{background:var(--cream-alt); border-color:var(--maroon-light); color:var(--maroon);}
 
 .menu-manager-row{justify-content:space-between;}
 .menu-manager-row.inactive{opacity:.55;}
@@ -1476,21 +1517,27 @@ footer ul li a:hover{color:#F0D9C9;}
   display:flex; align-items:center; justify-content:center; padding:20px;
 }
 .admin-form-panel{
-  background:#fff; border-radius:var(--radius); padding:26px 28px 28px; overflow-y:auto;
+  position:relative; background:#fff; border-radius:var(--radius); padding:26px 28px 28px; overflow-y:auto;
   max-width:520px; width:100%; max-height:90vh; box-shadow:0 20px 50px rgba(0,0,0,.3);
 }
-.admin-form-panel h3{font-size:1.2rem; margin-bottom:18px;}
+.admin-form-panel h3{font-size:1.2rem; margin-bottom:18px; padding-right:28px;}
+.admin-form-close{
+  position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:50%;
+  border:1px solid var(--line); background:#fff; color:var(--body); cursor:pointer; font-size:1.2rem; line-height:1;
+  display:flex; align-items:center; justify-content:center; transition:border-color .15s ease, color .15s ease;
+}
+.admin-form-close:hover{border-color:var(--maroon-light); color:var(--maroon);}
 .menu-manager-photo-row{display:flex; align-items:center; gap:16px; margin-bottom:18px;}
 .menu-manager-photo-preview{width:140px; aspect-ratio:4/3; border-radius:8px; object-fit:contain; background:#fff; border:1px solid var(--line); flex-shrink:0;}
 .menu-manager-photo-actions{display:flex; align-items:center; gap:10px;}
 .variant-price-input-row{display:flex; align-items:center; gap:6px;}
 .variant-price-input-row input{flex:1; min-width:0;}
-.variant-remove-btn{
+.variant-remove-btn, .variant-add-btn{
   flex-shrink:0; width:30px; height:30px; display:flex; align-items:center; justify-content:center;
   border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--body); cursor:pointer; font-size:1.1rem; line-height:1;
   transition:border-color .15s ease, color .15s ease;
 }
-.variant-remove-btn:hover{border-color:var(--maroon-light); color:var(--maroon);}
+.variant-remove-btn:hover, .variant-add-btn:hover{border-color:var(--maroon-light); color:var(--maroon);}
 
 /* Each "Add Item" row (an Item name + its own Price, plus a remove button) —
    used for Coffee & Drink's required per-size pricing and for any other
@@ -1500,6 +1547,15 @@ footer ul li a:hover{color:#F0D9C9;}
 .option-row{display:flex; gap:14px; margin-bottom:14px;}
 .option-row .field{flex:1 1 0; min-width:100px;}
 .option-rows > .btn{margin-top:2px;}
+/* Coffee's size rows drop the per-row "Option Name"/"Price" labels (the
+   Name+Price row above already establishes what these boxes are, and
+   repeating a label on every revealed row read as its own separate field
+   group rather than more rows of the same thing) — .field's own
+   margin-bottom existed to clear a label that's no longer there, so
+   without resetting it too the row gap doubles up to more than intended. */
+.coffee-size-rows .field{margin-bottom:0;}
+.coffee-size-rows .option-row{margin-bottom:10px;}
+.coffee-size-rows .option-row:last-child{margin-bottom:0;}
 
 /* Name+Price sharing one row: the Set category's compact item form (no
    category/subcategory selects — a set always belongs to "Set") and every
@@ -1571,19 +1627,43 @@ footer ul li a:hover{color:#F0D9C9;}
    this one's, inflating its height enough to push every category button
    (and the "Bagels" row's own top edge) down out of line with the product
    list on the right. */
-.taxonomy-editor .taxonomy-manage-toggle{
-  font-family:'Pretendard', sans-serif; font-weight:600; font-size:.72rem; color:var(--maroon);
+/* Same rule also targets .inventory-products-toggle-slot — the subcategory
+   pills' toggle portals there (see TaxonomyEditor's toggleContainerRef) so
+   it can sit beside the products list's own h2 instead of above the pills,
+   which moves it out from under the .taxonomy-editor ancestor these styles
+   would otherwise rely on. Kept identical between the two on purpose
+   (padding, font-size, icon, underline, hover color) — the nav variant
+   below only adds what it needs for sitting in the category list (full
+   width, x:0-flush box); it's not a different button style.
+   .taxonomy-manage-icon is boxed at the category buttons' own 18px (not
+   13px) so the icon COLUMN lines up with theirs and "Manage Categories"'
+   text starts at the same x as "Bagels"' text below it — the svg inside
+   is a plain 13px (this toggle's own smaller, lighter icon), not the box
+   scaled down via transform: a non-integer scaled size (18 * .72 =
+   12.96px) rendered visibly blurrier than an actual 13px icon does. */
+.taxonomy-editor .taxonomy-manage-toggle, .inventory-products-toggle-slot .taxonomy-manage-toggle{
+  display:inline-flex; align-items:center; gap:10px;
+  font-family:'Pretendard', sans-serif; font-weight:600; font-size:.72rem; color:var(--body);
   background:none; border:none; text-decoration:underline; cursor:pointer;
-  padding:4px 8px; margin:0; border-radius:6px; transition:background .15s ease;
+  padding:12px 12px; margin:0; border-radius:6px; transition:color .15s ease;
 }
-.taxonomy-editor .taxonomy-manage-toggle:hover{background:var(--cream-alt);}
-.taxonomy-editor.taxonomy-editor-pills .taxonomy-manage-toggle{margin:0 4px 0 0;}
-/* Same padding as the pills variant (above) now, so the hover/underline
-   background box is identically sized on both — the 12px-left icon-column
-   alignment and the extra top offset (to match "Manage Subcategories"
-   text height) are done with margin instead of padding, since margin sits
-   outside the painted background box and doesn't inflate it. */
-.taxonomy-editor.taxonomy-editor-nav .taxonomy-manage-toggle{margin:2px 0 19px 4px;}
+.taxonomy-manage-icon{width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
+.taxonomy-manage-icon svg{width:13px; height:13px;}
+/* The nav variant is also a <button> inside .menu-maincats, so it already
+   picks up .menu-maincats button:hover's cream-alt background for free —
+   that's the reference behavior (Manage Categories), so the subcategory
+   toggle (portaled outside .menu-maincats, never touched by that rule) is
+   given the same background explicitly here instead of just matching its
+   color change, so the two stay identical on hover regardless of which
+   part of the DOM either one actually lives in. */
+.taxonomy-editor .taxonomy-manage-toggle:hover, .inventory-products-toggle-slot .taxonomy-manage-toggle:hover{color:var(--maroon); background:var(--cream-alt);}
+/* Nav variant sits in the category list, so it takes the same full-width
+   row shape as the category buttons below it — just with this toggle's
+   own smaller font/icon and its underline kept, instead of matching their
+   0.9rem/no-underline style. Margin:0 so the list's own 4px row gap
+   (.taxonomy-editor-nav) applies uniformly instead of a bespoke bigger
+   gap here. */
+.taxonomy-editor.taxonomy-editor-nav .taxonomy-manage-toggle{width:100%; text-align:left; margin:0;}
 .taxonomy-manage-hint{margin:0 0 8px;}
 .taxonomy-manage-hint a{color:var(--maroon); text-decoration:underline;}
 .taxonomy-edit-row{display:flex; align-items:center; gap:6px; padding:6px 8px; border-radius:8px; background:var(--cream-alt); cursor:grab;}

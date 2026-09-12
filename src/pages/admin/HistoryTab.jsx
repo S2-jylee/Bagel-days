@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "../../lib/supabase";
 import Pagination from "../../components/Pagination";
 import { useAdminLang } from "../../lib/adminI18n";
@@ -34,6 +34,7 @@ const ENTITY_KEY = {
   subcategory: "entitySubcategory",
   product: "entityProduct",
   addon: "entityAddon",
+  addon_group: "entityAddonGroup",
   best_seller: "entityBestSeller",
   category_best: "entityCategoryBest",
   staff: "entityStaff",
@@ -50,6 +51,9 @@ export default function HistoryTab() {
   const [fetching, setFetching] = useState(false);
   const [page, setPage] = useState(1);
   const [modalEntry, setModalEntry] = useState(null);
+  // See MenuManager's identical guard: a text-selection drag that ends
+  // outside the panel would otherwise close it via a plain onClick.
+  const overlayMouseDownOnSelf = useRef(false);
 
   useEffect(() => {
     runSearch();
@@ -153,8 +157,13 @@ export default function HistoryTab() {
       )}
 
       {modalEntry && (
-        <div className="admin-form-overlay" onClick={() => setModalEntry(null)}>
+        <div
+          className="admin-form-overlay"
+          onMouseDown={(e) => { overlayMouseDownOnSelf.current = e.target === e.currentTarget; }}
+          onClick={(e) => { if (overlayMouseDownOnSelf.current && e.target === e.currentTarget) setModalEntry(null); }}
+        >
           <div className="admin-form-panel" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="admin-form-close" onClick={() => setModalEntry(null)} aria-label={t("close")}>×</button>
             <h3>{t("details")}</h3>
             <dl className="history-detail-list">
               <dt>{t("date")}</dt>

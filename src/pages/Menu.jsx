@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useCategories } from "../context/CategoriesContext";
 import FoodCard from "../components/FoodCard";
-import { useProducts } from "../context/ProductsContext";
+import { useProducts, groupAddons } from "../context/ProductsContext";
 import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcBowl, IcSet, IcPaperBag, IcTag } from "../components/Icons";
 import { IcChevron } from "../components/DeliveryButtons";
 import { asset } from "../lib/assetUrl";
@@ -103,10 +103,13 @@ export default function Menu() {
     return { bestIds: best, regularIds: regular };
   }, [products, activeCat, activeSubcat, activeSubcategory]);
   // Scoped to whichever category tab is active, same as the product grid —
-  // otherwise every add-on ever created (cream cheese swaps, coffee syrups,
+  // otherwise every add-on group ever created (milk changes, coffee syrups,
   // etc.) piles up in one long list regardless of what's being browsed.
-  const addonList = useMemo(
-    () => Object.values(addons).filter((a) => !a.categoryId || a.categoryId === activeCat),
+  // Grouped ("Milk Change" -> Oat/Soy/Almond/...) rather than flat, since an
+  // add-on pool item is now an option within a named group, not a standalone
+  // item — see ProductsContext's groupAddons.
+  const addonGroups = useMemo(
+    () => groupAddons(Object.values(addons).filter((a) => a.categoryId === activeCat)),
     [addons, activeCat]
   );
 
@@ -155,9 +158,10 @@ export default function Menu() {
           <div className="menu-products">
             <div className="menu-category active">
               {/* Sticks below the site header while scrolling, so the category
-                  name + subcat pills (+ Best section, when this category has
-                  one) stay visible instead of scrolling out of view before
-                  the product grid below it does. */}
+                  name + subcat pills stay visible instead of scrolling out of
+                  view before the product grid below it does. The Best section
+                  is deliberately outside this wrapper — it should scroll away
+                  like normal content, not pin to the top with the header. */}
               <div className="menu-category-sticky">
                 <h2>{activeCategory.label}</h2>
 
@@ -174,19 +178,19 @@ export default function Menu() {
                     ))}
                   </div>
                 )}
-
-                {bestIds.length > 0 && (
-                  <div className="menu-best-section">
-                    <div className="card-grid menu-best-grid">
-                      {bestIds.map((id) => (
-                        <FoodCard key={id} id={id} />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {bestIds.length > 0 && <hr className="menu-section-divider" />}
               </div>
+
+              {bestIds.length > 0 && (
+                <div className="menu-best-section">
+                  <div className="card-grid menu-best-grid">
+                    {bestIds.map((id) => (
+                      <FoodCard key={id} id={id} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {bestIds.length > 0 && <hr className="menu-section-divider" />}
 
               <div className="menu-promo-row">
                 <div className="card-grid">
@@ -196,18 +200,23 @@ export default function Menu() {
                 </div>
 
                 <div className="menu-promo-col">
-                  {addonList.length > 0 && (
+                  {addonGroups.length > 0 && (
                     <div className="addons-panel">
                       <h4>{activeCategory.label} Add-ons</h4>
                       <p className="addons-panel-hint">Available to add when you order.</p>
-                      <ul>
-                        {addonList.map((a) => (
-                          <li key={a.id}>
-                            <span>{a.name}</span>
-                            <span className="p">${a.price.toFixed(2)}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      {addonGroups.map((g) => (
+                        <div className="addons-panel-group" key={g.groupId}>
+                          <h5>{g.title}</h5>
+                          <ul>
+                            {g.options.map((a) => (
+                              <li key={a.id}>
+                                <span>{a.name}</span>
+                                <span className="p">${a.price.toFixed(2)}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
                     </div>
                   )}
 
