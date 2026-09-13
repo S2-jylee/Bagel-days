@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { useCategories } from "../context/CategoriesContext";
 import FoodCard from "../components/FoodCard";
 import { useProducts, groupAddons } from "../context/ProductsContext";
-import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcBowl, IcSet, IcPaperBag, IcTag } from "../components/Icons";
+import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcBowl, IcSet, IcPaperBag, IcTag, IcChevronDown } from "../components/Icons";
 import { IcChevron } from "../components/DeliveryButtons";
 import { asset } from "../lib/assetUrl";
 import { ORDER_NOW_URL } from "../lib/orderNow";
@@ -17,6 +17,38 @@ const CATEGORY_ICONS = {
   side: IcBowl,
   set: IcSet,
 };
+
+function formatAddonPrice(price) {
+  return price === 0 ? "Free" : `$${price.toFixed(2)}`;
+}
+
+// A single-option group (e.g. "Extra Shot") is usually created without
+// bothering to name its lone option too — the group title already says
+// it all. Only surface option names when at least one is actually filled
+// in; an all-blank tier renders as just the group title, no empty "()" .
+function tierNames(tier) {
+  const names = tier.names.map((n) => (n || "").trim()).filter(Boolean);
+  return names.length > 0 ? names.join(" · ") : null;
+}
+
+// Options sharing the same price read as one line ("Vanilla · Caramel ·
+// Hazelnut" all at $0.80) instead of a separate row each — groups options
+// by price, keeping the price each tier first appears at (already
+// sort_order-ordered coming in from groupAddons).
+function bucketAddonsByPrice(options) {
+  const tiers = [];
+  const byPrice = new Map();
+  for (const o of options) {
+    let tier = byPrice.get(o.price);
+    if (!tier) {
+      tier = { price: o.price, names: [] };
+      byPrice.set(o.price, tier);
+      tiers.push(tier);
+    }
+    tier.names.push(o.name);
+  }
+  return tiers;
+}
 
 function OrderNowButton({ className = "delivery-btn delivery-btn-direct" }) {
   return (
@@ -57,6 +89,7 @@ export default function Menu() {
 
   const [activeCat, setActiveCat] = useState(categories[0].id);
   const [activeSubcat, setActiveSubcat] = useState(categories[0].subcategories?.[0]?.id ?? null);
+  const [addonsOpen, setAddonsOpen] = useState(true);
   const { products, addons } = useProducts();
 
   // Same fix as admin's MenuManager: activeCat/activeSubcat above
@@ -200,26 +233,6 @@ export default function Menu() {
                 </div>
 
                 <div className="menu-promo-col">
-                  {addonGroups.length > 0 && (
-                    <div className="addons-panel">
-                      <h4>{activeCategory.label} Add-ons</h4>
-                      <p className="addons-panel-hint">Available to add when you order.</p>
-                      {addonGroups.map((g) => (
-                        <div className="addons-panel-group" key={g.groupId}>
-                          <h5>{g.title}</h5>
-                          <ul>
-                            {g.options.map((a) => (
-                              <li key={a.id}>
-                                <span>{a.name}</span>
-                                <span className="p">${a.price.toFixed(2)}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
                   <div
                     className="set-banner-mini"
                     role="button"
@@ -233,6 +246,55 @@ export default function Menu() {
                       <p>Enjoy our great-value set menu!</p>
                     </div>
                   </div>
+
+                  {addonGroups.length > 0 && (
+                    <div className="addons-panel">
+                      <button
+                        type="button"
+                        className="addons-panel-head"
+                        onClick={() => setAddonsOpen((v) => !v)}
+                        aria-expanded={addonsOpen}
+                      >
+                        <h4>Add-ons</h4>
+                        <span className={`addons-panel-chevron${addonsOpen ? "" : " collapsed"}`}>
+                          <IcChevronDown />
+                        </span>
+                      </button>
+                      {addonsOpen && addonGroups.map((g) => {
+                        const tiers = bucketAddonsByPrice(g.options);
+                        if (tiers.length === 1) {
+                          const names = tierNames(tiers[0]);
+                          return (
+                            <div className="addons-panel-group" key={g.groupId}>
+                              <div className="addons-panel-row">
+                                <span>
+                                  {g.title}
+                                  {names && <span className="addons-panel-inline-names"> ({names})</span>}
+                                </span>
+                                <span className="p">{formatAddonPrice(tiers[0].price)}</span>
+                              </div>
+                            </div>
+                          );
+                        }
+                        const firstNames = tierNames(tiers[0]);
+                        return (
+                          <div className="addons-panel-group" key={g.groupId}>
+                            <div className="addons-panel-row">
+                              <span className="addons-panel-title">{g.title}</span>
+                              <span className="p">{formatAddonPrice(tiers[0].price)}</span>
+                            </div>
+                            {firstNames && <p className="addons-panel-tier-names">{firstNames}</p>}
+                            {tiers.slice(1).map((tier) => (
+                              <div className="addons-panel-row" key={tier.price}>
+                                <span className="addons-panel-tier-names">{tierNames(tier) ?? g.title}</span>
+                                <span className="p">{formatAddonPrice(tier.price)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

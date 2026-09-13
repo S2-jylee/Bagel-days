@@ -299,7 +299,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .feature p{font-size:.85rem; color:var(--body);}
 
 /* ---------- Card grid (best sellers / general) ---------- */
-.card-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:24px;}
+.card-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:24px;}
 /* container-type here (not just relying on viewport width) is what lets
    the badges below track this CARD's own rendered width — a fixed-width
    sidebar next to the grid eats a disproportionate share of the viewport
@@ -703,20 +703,20 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    (up to 6) — otherwise 4 marked would stretch to fill 4 columns while 6
    marked would be narrower, sizing inconsistently depending on count. */
 .menu-best-grid{grid-template-columns:repeat(6,1fr);}
-/* Product grid on the left, a promo column (add-ons info above a compact
-   "Make It A Set" banner) on the right — when a category has no add-ons,
-   the banner sits alone at the top of that column instead of leaving a gap.
+/* Product grid on the left, a promo column (Make It A Set banner above
+   add-ons info) on the right — when a category has no add-ons, the
+   banner sits alone at the top of that column instead of leaving a gap.
    One shared 6-track grid (rather than the product grid and the promo
    column each sizing independently) so the promo column always measures
-   out to exactly 1 product-card column, gap included, at any width. */
+   out to exactly 2 product-card columns, gap included, at any width. */
 .menu-promo-row{display:grid; grid-template-columns:repeat(6,1fr); gap:24px; align-items:start; margin-bottom:26px;}
-.menu-promo-row .card-grid{grid-column:span 5;}
+.menu-promo-row .card-grid{grid-column:span 4;}
 /* A container-query context: lets addons-panel/set-banner-mini's fonts
    and spacing (cqw units below) scale with THIS box's own rendered
    width — which already tracks card-grid's width at every breakpoint —
    instead of sitting at one fixed size no matter how much card-grid
    itself has shrunk. */
-.menu-promo-col{grid-column:span 1; display:flex; flex-direction:column; gap:24px; container-type:inline-size;}
+.menu-promo-col{grid-column:span 2; display:flex; flex-direction:column; gap:24px; container-type:inline-size;}
 .menu-promo-col .addons-panel{margin:0;}
 /* Text on top, image below (image keeps its own native ratio — a wide
    landscape photo — and sits flush left; any extra width in the box is
@@ -761,31 +761,29 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    card-grid's own shrinking width instead of sitting fixed; the 600px
    override below goes back to plain px, since menu-promo-col is full
    viewport width there and cqw would badly oversize everything. */
-.addons-panel{background:var(--cream-alt); border-radius:var(--radius); padding:clamp(8px, 3.7cqw, 16px) clamp(10px, 4.2cqw, 18px); margin:0 0 26px;}
-.addons-panel h4{font-family:'PT Serif', serif; font-size:clamp(.85rem, 4.2cqw, 1.1rem); color:var(--maroon); margin-bottom:2px;}
-.addons-panel-hint{font-family:'Pretendard', sans-serif; font-size:clamp(.68rem, 3.3cqw, .85rem); color:var(--body); margin-bottom:clamp(4px, 2.1cqw, 10px);}
-.addons-panel-group{margin-bottom:clamp(10px, 3.2cqw, 16px);}
-.addons-panel-group:last-child{margin-bottom:0;}
-.addons-panel-group h5{
-  font-family:'PT Serif', serif; font-weight:700;
-  font-size:clamp(.8rem, 3.9cqw, .98rem); color:var(--maroon); margin-bottom:clamp(3px, 1.4cqw, 6px);
+.addons-panel{background:var(--cream-alt); border:1px solid var(--line); border-radius:var(--radius); padding:clamp(10px, 4.2cqw, 18px); margin:0;}
+.addons-panel-head{
+  display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%;
+  margin-bottom:clamp(6px, 2.6cqw, 12px); background:none; border:none; padding:0; font:inherit; cursor:pointer; text-align:left;
 }
-.addons-panel ul{display:flex; flex-direction:column; gap:clamp(3px, 1.6cqw, 8px);}
-/* Indented and left-bordered so each group's options read as clearly
-   subordinate to its (now larger) title above, rather than blending into
-   one undifferentiated list. */
-.addons-panel-group ul{padding-left:clamp(8px, 2.6cqw, 14px); border-left:2px solid var(--line);}
-.addons-panel li{display:flex; justify-content:space-between; gap:10px; font-size:clamp(.72rem, 3.6cqw, .95rem); color:var(--ink); padding:clamp(2px, 1.1cqw, 6px) 0; border-bottom:1px solid var(--line);}
-.addons-panel-group li{font-size:clamp(.66rem, 3.2cqw, .85rem); color:var(--body);}
-.addons-panel li span:first-child{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-.addons-panel li:last-child{border-bottom:none;}
-.addons-panel .p{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon);}
+.addons-panel-head h4{font-family:'PT Serif', serif; font-size:clamp(.85rem, 4.2cqw, 1.1rem); color:var(--maroon);}
+.addons-panel-chevron{display:flex; flex:none; color:var(--maroon); transition:transform .15s ease;}
+.addons-panel-chevron svg{width:16px; height:16px;}
+.addons-panel-chevron.collapsed{transform:rotate(-90deg);}
+.addons-panel-group{padding:clamp(6px, 2.6cqw, 10px) 0; border-top:1px solid var(--line);}
+.addons-panel-group:first-of-type{border-top:none; padding-top:0;}
+.addons-panel-row{display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:clamp(.72rem, 3.6cqw, .9rem); color:var(--ink);}
+.addons-panel-title{font-weight:700;}
+.addons-panel-inline-names{font-weight:400; color:var(--body);}
+.addons-panel-tier-names{font-size:clamp(.66rem, 3.2cqw, .82rem); color:var(--body); margin-top:clamp(2px, 1.1cqw, 4px);}
+.addons-panel-row + .addons-panel-tier-names{margin-top:clamp(2px, 1.1cqw, 4px);}
+.addons-panel-tier-names + .addons-panel-row{margin-top:clamp(2px, 1.1cqw, 4px);}
+.addons-panel .p{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon); white-space:nowrap;}
 @media (max-width:600px){
   .addons-panel{padding:14px 16px;}
-  .addons-panel h4{font-size:1rem;}
-  .addons-panel-hint{font-size:.78rem; margin-bottom:8px;}
-  .addons-panel ul{gap:6px;}
-  .addons-panel li{font-size:.85rem; padding:4px 0;}
+  .addons-panel-head h4{font-size:1rem;}
+  .addons-panel-row{font-size:.85rem;}
+  .addons-panel-tier-names{font-size:.78rem;}
 }
 
 /* ---------- Cart drawer ---------- */
