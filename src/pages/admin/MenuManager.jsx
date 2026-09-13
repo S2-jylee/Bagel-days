@@ -1121,14 +1121,18 @@ export default function MenuManager() {
 
 
   async function saveAddonModal() {
-    // Drop any group left titleless, or with no complete option rows —
-    // an admin who opens the modal, adds nothing, and saves shouldn't get
-    // an empty group cluttering the pool.
+    // Drop any group left titleless, or with no priced option rows — an
+    // admin who opens the modal, adds nothing, and saves shouldn't get an
+    // empty group cluttering the pool. A blank option NAME is kept, though
+    // (not filtered out) — that's the normal way to set up a single-option
+    // group like "Extra Shot", where the group title alone already says
+    // what it is; the customer-facing menu falls back to showing just the
+    // group title when an option has no name of its own.
     const cleanGroups = addonModal.groups
       .map((g) => ({
         ...g,
         title: g.title.trim(),
-        options: g.options.map((o) => ({ ...o, name: o.name.trim() })).filter((o) => o.name && o.price !== "" && !Number.isNaN(Number(o.price))),
+        options: g.options.map((o) => ({ ...o, name: o.name.trim() })).filter((o) => o.price !== "" && !Number.isNaN(Number(o.price))),
       }))
       .filter((g) => g.title && g.options.length > 0);
 
