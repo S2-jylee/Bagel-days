@@ -774,7 +774,6 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .addons-panel-group:first-of-type{border-top:none; padding-top:0;}
 .addons-panel-row{display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:clamp(.72rem, 3.6cqw, .9rem); color:var(--ink);}
 .addons-panel-title{font-weight:700;}
-.addons-panel-inline-names{font-weight:400; color:var(--body);}
 .addons-panel-tier-names{font-size:clamp(.66rem, 3.2cqw, .82rem); color:var(--body); margin-top:clamp(2px, 1.1cqw, 4px);}
 .addons-panel-row + .addons-panel-tier-names{margin-top:clamp(2px, 1.1cqw, 4px);}
 .addons-panel-tier-names + .addons-panel-row{margin-top:clamp(2px, 1.1cqw, 4px);}

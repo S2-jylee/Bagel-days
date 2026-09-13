@@ -262,20 +262,6 @@ export default function Menu() {
                       </button>
                       {addonsOpen && addonGroups.map((g) => {
                         const tiers = bucketAddonsByPrice(g.options);
-                        if (tiers.length === 1) {
-                          const names = tierNames(tiers[0]);
-                          return (
-                            <div className="addons-panel-group" key={g.groupId}>
-                              <div className="addons-panel-row">
-                                <span>
-                                  {g.title}
-                                  {names && <span className="addons-panel-inline-names"> ({names})</span>}
-                                </span>
-                                <span className="p">{formatAddonPrice(tiers[0].price)}</span>
-                              </div>
-                            </div>
-                          );
-                        }
                         const firstNames = tierNames(tiers[0]);
                         return (
                           <div className="addons-panel-group" key={g.groupId}>
