@@ -1322,149 +1322,157 @@ export default function MenuManager() {
 
           {activeCat !== "set" && (
             <>
-              <div className="inventory-fillall-bar">
-                <div className="inventory-fillall-text">
-                  <strong>{t("addonPool")}</strong>
-                  <span>{t("addonPoolDesc")}</span>
-                </div>
-                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAddonPoolOpen((v) => !v)}>
-                  {addonPoolOpen ? t("hide") : t("manage", poolGroups.length)}
-                </button>
-              </div>
-
-              {addonPoolOpen && (
-                <div className="addon-pool-editor">
-                  <div className="addon-pool-tabs-row">
-                    <button type="button" className="btn btn-primary btn-sm" onClick={openAddonModal}>{t("addonRegisterButton")}</button>
+              {/* Add-ons only ever apply to Coffee & Drink (milk swaps, syrups —
+                  nothing else sells a customizable option), so the whole pool
+                  section is scoped to that one category instead of showing an
+                  always-empty "Add-on pool" on every other tab. */}
+              {activeCat === "coffee" && (
+                <>
+                  <div className="inventory-fillall-bar">
+                    <div className="inventory-fillall-text">
+                      <strong>{t("addonPool")}</strong>
+                      <span>{t("addonPoolDesc")}</span>
+                    </div>
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAddonPoolOpen((v) => !v)}>
+                      {addonPoolOpen ? t("hide") : t("manage", poolGroups.length)}
+                    </button>
                   </div>
-                  <ul className="addon-pool-list">
-                    {poolGroups.map((g) => (
-                      <li key={g.groupId} className="addon-pool-group-row">
-                        <div className="addon-pool-group-info">
-                          <span className="addon-pool-group-title">{g.title}</span>
-                          <ul className="addon-pool-group-options">
-                            {g.options.map((o) => (
-                              <li key={o.id}>
-                                <span>{o.name}</span>
-                                <span className="mono">${o.price.toFixed(2)}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </li>
-                    ))}
-                    {poolGroups.length === 0 && <li className="addon-pool-empty">{t("noAddonsYet")}</li>}
-                  </ul>
-                </div>
-              )}
 
-              {addonModal && (
-                <div className="admin-form-overlay" onMouseDown={handleOverlayMouseDown} onClick={(e) => handleOverlayClick(e, closeAddonModal)}>
-                  <div className="admin-form-panel" onClick={(e) => e.stopPropagation()}>
-                    <button type="button" className="admin-form-close" onClick={closeAddonModal} aria-label={t("close")}>×</button>
-                    <h3>{activeCategory.label} {t("addonGroupModalTitle")}</h3>
+                  {addonPoolOpen && (
+                    <div className="addon-pool-editor">
+                      <div className="addon-pool-tabs-row">
+                        <button type="button" className="btn btn-primary btn-sm" onClick={openAddonModal}>{t("addonRegisterButton")}</button>
+                      </div>
+                      <ul className="addon-pool-list">
+                        {poolGroups.map((g) => (
+                          <li key={g.groupId} className="addon-pool-group-row">
+                            <div className="addon-pool-group-info">
+                              <span className="addon-pool-group-title">{g.title}</span>
+                              <ul className="addon-pool-group-options">
+                                {g.options.map((o) => (
+                                  <li key={o.id}>
+                                    <span>{o.name}</span>
+                                    <span className="mono">${o.price.toFixed(2)}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </li>
+                        ))}
+                        {poolGroups.length === 0 && <li className="addon-pool-empty">{t("noAddonsYet")}</li>}
+                      </ul>
+                    </div>
+                  )}
 
-                    {addonModal.groups.map((g) => (
-                      <div
-                        className={`addon-group-block${dragState?.type === "group" && dragState.key === g.key ? " dragging" : ""}`}
-                        key={g.key}
-                        ref={(el) => setDragNodeRef(`group:${g.key}`, el)}
-                      >
-                        <div className="addon-group-head">
-                          {editingGroups && (
-                            <span
-                              className="taxonomy-drag-handle"
-                              aria-hidden="true"
-                              onMouseDown={(e) => {
-                                e.preventDefault();
-                                setDragState({ type: "group", key: g.key });
-                              }}
-                            >
-                              <IcGrip />
-                            </span>
-                          )}
-                          <input
-                            type="text"
-                            className="addon-group-title-input"
-                            placeholder={t("addonGroupTitlePlaceholder")}
-                            value={g.title}
-                            onChange={(e) => updateGroupTitle(g.key, e.target.value)}
-                          />
-                          <button
-                            type="button"
-                            className="addon-group-remove-btn"
-                            onClick={() => removeGroupFromModal(g.key)}
-                            aria-label={t("removeAddonGroupRow")}
-                            title={t("removeAddonGroupRow")}
-                            disabled={addonModal.groups.length < 2}
-                          >
-                            ×
-                          </button>
-                        </div>
-                        {g.options.map((o) => (
+                  {addonModal && (
+                    <div className="admin-form-overlay" onMouseDown={handleOverlayMouseDown} onClick={(e) => handleOverlayClick(e, closeAddonModal)}>
+                      <div className="admin-form-panel" onClick={(e) => e.stopPropagation()}>
+                        <button type="button" className="admin-form-close" onClick={closeAddonModal} aria-label={t("close")}>×</button>
+                        <h3>{activeCategory.label} {t("addonGroupModalTitle")}</h3>
+
+                        {addonModal.groups.map((g) => (
                           <div
-                            className={`option-row${editingGroups ? " reordering" : ""}${dragState?.type === "option" && dragState.key === o.key ? " dragging" : ""}`}
-                            key={o.key}
-                            ref={(el) => setDragNodeRef(`option:${g.key}:${o.key}`, el)}
+                            className={`addon-group-block${dragState?.type === "group" && dragState.key === g.key ? " dragging" : ""}`}
+                            key={g.key}
+                            ref={(el) => setDragNodeRef(`group:${g.key}`, el)}
                           >
-                            {editingGroups && (
-                              <span
-                                className="taxonomy-drag-handle"
-                                aria-hidden="true"
-                                onMouseDown={(e) => {
-                                  e.preventDefault();
-                                  setDragState({ type: "option", groupKey: g.key, key: o.key });
-                                }}
-                              >
-                                <IcGrip />
-                              </span>
-                            )}
-                            <div className="field">
+                            <div className="addon-group-head">
+                              {editingGroups && (
+                                <span
+                                  className="taxonomy-drag-handle"
+                                  aria-hidden="true"
+                                  onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    setDragState({ type: "group", key: g.key });
+                                  }}
+                                >
+                                  <IcGrip />
+                                </span>
+                              )}
                               <input
                                 type="text"
-                                placeholder={t("addonName")}
-                                value={o.name}
-                                onChange={(e) => updateOption(g.key, o.key, { name: e.target.value })}
+                                className="addon-group-title-input"
+                                placeholder={t("addonGroupTitlePlaceholder")}
+                                value={g.title}
+                                onChange={(e) => updateGroupTitle(g.key, e.target.value)}
                               />
+                              <button
+                                type="button"
+                                className="addon-group-remove-btn"
+                                onClick={() => removeGroupFromModal(g.key)}
+                                aria-label={t("removeAddonGroupRow")}
+                                title={t("removeAddonGroupRow")}
+                                disabled={addonModal.groups.length < 2}
+                              >
+                                ×
+                              </button>
                             </div>
-                            <div className="field">
-                              <div className="variant-price-input-row">
-                                <input
-                                  type="number"
-                                  min="0"
-                                  step="0.01"
-                                  placeholder={t("price")}
-                                  value={o.price}
-                                  onChange={(e) => updateOption(g.key, o.key, { price: e.target.value })}
-                                />
-                                <button type="button" className="variant-remove-btn" onClick={() => removeOptionFromGroup(g.key, o.key)} aria-label={t("removeAddonOptionRow")} title={t("removeAddonOptionRow")}>
-                                  ×
-                                </button>
+                            {g.options.map((o) => (
+                              <div
+                                className={`option-row${editingGroups ? " reordering" : ""}${dragState?.type === "option" && dragState.key === o.key ? " dragging" : ""}`}
+                                key={o.key}
+                                ref={(el) => setDragNodeRef(`option:${g.key}:${o.key}`, el)}
+                              >
+                                {editingGroups && (
+                                  <span
+                                    className="taxonomy-drag-handle"
+                                    aria-hidden="true"
+                                    onMouseDown={(e) => {
+                                      e.preventDefault();
+                                      setDragState({ type: "option", groupKey: g.key, key: o.key });
+                                    }}
+                                  >
+                                    <IcGrip />
+                                  </span>
+                                )}
+                                <div className="field">
+                                  <input
+                                    type="text"
+                                    placeholder={t("addonName")}
+                                    value={o.name}
+                                    onChange={(e) => updateOption(g.key, o.key, { name: e.target.value })}
+                                  />
+                                </div>
+                                <div className="field">
+                                  <div className="variant-price-input-row">
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      step="0.01"
+                                      placeholder={t("price")}
+                                      value={o.price}
+                                      onChange={(e) => updateOption(g.key, o.key, { price: e.target.value })}
+                                    />
+                                    <button type="button" className="variant-remove-btn" onClick={() => removeOptionFromGroup(g.key, o.key)} aria-label={t("removeAddonOptionRow")} title={t("removeAddonOptionRow")}>
+                                      ×
+                                    </button>
+                                  </div>
+                                </div>
                               </div>
-                            </div>
+                            ))}
+                            <button type="button" className="btn btn-ghost btn-sm" onClick={() => addOptionToGroup(g.key)}>{t("addAddonOption")}</button>
                           </div>
                         ))}
-                        <button type="button" className="btn btn-ghost btn-sm" onClick={() => addOptionToGroup(g.key)}>{t("addAddonOption")}</button>
+
+                        {addonModalError && <p className="form-status err">{addonModalError}</p>}
+
+                        <div className="menu-manager-form-actions addon-modal-actions">
+                          <button type="button" className="btn btn-ghost btn-sm" onClick={addGroupToModal}>{t("addSetSection")}</button>
+                          <button type="button" className={`btn btn-ghost btn-sm${editingGroups ? " active" : ""}`} onClick={() => setEditingGroups((v) => !v)}>
+                            {t("rearrange")}
+                          </button>
+                        </div>
+
+                        <div className="menu-manager-form-actions">
+                          <button type="button" className="btn btn-ghost" onClick={closeAddonModal} disabled={savingAddonModal}>{t("cancel")}</button>
+                          <button type="button" className="btn btn-primary" onClick={saveAddonModal} disabled={savingAddonModal}>
+                            {savingAddonModal ? t("saving") : t("addonRegisterButton")}
+                          </button>
+                        </div>
                       </div>
-                    ))}
-
-                    {addonModalError && <p className="form-status err">{addonModalError}</p>}
-
-                    <div className="menu-manager-form-actions addon-modal-actions">
-                      <button type="button" className="btn btn-ghost btn-sm" onClick={addGroupToModal}>{t("addSetSection")}</button>
-                      <button type="button" className={`btn btn-ghost btn-sm${editingGroups ? " active" : ""}`} onClick={() => setEditingGroups((v) => !v)}>
-                        {t("rearrange")}
-                      </button>
                     </div>
-
-                    <div className="menu-manager-form-actions">
-                      <button type="button" className="btn btn-ghost" onClick={closeAddonModal} disabled={savingAddonModal}>{t("cancel")}</button>
-                      <button type="button" className="btn btn-primary" onClick={saveAddonModal} disabled={savingAddonModal}>
-                        {savingAddonModal ? t("saving") : t("addonRegisterButton")}
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                  )}
+                </>
               )}
 
               <div className="bestseller-panel category-best-panel">
