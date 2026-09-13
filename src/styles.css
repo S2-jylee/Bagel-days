@@ -299,7 +299,7 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .feature p{font-size:.85rem; color:var(--body);}
 
 /* ---------- Card grid (best sellers / general) ---------- */
-.card-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:24px;}
+.card-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:24px;}
 /* container-type here (not just relying on viewport width) is what lets
    the badges below track this CARD's own rendered width — a fixed-width
    sidebar next to the grid eats a disproportionate share of the viewport
@@ -708,15 +708,15 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    the banner sits alone at the top of that column instead of leaving a gap.
    One shared 6-track grid (rather than the product grid and the promo
    column each sizing independently) so the promo column always measures
-   out to exactly 2 product-card columns, gap included, at any width. */
+   out to exactly 1 product-card column, gap included, at any width. */
 .menu-promo-row{display:grid; grid-template-columns:repeat(6,1fr); gap:24px; align-items:start; margin-bottom:26px;}
-.menu-promo-row .card-grid{grid-column:span 4;}
+.menu-promo-row .card-grid{grid-column:span 5;}
 /* A container-query context: lets addons-panel/set-banner-mini's fonts
    and spacing (cqw units below) scale with THIS box's own rendered
    width — which already tracks card-grid's width at every breakpoint —
    instead of sitting at one fixed size no matter how much card-grid
    itself has shrunk. */
-.menu-promo-col{grid-column:span 2; display:flex; flex-direction:column; gap:24px; container-type:inline-size;}
+.menu-promo-col{grid-column:span 1; display:flex; flex-direction:column; gap:24px; container-type:inline-size;}
 .menu-promo-col .addons-panel{margin:0;}
 /* Text on top, image below (image keeps its own native ratio — a wide
    landscape photo — and sits flush left; any extra width in the box is
@@ -1008,13 +1008,12 @@ footer ul li a:hover{color:#F0D9C9;}
   /* menu-promo-col takes the full row width here (there's no card-grid
      sharing the row anymore) so its two children — addons-panel and
      set-banner-mini — can sit side by side instead of stacked. Each one
-     gets an explicit width:calc(50% - 12px) (2 card-grid columns + the
-     24px gap between them, same math as the desktop 6-track grid) and
-     the row's own gap matches that 24px — flex:1 would size them off
-     menu-promo-col's own 20px gap instead, drifting a few px out of line
-     with the actual card-grid column boundary above. Explicit width
-     (not flex:1) also means a lone set-banner-mini (no add-ons) stays
-     at that same fixed size instead of stretching to fill the row. */
+     gets an explicit width:calc(50% - 12px) (half the row, minus half
+     the 24px gap between them) and the row's own gap matches that 24px
+     — flex:1 would size them off menu-promo-col's own 20px gap instead,
+     drifting a few px out of line. Explicit width (not flex:1) also
+     means a lone set-banner-mini (no add-ons) stays at that same fixed
+     size instead of stretching to fill the row. */
   .menu-promo-col{grid-column:span 1; width:100%; flex-direction:row; gap:24px;}
   .menu-promo-col .addons-panel, .menu-promo-col .set-banner-mini{flex:0 0 calc(50% - 12px);}
   .menu-maincats{
