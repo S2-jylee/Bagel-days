@@ -240,10 +240,12 @@ export default function Menu() {
                     onClick={goToSetCategory}
                     onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), goToSetCategory())}
                   >
-                    <img src={asset("/assets/images/sandwich-set.jpg")} alt="Bagel set" className="set-banner-mini-img" />
-                    <div className="set-banner-mini-text">
+                    <div className="set-banner-mini-head">
                       <h4>Make It A Set</h4>
+                    </div>
+                    <div className="set-banner-mini-body">
                       <p>Enjoy our great-value set menu!</p>
+                      <img src={asset("/assets/images/sandwich-set.jpg")} alt="Bagel set" className="set-banner-mini-img" />
                     </div>
                   </div>
 
@@ -260,25 +262,36 @@ export default function Menu() {
                           <IcChevronDown />
                         </span>
                       </button>
-                      {addonsOpen && addonGroups.map((g) => {
-                        const tiers = bucketAddonsByPrice(g.options);
-                        const firstNames = tierNames(tiers[0]);
-                        return (
-                          <div className="addons-panel-group" key={g.groupId}>
-                            <div className="addons-panel-row">
-                              <span className="addons-panel-title">{g.title}</span>
-                              <span className="p">{formatAddonPrice(tiers[0].price)}</span>
-                            </div>
-                            {firstNames && <p className="addons-panel-tier-names">{firstNames}</p>}
-                            {tiers.slice(1).map((tier) => (
-                              <div className="addons-panel-row" key={tier.price}>
-                                <span className="addons-panel-tier-names">{tierNames(tier) ?? g.title}</span>
-                                <span className="p">{formatAddonPrice(tier.price)}</span>
+                      {addonsOpen && (
+                        <div className="addons-panel-body">
+                          {addonGroups.map((g) => {
+                            const tiers = bucketAddonsByPrice(g.options);
+                            const firstNames = tierNames(tiers[0]);
+                            return (
+                              <div className="addons-panel-group" key={g.groupId}>
+                                <div className="addons-panel-row">
+                                  <span className="addons-panel-title">{g.title}</span>
+                                  {/* No named options at all (e.g. "Extra Shot") — the price
+                                      has nowhere else to go, so it stays on the title row. */}
+                                  {!firstNames && <span className="p">{formatAddonPrice(tiers[0].price)}</span>}
+                                </div>
+                                {firstNames && (
+                                  <div className="addons-panel-row">
+                                    <span className="addons-panel-tier-names">{firstNames}</span>
+                                    <span className="p">{formatAddonPrice(tiers[0].price)}</span>
+                                  </div>
+                                )}
+                                {tiers.slice(1).map((tier) => (
+                                  <div className="addons-panel-row" key={tier.price}>
+                                    <span className="addons-panel-tier-names">{tierNames(tier) ?? g.title}</span>
+                                    <span className="p">{formatAddonPrice(tier.price)}</span>
+                                  </div>
+                                ))}
                               </div>
-                            ))}
-                          </div>
-                        );
-                      })}
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

@@ -718,15 +718,14 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    itself has shrunk. */
 .menu-promo-col{grid-column:span 2; display:flex; flex-direction:column; gap:24px; container-type:inline-size;}
 .menu-promo-col .addons-panel{margin:0;}
-/* Text on top, image below (image keeps its own native ratio — a wide
-   landscape photo — and sits flush left; any extra width in the box is
-   just empty space, not stretched to fill it). */
+/* Same two-zone look as the Add-ons card below it: a title strip on the
+   card's own base color, then a body zone (description + photo) on the
+   lighter #FEF8F1 — overflow:hidden clips that body's square corners to
+   the outer border-radius instead of needing to match it by hand. */
 .set-banner-mini{
-  display:flex; flex-direction:column-reverse; align-items:flex-start; justify-content:flex-end; gap:clamp(3px, 1.6cqw, 8px);
-  background:var(--cream-alt); border-radius:var(--radius); padding:clamp(8px, 7cqw, 26px);
-  cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; box-sizing:border-box;
+  background:var(--cream-alt); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;
+  cursor:pointer; box-sizing:border-box;
 }
-.set-banner-mini:hover{transform:translateY(-2px);}
 /* .wrap tops out at its own max-width here, so card-grid's product cards
    stop growing and settle at a fixed height (~234px: thumb's 4/3 ratio at
    a 178px card width, plus the name/price rows below it) — matches that
@@ -735,19 +734,31 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 @media (min-width:1470px){
   .set-banner-mini{min-height:234px;}
 }
+/* Padding equal on all sides (and matching Add-ons' own header padding
+   just below it) — the title sits centered in its own strip, not flush
+   to one edge. The gap down to the body zone is a separate margin-top
+   on the body itself (below), not a squashed bottom padding here. */
+.set-banner-mini-head{padding:clamp(10px, 4.2cqw, 18px);}
+/* Flush against the head, same as Add-ons' header/body boundary — a
+   margin here would show as extra cream-alt colored dead space (same
+   color as the head above it, so it just reads as too much empty room
+   under the title rather than a deliberate gap). */
+.set-banner-mini-body{
+  display:flex; flex-direction:column; gap:clamp(3px, 1.6cqw, 8px);
+  background:#FEF8F1; padding:clamp(8px, 7cqw, 26px);
+}
 .set-banner-mini-img{width:57.5%; max-width:100%; aspect-ratio:1347/784; object-fit:contain; border-radius:6px; display:block;}
-.set-banner-mini-text h4{font-family:'PT Serif', serif; font-size:clamp(.75rem, 3.8cqw, 1rem); color:var(--maroon); margin-bottom:2px;}
-.set-banner-mini-text p{font-family:'Pretendard', sans-serif; font-size:clamp(.65rem, 3.15cqw, .85rem); color:var(--body); margin-bottom:4px;}
+/* Sized to match the Add-ons card right beside it (that card's own h4/
+   tier-name sizes are the reference) rather than its own independent
+   scale, so the two promo-column cards read as one consistent pair. */
+.set-banner-mini-head h4{font-family:'PT Serif', serif; font-size:clamp(.85rem, 4.2cqw, 1.1rem); color:var(--maroon); margin:0;}
+.set-banner-mini-body p{font-family:'Pretendard', sans-serif; font-size:clamp(.66rem, 3.2cqw, .82rem); color:var(--body);}
 @media (max-width:600px){
-  /* Mobile keeps the original side-by-side composition (image left, text
-     right) instead of stacking — only the desktop layout stacks them —
-     but the image itself stays the same size as desktop's. Fixed sizes
-     here too (not cqw) — menu-promo-col is full viewport width at this
-     breakpoint, so scaling off it would badly oversize everything. */
-  .set-banner-mini{flex-direction:row; align-items:center; width:100%; gap:6px; padding:12px;}
+  .set-banner-mini-head{padding:14px 16px;}
+  .set-banner-mini-body{padding:12px;}
   .set-banner-mini-img{width:205px;}
-  .set-banner-mini-text h4{font-size:.9rem;}
-  .set-banner-mini-text p{font-size:.75rem;}
+  .set-banner-mini-head h4{font-size:.9rem;}
+  .set-banner-mini-body p{font-size:.75rem;}
   .set-banner-mini .price{font-size:.9rem;}
 }
 
@@ -761,25 +772,47 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
    card-grid's own shrinking width instead of sitting fixed; the 600px
    override below goes back to plain px, since menu-promo-col is full
    viewport width there and cqw would badly oversize everything. */
-.addons-panel{background:var(--cream-alt); border:1px solid var(--line); border-radius:var(--radius); padding:clamp(10px, 4.2cqw, 18px); margin:0;}
+/* Two zones, not one flat fill: the header sits directly on the panel's
+   own base color (cream-alt — no background of its own, so the panel
+   shows through), and the body below gets the lighter #FEF8F1 — same
+   pairing as the Set banner card beside it. overflow:hidden clips the
+   body's square corners to the panel's own border-radius. */
+.addons-panel{background:var(--cream-alt); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; margin:0;}
 .addons-panel-head{
   display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%;
-  margin-bottom:clamp(6px, 2.6cqw, 12px); background:none; border:none; padding:0; font:inherit; cursor:pointer; text-align:left;
+  padding:clamp(10px, 4.2cqw, 18px); background:none; border:none; font:inherit; cursor:pointer; text-align:left;
 }
-.addons-panel-head h4{font-family:'PT Serif', serif; font-size:clamp(.85rem, 4.2cqw, 1.1rem); color:var(--maroon);}
+/* This disclosure toggle doesn't need the site-wide focus-visible ring
+   (a heavy maroon box that reads like a selection highlight here) —
+   its own chevron rotation already shows state. */
+.addons-panel-head:focus-visible{outline:none;}
+.addons-panel-head h4{font-family:'PT Serif', serif; font-size:clamp(.85rem, 4.2cqw, 1.1rem); color:var(--maroon); margin:0;}
 .addons-panel-chevron{display:flex; flex:none; color:var(--maroon); transition:transform .15s ease;}
 .addons-panel-chevron svg{width:16px; height:16px;}
 .addons-panel-chevron.collapsed{transform:rotate(-90deg);}
-.addons-panel-group{padding:clamp(6px, 2.6cqw, 10px) 0; border-top:1px solid var(--line);}
+/* Flush against the header (no gap) — the color change itself is the
+   boundary, so a margin here would just show a stripe of the header's
+   cream-alt showing through between the two zones. */
+.addons-panel-body{background:#FEF8F1; padding:clamp(10px, 4.2cqw, 18px);}
+.addons-panel-group{
+  display:flex; flex-direction:column; gap:clamp(2px, 1.1cqw, 4px);
+  padding:clamp(6px, 2.6cqw, 10px) 0; border-top:1px solid var(--line);
+}
+/* first-of-type drops its own top padding (the body's own top padding
+   above already provides that gap) and last-of-type drops its own
+   bottom padding (the body's own bottom padding already provides that
+   gap) — without these, the last group's padding stacked on top of the
+   body's, making the card's bottom whitespace visibly bigger than its
+   symmetric top whitespace. */
 .addons-panel-group:first-of-type{border-top:none; padding-top:0;}
+.addons-panel-group:last-of-type{padding-bottom:0;}
 .addons-panel-row{display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:clamp(.72rem, 3.6cqw, .9rem); color:var(--ink);}
 .addons-panel-title{font-weight:700;}
-.addons-panel-tier-names{font-size:clamp(.66rem, 3.2cqw, .82rem); color:var(--body); margin-top:clamp(2px, 1.1cqw, 4px);}
-.addons-panel-row + .addons-panel-tier-names{margin-top:clamp(2px, 1.1cqw, 4px);}
-.addons-panel-tier-names + .addons-panel-row{margin-top:clamp(2px, 1.1cqw, 4px);}
+.addons-panel-tier-names{font-size:clamp(.66rem, 3.2cqw, .82rem); color:var(--body);}
 .addons-panel .p{font-family:'Pretendard', sans-serif; font-weight:600; color:var(--maroon); white-space:nowrap;}
 @media (max-width:600px){
-  .addons-panel{padding:14px 16px;}
+  .addons-panel-head{padding:14px 16px;}
+  .addons-panel-body{padding:14px 16px;}
   .addons-panel-head h4{font-size:1rem;}
   .addons-panel-row{font-size:.85rem;}
   .addons-panel-tier-names{font-size:.78rem;}
