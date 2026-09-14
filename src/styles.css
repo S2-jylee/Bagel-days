@@ -1555,6 +1555,13 @@ footer ul li a:hover{color:#F0D9C9;}
 .menu-manager-row-actions{display:flex; gap:8px; flex-shrink:0;}
 .menu-manager-delete{color:var(--maroon-light);}
 .menu-manager-toolbar-actions{display:flex; align-items:center; justify-content:flex-end; gap:12px;}
+/* Cancel/Save Order here replace a single "Rearrange" button in place —
+   whichever new button lands under the finger keeps a lingering hover
+   and/or focus state on real phones despite the (hover:hover) guard on
+   .btn:hover (behavior isn't fully consistent across mobile browsers),
+   lifting it 2px above its sibling. Neither button needs the lift
+   affordance in this toggle-pair context, so just kill it outright. */
+.menu-manager-toolbar-actions .btn:hover, .menu-manager-toolbar-actions .btn:focus, .menu-manager-toolbar-actions .btn:active{transform:none;}
 /* Just the standalone Rearrange/+Add New Item row above the product list —
    not the shared class's other usages (Best Sellers/Best Menu panel heads),
    which stay right-aligned next to their own heading text. */
