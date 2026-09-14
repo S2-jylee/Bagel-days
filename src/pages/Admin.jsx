@@ -34,8 +34,10 @@ function AdminShell({ role, userId, signOut }) {
             <button type="button" className={lang === "ko" ? "active" : ""} onClick={() => setLang("ko")}>한국어</button>
             <button type="button" className={lang === "en" ? "active" : ""} onClick={() => setLang("en")}>English</button>
           </div>
-          {isOwner && <button className="btn btn-ghost btn-sm" onClick={() => setStaffModalOpen(true)}>{t("inviteStaffButton")}</button>}
-          <button className="btn btn-ghost btn-sm" onClick={signOut}>{t("signOut")}</button>
+          <div className="admin-shell-buttons">
+            {isOwner && <button className="btn btn-ghost btn-sm" onClick={() => setStaffModalOpen(true)}>{t("inviteStaffButton")}</button>}
+            <button className="btn btn-ghost btn-sm" onClick={signOut}>{t("signOut")}</button>
+          </div>
         </div>
       </div>
 

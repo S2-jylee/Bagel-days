@@ -1629,7 +1629,7 @@ export default function MenuManager() {
             <form onSubmit={handleSubmit}>
               <div className="menu-manager-photo-row">
                 {form.imageUrl ? <img src={productImageUrl(form.imageUrl)} alt="" className="menu-manager-photo-preview" /> : <div className="menu-manager-noimg large" />}
-                <div>
+                <div className="menu-manager-photo-info">
                   <p className="menu-manager-photo-hint">{t("recommendedSize")}</p>
                   <div className="menu-manager-photo-actions">
                     <label className="btn btn-ghost btn-sm menu-manager-upload-btn">
