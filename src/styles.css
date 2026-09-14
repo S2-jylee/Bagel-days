@@ -1275,7 +1275,11 @@ footer ul li a:hover{color:#F0D9C9;}
 .admin-page[data-lang="ko"] .script{
   font-family:'Pretendard', sans-serif;
 }
-.admin-shell-bar{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:28px; padding-bottom:16px; border-bottom:1px solid var(--line);}
+/* flex-wrap here is what lets .admin-shell-actions (lang toggle + Add
+   Staff + Sign Out) drop to its own line below the tabs once both can't
+   fit on one row — without it, .admin-shell-actions' flex-shrink:0 had
+   nowhere to go but to overlap/collide with the tabs on a narrow screen. */
+.admin-shell-bar{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:28px; padding-bottom:16px; border-bottom:1px solid var(--line);}
 .admin-tabs{display:flex; flex-wrap:wrap; gap:6px; flex:1 1 auto; min-width:0;}
 .admin-tabs button{
   font-family:'Pretendard', sans-serif; font-weight:600; font-size:.85rem;
@@ -1284,7 +1288,7 @@ footer ul li a:hover{color:#F0D9C9;}
 }
 .admin-tabs button:hover{border-color:var(--maroon-light);}
 .admin-tabs button.active{background:var(--maroon); border-color:var(--maroon); color:#fff;}
-.admin-shell-actions{display:flex; align-items:center; gap:14px; flex-shrink:0;}
+.admin-shell-actions{display:flex; flex-wrap:wrap; align-items:center; gap:14px; flex-shrink:0;}
 .admin-lang-toggle{display:flex; gap:4px; background:var(--cream-alt); border-radius:20px; padding:3px;}
 .admin-lang-toggle button{
   font-family:'Pretendard', sans-serif; font-weight:600; font-size:.78rem;
@@ -1351,7 +1355,13 @@ footer ul li a:hover{color:#F0D9C9;}
 .history-detail-text{white-space:pre-wrap; line-height:1.55;}
 
 .inventory-layout{display:grid; grid-template-columns:200px 1fr; gap:40px; align-items:start;}
-.inventory-products{padding-top:18px;}
+/* min-width:0 so this grid item can actually shrink to the 1fr track's
+   available width — a grid item's default min-width:auto refuses to go
+   below its own content's min-content size, which is how one long-lived
+   fixed-column grid deep inside it (the per-category bestseller grid)
+   was able to force this whole column, and the page along with it, wider
+   than the viewport on mobile. */
+.inventory-products{padding-top:18px; min-width:0;}
 .inventory-products-head{display:flex; align-items:baseline; gap:14px; margin-bottom:14px;}
 .inventory-products h2{font-size:1.5rem;}
 .inventory-hint{
@@ -1414,6 +1424,17 @@ footer ul li a:hover{color:#F0D9C9;}
 @media (max-width:600px){
   .bestseller-grid{grid-template-columns:repeat(2,1fr);}
 }
+/* .category-best-panel .bestseller-grid (two classes) otherwise outranks
+   the plain .bestseller-grid media-query rules above regardless of
+   viewport, so the per-category panel never got Home Best Sellers' own
+   narrowing — stuck at 6 non-shrinking columns, which is what was
+   forcing the whole admin page into horizontal scroll on a phone. */
+@media (max-width:900px){
+  .category-best-panel .bestseller-grid{grid-template-columns:repeat(3,1fr);}
+}
+@media (max-width:600px){
+  .category-best-panel .bestseller-grid{grid-template-columns:repeat(2,1fr);}
+}
 .inventory-bulk-bar{
   display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;
   background:var(--cream-alt); border-radius:var(--radius); padding:14px 16px; margin-top:18px;
@@ -1443,6 +1464,10 @@ footer ul li a:hover{color:#F0D9C9;}
   .admin-page{padding:24px 16px;}
   .admin-section-header h2{font-size:1.3rem;}
   .inventory-row{flex-wrap:wrap;}
+  /* Full width once wrapped below the tabs, so the lang toggle and
+     Add Staff/Sign Out spread across the row instead of staying
+     bunched at whatever width their own content needs. */
+  .admin-shell-actions{width:100%; justify-content:space-between;}
 }
 
 /* ---------- Menu manager (admin) ---------- */
