@@ -48,7 +48,14 @@ section{padding:40px 0;}
   transition:transform .15s ease, background .15s ease, color .15s ease, box-shadow .15s ease;
   background:transparent; color:var(--maroon);
 }
-.btn:hover{ transform:translateY(-2px); }
+/* hover:hover excludes touchscreens — without it, tapping a button that
+   morphs in place (e.g. "Rearrange" becoming "Cancel"/"Save Order") can
+   leave the new button stuck in :hover on mobile (many touch browsers
+   keep :hover engaged until the next tap elsewhere), lifting it 2px
+   above its sibling that never received the hover. */
+@media (hover:hover){
+  .btn:hover{ transform:translateY(-2px); }
+}
 .btn-primary{background:var(--maroon); border-color:var(--maroon); color:var(--cream);}
 .btn-primary:hover{background:var(--maroon-dark); }
 .btn-ghost:hover{background:var(--maroon); color:var(--cream);}
