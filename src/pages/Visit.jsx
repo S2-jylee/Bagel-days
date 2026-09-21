@@ -1,7 +1,7 @@
 import { IcMapPin, IcClockOutline, IcMapPinned, IcCircleParking, IcCheck, IcHeartThin } from "../components/Icons";
 import { usePageContent } from "../context/PageContentContext";
 import { useSiteSettings } from "../context/SiteSettingsContext";
-import { mapsDirectionsUrl, mapsViewUrl } from "../lib/siteSettings";
+import { mapsDirectionsUrl, mapsViewUrl, hoursRows } from "../lib/siteSettings";
 import HeroCarousel from "../components/HeroCarousel";
 import { useSeo } from "../lib/seo";
 
@@ -62,8 +62,9 @@ export default function Visit() {
                 <div className="ic"><IcClockOutline /></div>
                 <div className="loc-card-text">
                   <h4>Opening Hours</h4>
-                  <p>{settings.hoursDays}</p>
-                  <p>{settings.hoursTime}</p>
+                  {hoursRows(settings).map((row) => (
+                    <p className="loc-hours-row" key={row.days}><strong>{row.days}</strong><span>{row.time}</span></p>
+                  ))}
                 </div>
               </div>
             </div>

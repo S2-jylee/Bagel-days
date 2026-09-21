@@ -15,3 +15,13 @@ export function mapsViewUrl(settings) {
 export function telHref(phone) {
   return `tel:${phone.replace(/[^\d+]/g, "")}`;
 }
+
+// Opening hours are stored as newline-separated rows in hoursDays/hoursTime
+// (line 1 of each pairs together, line 2 with line 2, etc.) so admins can
+// list several day-groups — e.g. Mon–Fri, Sat–Sun, Public Holidays — without
+// a schema change.
+export function hoursRows(settings) {
+  const days = (settings.hoursDays || "").split("\n").map((s) => s.trim()).filter(Boolean);
+  const times = (settings.hoursTime || "").split("\n").map((s) => s.trim()).filter(Boolean);
+  return days.map((days, i) => ({ days, time: times[i] || "" }));
+}

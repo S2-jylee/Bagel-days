@@ -396,9 +396,10 @@ function BusinessInfoSection({ settings, t }) {
 
       <h4 className="homepage-subheading">{t("openingHoursLabel")}</h4>
       <p className="homepage-affects">{t("hoursAffects")}</p>
+      <p className="homepage-hint">{t("hoursMultilineHint")}</p>
       <div className="form-grid">
-        <div className="field"><label>{t("hoursDaysLabel")}</label><input type="text" {...field("hoursDays")} /></div>
-        <div className="field"><label>{t("hoursTimeLabel")}</label><input type="text" {...field("hoursTime")} /></div>
+        <div className="field"><label>{t("hoursDaysLabel")}</label><textarea rows={3} {...field("hoursDays")} /></div>
+        <div className="field"><label>{t("hoursTimeLabel")}</label><textarea rows={3} {...field("hoursTime")} /></div>
       </div>
 
       <h4 className="homepage-subheading">{t("findUsLabel")}</h4>

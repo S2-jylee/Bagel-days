@@ -8,7 +8,7 @@ import { asset } from "../lib/assetUrl";
 import { useProducts } from "../context/ProductsContext";
 import { usePageContent } from "../context/PageContentContext";
 import { useSiteSettings } from "../context/SiteSettingsContext";
-import { telHref } from "../lib/siteSettings";
+import { telHref, hoursRows } from "../lib/siteSettings";
 import { useSeo } from "../lib/seo";
 
 const DEFAULT_CONTENT = {
@@ -116,7 +116,14 @@ export default function Home() {
             <h3>Visit Us</h3>
             <ul className="widget-info-list">
               <li><IcPin /><span>{settings.addressLine1}, {settings.addressLine2}</span></li>
-              <li><IcClock /><span>{settings.hoursDays}, {settings.hoursTime}</span></li>
+              <li>
+                <IcClock />
+                <div className="widget-hours-lines">
+                  {hoursRows(settings).map((row) => (
+                    <div className="widget-hours-row" key={row.days}><strong>{row.days}</strong><span>{row.time}</span></div>
+                  ))}
+                </div>
+              </li>
               <li>
                 <IcPhone />
                 <a href={telHref(settings.phone)} className="widget-phone-link">

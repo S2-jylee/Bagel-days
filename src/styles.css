@@ -269,6 +269,9 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .widget-info-list{margin-bottom:10px;}
 .widget-info-list li{display:flex; gap:10px; font-size:.85rem; margin-bottom:7px; color:var(--body); align-items:flex-start;}
 .widget-info-list li svg{width:16px; height:16px; color:var(--maroon); flex-shrink:0; margin-top:2px;}
+.widget-hours-lines{display:flex; flex-direction:column; gap:2px;}
+.widget-hours-row{display:flex; gap:10px;}
+.widget-hours-row strong{min-width:108px; flex-shrink:0;}
 .widget-phone-link{display:inline-flex; align-items:center; gap:8px; color:var(--body);}
 .widget-phone-link:hover{color:var(--maroon);}
 .call-us-badge{
@@ -889,6 +892,8 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .loc-card-text{flex:1; min-width:0;}
 .loc-card h4{font-size:1.02rem; color:var(--ink); margin-bottom:8px;}
 .loc-card p{font-size:.9rem; color:var(--body); margin-bottom:4px;}
+.loc-hours-row{display:flex; gap:10px;}
+.loc-hours-row strong{min-width:120px; flex-shrink:0;}
 .getting-here{
   margin-top:28px; background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:28px;
   display:grid; grid-template-columns:auto 1fr auto; grid-template-areas:"icon text list"; gap:22px; align-items:center;
@@ -964,6 +969,8 @@ footer{background:var(--maroon); color:rgba(251,246,241,.82); padding:26px 0 14p
 footer h4{font-family:'Pretendard', sans-serif; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:#F0D9C9; margin-bottom:8px;}
 footer ul li{margin-bottom:4px; font-size:.82rem;}
 footer ul li a:hover{color:#F0D9C9;}
+.foot-hours-row{display:flex; gap:10px;}
+.foot-hours-row strong{min-width:100px; flex-shrink:0;}
 .foot-contact ul li{display:flex; align-items:center; gap:7px;}
 .foot-contact ul li svg{width:14px; height:14px; flex-shrink:0; color:#F0D9C9;}
 .foot-social{display:flex; gap:10px; margin-top:8px;}

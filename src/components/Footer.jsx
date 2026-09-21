@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { IcMail, IcPhone, IcInsta, IcTikTok, IcFacebook, IcDonut } from "./Icons";
 import { useSiteSettings } from "../context/SiteSettingsContext";
+import { hoursRows } from "../lib/siteSettings";
 
 export default function Footer() {
   const { settings } = useSiteSettings();
@@ -29,7 +30,9 @@ export default function Footer() {
             <ul>
               <li>{settings.addressLine1}</li>
               <li>{settings.addressLine2}</li>
-              <li>{settings.hoursDays}, {settings.hoursTime}</li>
+              {hoursRows(settings).map((row) => (
+                <li className="foot-hours-row" key={row.days}><strong>{row.days}</strong><span>{row.time}</span></li>
+              ))}
             </ul>
           </div>
 
