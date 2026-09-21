@@ -112,7 +112,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="widget-card">
+          <div className="widget-card widget-visit">
             <h3>Visit Us</h3>
             <ul className="widget-info-list">
               <li><IcPin /><span>{settings.addressLine1}, {settings.addressLine2}</span></li>

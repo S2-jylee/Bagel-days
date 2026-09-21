@@ -269,7 +269,14 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .widget-info-list{margin-bottom:10px;}
 .widget-info-list li{display:flex; gap:10px; font-size:.85rem; margin-bottom:7px; color:var(--body); align-items:flex-start;}
 .widget-info-list li svg{width:16px; height:16px; color:var(--maroon); flex-shrink:0; margin-top:2px;}
-.widget-hours-lines{display:flex; flex-direction:column; gap:2px;}
+/* Visit Us carries three hours rows, so it's tighter than the other cards to
+   keep the row from growing taller than Best Sellers. */
+.widget-visit{padding:16px 18px;}
+.widget-visit h3{margin-bottom:6px;}
+.widget-visit .widget-info-list{margin-bottom:6px;}
+.widget-visit .widget-info-list li{margin-bottom:4px; line-height:1.3;}
+.widget-visit .btn{padding-top:8px; padding-bottom:8px;}
+.widget-hours-lines{display:flex; flex-direction:column; gap:0;}
 .widget-hours-row{display:flex; flex-wrap:wrap; column-gap:8px;}
 .widget-hours-row strong{min-width:96px; flex-shrink:0;}
 .widget-phone-link{display:inline-flex; align-items:center; gap:8px; color:var(--body);}
