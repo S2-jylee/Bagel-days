@@ -291,13 +291,6 @@ body.menu-page .nav-actions .icon-btn{visibility:hidden;}
 .mini-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
 .widget-bestsellers .mini-grid{grid-template-columns:repeat(4,1fr); gap:8px; flex:1; align-content:center;}
 .widget-bestsellers .mini-grid > :nth-child(n+5){display:none;}
-/* The Visit Us card is taller now (three hours rows), which stretches this
-   row — taller thumbs + a stretched grid let the cards fill it instead of
-   leaving blank space under them. Only in the 4-column desktop layout. */
-@media (min-width:1201px){
-  .widget-bestsellers .mini-grid{align-content:stretch;}
-  .widget-bestsellers .food-card .thumb{aspect-ratio:1/1;}
-}
 /* No small-card-specific padding/font-size override here on purpose — on
    desktop/tablet, .food-card-small should fall back to the exact same
    .body/h4/.card-price sizing as a regular Menu grid card (they're the same
