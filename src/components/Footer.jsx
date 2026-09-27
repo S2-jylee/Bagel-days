@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { IcMail, IcPhone, IcInsta, IcTikTok, IcFacebook, IcDonut } from "./Icons";
 import { useSiteSettings } from "../context/SiteSettingsContext";
-import { hoursRows } from "../lib/siteSettings";
+import { hoursRows, telHref } from "../lib/siteSettings";
 
 export default function Footer() {
   const { settings } = useSiteSettings();
@@ -40,7 +40,7 @@ export default function Footer() {
             <h4>Contact</h4>
             <ul>
               <li><IcMail /><a href={`mailto:${settings.email}`}>{settings.email}</a></li>
-              <li><IcPhone /><span>{settings.phone}</span></li>
+              <li><IcPhone /><a href={telHref(settings.phone)}>{settings.phone}</a></li>
             </ul>
             <div className="foot-social">
               <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><IcInsta /></a>
