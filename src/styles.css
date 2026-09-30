@@ -767,7 +767,10 @@ p.lede{white-space:pre-line;}
   display:flex; flex-direction:column; gap:clamp(3px, 1.6cqw, 8px);
   background:#FEF8F1; padding:clamp(8px, 7cqw, 26px);
 }
-.set-banner-mini-img{width:57.5%; max-width:100%; aspect-ratio:325/110; object-fit:fill; border-radius:6px; display:block;}
+/* 325px is the recommended upload width itself (see the admin hint) — shown
+   at that literal size instead of scaled to a % of the card, which used to
+   make it look noticeably smaller than the photo actually uploaded. */
+.set-banner-mini-img{width:325px; max-width:100%; aspect-ratio:325/110; object-fit:fill; border-radius:6px; display:block;}
 /* Sized to match the Add-ons card right beside it (that card's own h4/
    tier-name sizes are the reference) rather than its own independent
    scale, so the two promo-column cards read as one consistent pair. */
