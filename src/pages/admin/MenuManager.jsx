@@ -422,8 +422,11 @@ function emptyForm(category, subcategory) {
 // Set is the one category with no Best Menu panel (it has no best-seller
 // concept), so this fills that spot instead — the photo + line of text
 // behind Menu's "Make It A Set" mini-banner. Stored on a "menu" page_content
-// row, which (unlike every other page) doesn't exist until this saves for
-// the first time, hence upsert rather than update.
+// row — unlike every other page, nothing ever created this row from the
+// client, so it was seeded once directly in the DB; update (not upsert)
+// after that, same as every other page_content editor, since an upsert's
+// implicit INSERT is what page_content's RLS policy (update-only) rejects,
+// even when the row already exists and it would only ever update.
 function SetBannerSection({ content, t }) {
   const [text, setText] = useState(content.description || "Enjoy our great-value set menu!");
   const [image, setImage] = useState(content.images?.[0] || "/assets/images/sandwich-set.jpg");
@@ -443,7 +446,8 @@ function SetBannerSection({ content, t }) {
       const url = supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
       const { error: err } = await supabase
         .from("page_content")
-        .upsert({ page_id: "menu", images: [url], updated_at: new Date().toISOString() }, { onConflict: "page_id" });
+        .update({ images: [url], updated_at: new Date().toISOString() })
+        .eq("page_id", "menu");
       if (err) throw err;
       setImage(url);
       logActivity({ action: "update", entity: "set_banner", label: t("setBannerHeading"), path: t("menu") });
@@ -459,7 +463,8 @@ function SetBannerSection({ content, t }) {
     setError("");
     const { error: err } = await supabase
       .from("page_content")
-      .upsert({ page_id: "menu", description: text, updated_at: new Date().toISOString() }, { onConflict: "page_id" });
+      .update({ description: text, updated_at: new Date().toISOString() })
+      .eq("page_id", "menu");
     setSaving(false);
     if (err) {
       setError(err.message || t("saveFailed"));
