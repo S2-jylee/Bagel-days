@@ -8,7 +8,7 @@ import { asset } from "../lib/assetUrl";
 import { useProducts } from "../context/ProductsContext";
 import { usePageContent } from "../context/PageContentContext";
 import { useSiteSettings } from "../context/SiteSettingsContext";
-import { telHref, hoursRows } from "../lib/siteSettings";
+import { telHref, hoursRows, mapsViewUrl } from "../lib/siteSettings";
 import { useSeo } from "../lib/seo";
 
 const DEFAULT_CONTENT = {
@@ -132,7 +132,7 @@ export default function Home() {
                 </a>
               </li>
             </ul>
-            <Link to="/visit" className="btn btn-primary btn-sm">View on Google Maps</Link>
+            <a href={mapsViewUrl(settings)} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm">View on Google Maps</a>
           </div>
         </div>
       </section>
