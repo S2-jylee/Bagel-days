@@ -1933,9 +1933,6 @@ export default function MenuManager() {
                       const pickerProducts = Object.values(products).filter(
                         (p) => p.categoryId === picker.categoryId && (!hasSubcats || p.subcategoryId === picker.subcategoryId) && p.id !== form.id
                       );
-                      const scopeLabel = hasSubcats
-                        ? pickerCat?.subcategories.find((s) => s.id === picker.subcategoryId)?.label
-                        : pickerCat?.label;
                       return (
                         <div className="set-section" key={si}>
                           <div className="set-section-head">
@@ -1978,29 +1975,12 @@ export default function MenuManager() {
                               onChange={(e) => {
                                 const val = e.target.value;
                                 if (!val) return;
-                                if (val === "__any__") {
-                                  addSetSectionChoice(si, {
-                                    type: "category",
-                                    categoryId: picker.categoryId,
-                                    subcategoryId: hasSubcats ? picker.subcategoryId : null,
-                                  });
-                                } else {
-                                  addSetSectionChoice(si, { type: "product", productId: val });
-                                }
+                                addSetSectionChoice(si, { type: "product", productId: val });
                               }}
                               disabled={!picker.categoryId || (hasSubcats && !picker.subcategoryId)}
                             >
                               <option value="">{t("setSelectProduct")}</option>
-                              {scopeLabel && (
-                                <optgroup label={t("setWildcardGroupLabel")}>
-                                  <option value="__any__">{t("setAnyItemIn", scopeLabel)}</option>
-                                </optgroup>
-                              )}
-                              {pickerProducts.length > 0 && (
-                                <optgroup label={t("setSpecificItemGroupLabel")}>
-                                  {pickerProducts.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                                </optgroup>
-                              )}
+                              {pickerProducts.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
                             </select>
                           </div>
                           {section.choices.length > 0 && (

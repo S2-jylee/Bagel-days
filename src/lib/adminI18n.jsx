@@ -131,9 +131,10 @@ const STRINGS = {
     setSelectCategory: "Category",
     setSelectSubcategory: "Subcategory",
     setSelectProduct: "Item",
+    // Still used to render any pre-existing "choose any category" choice
+    // saved before this option was removed from the picker below — not for
+    // creating new ones any more.
     setAnyItemIn: (label) => `Choose any ${label}`,
-    setWildcardGroupLabel: "Whole category (shows every item in it)",
-    setSpecificItemGroupLabel: "Specific item",
     removeSetItem: "Remove this choice",
     inviteStaffButton: "+ Add Staff",
     inviteStaffTitle: "Add a Staff Account",
@@ -351,9 +352,9 @@ const STRINGS = {
     setSelectCategory: "대카테고리",
     setSelectSubcategory: "중카테고리",
     setSelectProduct: "상품",
+    // 이 옵션이 선택창에서 빠지기 전에 저장된 기존 "카테고리 아무거나" 항목을
+    // 표시할 때만 쓰입니다 — 새로 추가하는 용도는 아닙니다.
     setAnyItemIn: (label) => `${label} 중 아무거나 선택`,
-    setWildcardGroupLabel: "카테고리 전체 (그 안의 모든 상품이 다 보임)",
-    setSpecificItemGroupLabel: "특정 상품",
     removeSetItem: "이 항목 삭제",
     inviteStaffButton: "+ 직원 추가",
     inviteStaffTitle: "직원 계정 추가",
