@@ -480,27 +480,30 @@ function SetBannerSection({ content, t }) {
       </div>
 
       <div className="set-banner-panel-body">
-        <div className="set-banner-panel-photo">
-          <img src={productImageUrl(image)} alt="" />
-          <label className="about-editable-photo-pencil" aria-label={t("setBannerImageLabel")}>
-            {uploading ? <span className="about-editable-photo-busy" /> : <IcPencil />}
-            <input
-              type="file"
-              accept="image/*"
-              hidden
-              disabled={uploading}
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                e.target.value = "";
-                if (f) handlePhotoPick(f);
-              }}
-            />
-          </label>
+        <div>
+          <div className="set-banner-panel-photo">
+            <img src={productImageUrl(image)} alt="" />
+            <label className="about-editable-photo-pencil" aria-label={t("setBannerImageLabel")}>
+              {uploading ? <span className="about-editable-photo-busy" /> : <IcPencil />}
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                disabled={uploading}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = "";
+                  if (f) handlePhotoPick(f);
+                }}
+              />
+            </label>
+          </div>
+          <p className="menu-manager-photo-hint">{t("setBannerImageHint")}</p>
         </div>
 
-        <div className="field full set-banner-panel-text">
+        <div className="field set-banner-panel-text">
           <label>{t("setBannerTextLabel")}</label>
-          <textarea rows={2} value={text} onChange={(e) => setText(e.target.value)} />
+          <input type="text" value={text} onChange={(e) => setText(e.target.value)} />
         </div>
       </div>
 
@@ -518,7 +521,7 @@ function SetBannerSection({ content, t }) {
 
 export default function MenuManager() {
   const { t } = useAdminLang();
-  const { products, addons } = useProducts();
+  const { products, addons, refresh: refreshProducts } = useProducts();
   const { categories, loading: categoriesLoading } = useCategories();
   const { pages: pageContent, loading: pageContentLoading } = usePageContent();
   const [activeCat, setActiveCat] = useState(categories[0].id);
@@ -1129,6 +1132,11 @@ export default function MenuManager() {
         details: prevProduct ? diffProductDetails(prevProduct, row, categories, t) : `${t("price")}: $${row.price.toFixed(2)}`,
       });
 
+      // Pull the just-saved row in directly rather than waiting on the
+      // realtime subscription — reopening this same product's edit modal
+      // right after Save could otherwise win that race and seed the form
+      // from the pre-save snapshot (see refresh()'s doc comment).
+      await refreshProducts();
       setForm(null);
     } catch (err) {
       setFormError(err.message || t("saveFailed"));

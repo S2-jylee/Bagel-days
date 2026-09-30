@@ -107,7 +107,17 @@ export function ProductsProvider({ children }) {
     };
   }, []);
 
-  return <ProductsContext.Provider value={state}>{children}</ProductsContext.Provider>;
+  // Exposed so a save in the admin can pull the fresh row straight away
+  // instead of waiting on the realtime round-trip — reopening the edit
+  // modal right after Save used to be able to win that race and show the
+  // pre-save (e.g. still-empty) data, which then looked like the save had
+  // silently done nothing if saved again from there.
+  async function refresh() {
+    const next = await fetchAll();
+    setState({ ...next, loading: false });
+  }
+
+  return <ProductsContext.Provider value={{ ...state, refresh }}>{children}</ProductsContext.Provider>;
 }
 
 // Buckets a flat list of addons (as found on `addons` / `product.addons`)
@@ -126,7 +136,7 @@ export function groupAddons(list) {
     .map((g) => ({ ...g, options: [...g.options].sort((a, b) => a.sortOrder - b.sortOrder) }));
 }
 
-// { products: {[id]: {...}}, addons: {[id]: {...}}, addonGroups: {[id]: {...}}, loading }
+// { products: {[id]: {...}}, addons: {[id]: {...}}, addonGroups: {[id]: {...}}, loading, refresh }
 export function useProducts() {
   const ctx = useContext(ProductsContext);
   if (!ctx) throw new Error("useProducts must be used within ProductsProvider");
