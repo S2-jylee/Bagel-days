@@ -1724,20 +1724,22 @@ export default function MenuManager() {
                         <span className="menu-manager-star-notice">{t("bestSellersFull")}</span>
                       )}
                     </div>
-                    <div className="menu-manager-star-wrap" hidden={activeCat === "set"}>
-                      <button
-                        type="button"
-                        className={`menu-manager-star menu-manager-category-best${p.isCategoryBest ? " active" : ""}`}
-                        onClick={() => toggleCategoryBest(p)}
-                        aria-label={p.isCategoryBest ? t("removeFromCategoryBest") : t("markAsCategoryBest")}
-                        title={p.isCategoryBest ? t("categoryBestShownOnMenu") : t("markAsCategoryBest")}
-                      >
-                        <IcTag />
-                      </button>
-                      {categoryBestLimitId === p.id && (
-                        <span className="menu-manager-star-notice">{t("categoryBestFull")}</span>
-                      )}
-                    </div>
+                    {activeCat !== "set" && (
+                      <div className="menu-manager-star-wrap">
+                        <button
+                          type="button"
+                          className={`menu-manager-star menu-manager-category-best${p.isCategoryBest ? " active" : ""}`}
+                          onClick={() => toggleCategoryBest(p)}
+                          aria-label={p.isCategoryBest ? t("removeFromCategoryBest") : t("markAsCategoryBest")}
+                          title={p.isCategoryBest ? t("categoryBestShownOnMenu") : t("markAsCategoryBest")}
+                        >
+                          <IcTag />
+                        </button>
+                        {categoryBestLimitId === p.id && (
+                          <span className="menu-manager-star-notice">{t("categoryBestFull")}</span>
+                        )}
+                      </div>
+                    )}
                     <div className="menu-manager-row-actions">
                       <button type="button" className="btn btn-ghost btn-sm" onClick={() => openEdit(p)}>{t("edit")}</button>
                       <button type="button" className="btn btn-ghost btn-sm menu-manager-delete" onClick={() => handleDelete(p)}>{t("delete")}</button>
