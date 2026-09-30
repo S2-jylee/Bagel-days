@@ -1991,8 +1991,16 @@ export default function MenuManager() {
                               disabled={!picker.categoryId || (hasSubcats && !picker.subcategoryId)}
                             >
                               <option value="">{t("setSelectProduct")}</option>
-                              {scopeLabel && <option value="__any__">{t("setAnyItemIn", scopeLabel)}</option>}
-                              {pickerProducts.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                              {scopeLabel && (
+                                <optgroup label={t("setWildcardGroupLabel")}>
+                                  <option value="__any__">{t("setAnyItemIn", scopeLabel)}</option>
+                                </optgroup>
+                              )}
+                              {pickerProducts.length > 0 && (
+                                <optgroup label={t("setSpecificItemGroupLabel")}>
+                                  {pickerProducts.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                </optgroup>
+                              )}
                             </select>
                           </div>
                           {section.choices.length > 0 && (
