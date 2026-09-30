@@ -1075,6 +1075,20 @@ export default function MenuManager() {
       setFormError(t("nameRequired"));
       return;
     }
+    // A section with only a label (no choices picked yet) or only choices
+    // (label never typed) used to save as neither — the row's own filter
+    // below silently drops any section missing either half, so a half-filled
+    // one just vanished on save with no explanation. A section with NEITHER
+    // (the untouched default row) is still fine to drop silently. Only
+    // flagging the XOR case catches genuinely half-done sections without
+    // blocking the common case of an unused extra row.
+    if (form.categoryId === "set") {
+      const incomplete = form.setSections.some((s) => Boolean(s.label.trim()) !== (s.choices.length > 0));
+      if (incomplete) {
+        setFormError(t("setSectionIncomplete"));
+        return;
+      }
+    }
     setSaving(true);
     setFormError("");
     try {
