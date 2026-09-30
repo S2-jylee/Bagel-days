@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { supabase } from "../../lib/supabase";
 import { useProducts, groupAddons } from "../../context/ProductsContext";
 import { useCategories } from "../../context/CategoriesContext";
+import { usePageContent } from "../../context/PageContentContext";
 import { productImageUrl } from "../../lib/assetUrl";
 import { resizeImage } from "../../lib/imageResize";
 import {
@@ -418,10 +419,108 @@ function emptyForm(category, subcategory) {
   };
 }
 
+// Set is the one category with no Best Menu panel (it has no best-seller
+// concept), so this fills that spot instead — the photo + line of text
+// behind Menu's "Make It A Set" mini-banner. Stored on a "menu" page_content
+// row, which (unlike every other page) doesn't exist until this saves for
+// the first time, hence upsert rather than update.
+function SetBannerSection({ content, t }) {
+  const [text, setText] = useState(content.description || "Enjoy our great-value set menu!");
+  const [image, setImage] = useState(content.images?.[0] || "/assets/images/sandwich-set.jpg");
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [savedFlash, setSavedFlash] = useState(false);
+
+  async function handlePhotoPick(file) {
+    setUploading(true);
+    setError("");
+    try {
+      const resized = await resizeImage(file, 1200);
+      const path = `${crypto.randomUUID()}.jpg`;
+      const { error: upErr } = await supabase.storage.from(BUCKET).upload(path, resized, { cacheControl: "3600", upsert: false });
+      if (upErr) throw upErr;
+      const url = supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+      const { error: err } = await supabase
+        .from("page_content")
+        .upsert({ page_id: "menu", images: [url], updated_at: new Date().toISOString() }, { onConflict: "page_id" });
+      if (err) throw err;
+      setImage(url);
+      logActivity({ action: "update", entity: "set_banner", label: t("setBannerHeading"), path: t("menu") });
+    } catch (err) {
+      setError(err.message || t("photoUploadFailed"));
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function handleSaveText() {
+    setSaving(true);
+    setError("");
+    const { error: err } = await supabase
+      .from("page_content")
+      .upsert({ page_id: "menu", description: text, updated_at: new Date().toISOString() }, { onConflict: "page_id" });
+    setSaving(false);
+    if (err) {
+      setError(err.message || t("saveFailed"));
+      return;
+    }
+    logActivity({ action: "update", entity: "set_banner", label: t("setBannerHeading"), path: t("menu") });
+    setSavedFlash(true);
+    setTimeout(() => setSavedFlash(false), 2000);
+  }
+
+  return (
+    <div className="bestseller-panel set-banner-panel">
+      <div className="bestseller-panel-head">
+        <div className="inventory-fillall-text">
+          <strong>{t("setBannerHeading")}</strong>
+          <span>{t("setBannerDesc")}</span>
+        </div>
+      </div>
+
+      <div className="set-banner-panel-body">
+        <div className="set-banner-panel-photo">
+          <img src={productImageUrl(image)} alt="" />
+          <label className="about-editable-photo-pencil" aria-label={t("setBannerImageLabel")}>
+            {uploading ? <span className="about-editable-photo-busy" /> : <IcPencil />}
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              disabled={uploading}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = "";
+                if (f) handlePhotoPick(f);
+              }}
+            />
+          </label>
+        </div>
+
+        <div className="field full set-banner-panel-text">
+          <label>{t("setBannerTextLabel")}</label>
+          <textarea rows={2} value={text} onChange={(e) => setText(e.target.value)} />
+        </div>
+      </div>
+
+      {error && <p className="form-status err">{error}</p>}
+
+      <div className="menu-manager-form-actions">
+        {savedFlash && <span className="form-status ok">{t("saved")}</span>}
+        <button type="button" className="btn btn-primary btn-sm" onClick={handleSaveText} disabled={saving}>
+          {saving ? t("saving") : t("saveChanges")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function MenuManager() {
   const { t } = useAdminLang();
   const { products, addons } = useProducts();
   const { categories, loading: categoriesLoading } = useCategories();
+  const { pages: pageContent, loading: pageContentLoading } = usePageContent();
   const [activeCat, setActiveCat] = useState(categories[0].id);
   const [activeSubcat, setActiveSubcat] = useState(categories[0].subcategories?.[0]?.id ?? null);
   // Where the subcategory TaxonomyEditor's "Manage Subcategories" toggle
@@ -1535,6 +1634,10 @@ export default function MenuManager() {
                 )}
               </div>
             </>
+          )}
+
+          {activeCat === "set" && !pageContentLoading && (
+            <SetBannerSection key="set-banner" content={pageContent.menu || {}} t={t} />
           )}
 
           <div className="menu-manager-toolbar-actions menu-manager-toolbar-actions-left">

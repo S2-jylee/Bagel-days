@@ -4,9 +4,16 @@ import FoodCard from "../components/FoodCard";
 import { useProducts, groupAddons } from "../context/ProductsContext";
 import { IcDonut, IcTub, IcBread, IcCakeSlice, IcCup, IcBowl, IcSet, IcPaperBag, IcTag, IcChevronDown } from "../components/Icons";
 import { IcChevron } from "../components/DeliveryButtons";
-import { asset } from "../lib/assetUrl";
+import { productImageUrl } from "../lib/assetUrl";
 import { ORDER_NOW_URL } from "../lib/orderNow";
 import { useSeo, SITE_URL } from "../lib/seo";
+import { usePageContent } from "../context/PageContentContext";
+
+// Fallback for the "Make It A Set" mini-banner until admin (Menu > Set tab)
+// saves a page_content row for "menu" — reused from there so this page never
+// shows blank text/image before or without one.
+const DEFAULT_SET_BANNER_TEXT = "Enjoy our great-value set menu!";
+const DEFAULT_SET_BANNER_IMAGE = "/assets/images/sandwich-set.jpg";
 
 const CATEGORY_ICONS = {
   bagels: IcDonut,
@@ -62,6 +69,9 @@ function OrderNowButton({ className = "delivery-btn delivery-btn-direct" }) {
 
 export default function Menu() {
   const { categories, loading: categoriesLoading } = useCategories();
+  const { pages: pageContent } = usePageContent();
+  const setBannerText = pageContent.menu?.description || DEFAULT_SET_BANNER_TEXT;
+  const setBannerImage = pageContent.menu?.images?.[0] || DEFAULT_SET_BANNER_IMAGE;
 
   // Category/subcategory names only — actual prices load async from Supabase
   // (see ProductsContext), so a full item-by-item Menu schema isn't reliable here.
@@ -244,8 +254,8 @@ export default function Menu() {
                       <h4>Make It A Set</h4>
                     </div>
                     <div className="set-banner-mini-body">
-                      <p>Enjoy our great-value set menu!</p>
-                      <img src={asset("/assets/images/sandwich-set.jpg")} alt="Bagel set" className="set-banner-mini-img" />
+                      <p>{setBannerText}</p>
+                      <img src={productImageUrl(setBannerImage)} alt="Bagel set" className="set-banner-mini-img" />
                     </div>
                   </div>
 
