@@ -106,6 +106,58 @@ function moveByKey(list, draggingKey, overKey) {
   return next;
 }
 
+// Scrolls the page while a native drag is held near the top/bottom edge of
+// the viewport. Browsers' built-in drag autoscroll only kicks in within a
+// few pixels of the edge (and not at all in some), so dragging a row from
+// the top of a long list to the bottom would otherwise stall at the fold.
+// Speed ramps up the closer the pointer gets to the edge.
+// Rows only get a dragover when the browser decides to send one, so while
+// the page scrolls under a pointer held still, `onOver` is fed whichever
+// [data-reorder-id] row has slid underneath it — otherwise the list would
+// scroll while the dragged row lagged behind.
+const AUTO_SCROLL_EDGE = 110;
+const AUTO_SCROLL_MAX_SPEED = 24;
+function useDragAutoScroll(active, onOver) {
+  const onOverRef = useRef(onOver);
+  onOverRef.current = onOver;
+  useEffect(() => {
+    if (!active) return;
+    let speed = 0;
+    let raf = 0;
+    let x = 0;
+    let y = 0;
+
+    function handleDragOver(e) {
+      x = e.clientX;
+      y = e.clientY;
+      const fromBottom = window.innerHeight - e.clientY;
+      if (e.clientY < AUTO_SCROLL_EDGE) {
+        speed = -AUTO_SCROLL_MAX_SPEED * (1 - Math.max(e.clientY, 0) / AUTO_SCROLL_EDGE);
+      } else if (fromBottom < AUTO_SCROLL_EDGE) {
+        speed = AUTO_SCROLL_MAX_SPEED * (1 - Math.max(fromBottom, 0) / AUTO_SCROLL_EDGE);
+      } else {
+        speed = 0;
+      }
+    }
+    function tick() {
+      // "instant" overrides html{scroll-behavior:smooth}, which would
+      // otherwise restart an easing animation on every frame.
+      if (speed !== 0) {
+        window.scrollBy({ top: speed, behavior: "instant" });
+        const row = document.elementFromPoint(x, y)?.closest("[data-reorder-id]");
+        if (row) onOverRef.current(row.dataset.reorderId);
+      }
+      raf = requestAnimationFrame(tick);
+    }
+    document.addEventListener("dragover", handleDragOver);
+    raf = requestAnimationFrame(tick);
+    return () => {
+      document.removeEventListener("dragover", handleDragOver);
+      cancelAnimationFrame(raf);
+    };
+  }, [active]);
+}
+
 function emptyAddonOption() {
   return { key: crypto.randomUUID(), id: null, name: "", price: "" };
 }
@@ -207,6 +259,9 @@ function TaxonomyEditor({
   const [newLabel, setNewLabel] = useState("");
   const [order, setOrder] = useState(items.map((it) => it.id));
   const [draggingId, setDraggingId] = useState(null);
+  useDragAutoScroll(draggingId !== null, (overId) => {
+    if (draggingId !== overId) setOrder((prev) => moveInList(prev, draggingId, overId));
+  });
   const [uploadingIconId, setUploadingIconId] = useState(null);
 
   // toggleContainerRef (when passed) lets a caller relocate just the
@@ -312,6 +367,7 @@ function TaxonomyEditor({
             className={`taxonomy-edit-row${draggingId === item.id ? " dragging" : ""}`}
             key={item.id}
             draggable
+            data-reorder-id={item.id}
             onDragStart={(e) => {
               e.dataTransfer.effectAllowed = "move";
               e.dataTransfer.setData("text/plain", item.id);
@@ -674,6 +730,12 @@ export default function MenuManager() {
   const [categoryBestOrderedIds, setCategoryBestOrderedIds] = useState([]);
   const [savingCategoryBestOrder, setSavingCategoryBestOrder] = useState(false);
   const [draggingCategoryBestId, setDraggingCategoryBestId] = useState(null);
+
+  useDragAutoScroll(draggingId !== null || draggingBestSellerId !== null || draggingCategoryBestId !== null, (overId) => {
+    if (draggingId && draggingId !== overId) setOrderedIds((prev) => moveInList(prev, draggingId, overId));
+    if (draggingBestSellerId && draggingBestSellerId !== overId) setBestSellerOrderedIds((prev) => moveInList(prev, draggingBestSellerId, overId));
+    if (draggingCategoryBestId && draggingCategoryBestId !== overId) setCategoryBestOrderedIds((prev) => moveInList(prev, draggingCategoryBestId, overId));
+  });
 
   // Leaving the category/subcategory you were reordering discards the
   // unsaved drag state rather than trying to carry it somewhere it no
@@ -1362,6 +1424,7 @@ export default function MenuManager() {
                 className={`bestseller-card${bestSellerReordering ? " reordering" : ""}${draggingBestSellerId === p.id ? " dragging" : ""}`}
                 key={p.id}
                 draggable={bestSellerReordering}
+                data-reorder-id={p.id}
                 onDragStart={(e) => {
                   e.dataTransfer.effectAllowed = "move";
                   e.dataTransfer.setData("text/plain", p.id);
@@ -1633,6 +1696,7 @@ export default function MenuManager() {
                         className={`bestseller-card${categoryBestReordering ? " reordering" : ""}${draggingCategoryBestId === p.id ? " dragging" : ""}`}
                         key={p.id}
                         draggable={categoryBestReordering}
+                        data-reorder-id={p.id}
                         onDragStart={(e) => {
                           e.dataTransfer.effectAllowed = "move";
                           e.dataTransfer.setData("text/plain", p.id);
@@ -1690,6 +1754,7 @@ export default function MenuManager() {
                 className={`inventory-row menu-manager-row${p.isActive === false ? " inactive" : ""}${reordering ? " reordering" : ""}${draggingId === p.id ? " dragging" : ""}`}
                 key={p.id}
                 draggable={reordering}
+                data-reorder-id={p.id}
                 onDragStart={(e) => {
                   e.dataTransfer.effectAllowed = "move";
                   e.dataTransfer.setData("text/plain", p.id);
