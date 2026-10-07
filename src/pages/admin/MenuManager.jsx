@@ -115,8 +115,8 @@ function moveByKey(list, draggingKey, overKey) {
 // the page scrolls under a pointer held still, `onOver` is fed whichever
 // [data-reorder-id] row has slid underneath it — otherwise the list would
 // scroll while the dragged row lagged behind.
-const AUTO_SCROLL_EDGE = 110;
-const AUTO_SCROLL_MAX_SPEED = 24;
+const AUTO_SCROLL_EDGE = 140;
+const AUTO_SCROLL_MAX_SPEED = 48;
 function useDragAutoScroll(active, onOver) {
   const onOverRef = useRef(onOver);
   onOverRef.current = onOver;
