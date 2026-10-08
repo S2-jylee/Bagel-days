@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
 import { UberEatsButton, DoorDashButton } from "../components/DeliveryButtons";
 import HeroCarousel from "../components/HeroCarousel";
 import { IcHandCoins, IcCan, IcCoffeeCup, IcPaperBag, IcMapPinThin, IcMotorbike } from "../components/Icons";
 import { usePageContent } from "../context/PageContentContext";
+import { useSiteSettings } from "../context/SiteSettingsContext";
+import { mapsViewUrl } from "../lib/siteSettings";
 import { useSeo } from "../lib/seo";
 
 const DEFAULT_CONTENT = {
@@ -27,6 +28,7 @@ export default function Pickup() {
   });
 
   const { pages, loading: pagesLoading } = usePageContent();
+  const { settings } = useSiteSettings();
   const content = pages.pickup || DEFAULT_CONTENT;
 
   // Avoid flashing DEFAULT_CONTENT's bundled placeholder photo before the
@@ -78,10 +80,10 @@ export default function Pickup() {
               </div>
               <div>
                 <h4 style={{ color: "var(--ink)", fontSize: "1rem" }}>Need to find us?</h4>
-                <p style={{ fontSize: ".9rem" }}>Shop 1, 29 Robertson Street, Fortitude Valley QLD 4006</p>
+                <p style={{ fontSize: ".9rem" }}>{settings.addressLine1}, {settings.addressLine2}</p>
               </div>
             </div>
-            <Link to="/visit" className="btn btn-ghost btn-sm">View on Google Maps</Link>
+            <a href={mapsViewUrl(settings)} target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm">View on Google Maps</a>
           </div>
         </div>
       </section>
