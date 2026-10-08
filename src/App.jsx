@@ -27,6 +27,19 @@ export default function App() {
     document.body.classList.toggle("menu-page", location.pathname === "/menu");
   }, [location.pathname]);
 
+  // Block the right-click menu on the public site (admin and the order
+  // display keep it). Text fields are left alone so customers can still
+  // paste into the pickup/contact forms.
+  useEffect(() => {
+    if (isStandalone) return;
+    function handleContextMenu(e) {
+      if (e.target.closest("input, textarea")) return;
+      e.preventDefault();
+    }
+    document.addEventListener("contextmenu", handleContextMenu);
+    return () => document.removeEventListener("contextmenu", handleContextMenu);
+  }, [isStandalone]);
+
   if (isStandalone) {
     return (
       <Routes>
