@@ -1969,5 +1969,18 @@ textarea.about-editable-input{min-width:260px;}
   border-radius:50%; background:rgba(255,255,255,.95); color:var(--maroon); cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.25);
 }
 .about-editable-photo-pencil svg{width:14px; height:14px;}
+/* Recommended upload size, bottom-left of each editable photo (the pencil
+   is bottom-right). */
+.about-photo-size{
+  position:absolute; bottom:6px; left:6px; padding:2px 6px; border-radius:4px; background:rgba(43,27,20,.72); color:#fff;
+  font-family:'Pretendard', sans-serif; font-size:.62rem; font-weight:500; line-height:1.4; letter-spacing:0; white-space:nowrap; pointer-events:none;
+}
+.about-photo-size-inline{position:static; align-self:center;}
+/* The mascot illustration keeps its own natural height (the wrapper, not
+   the img, carries .mascot-panel-deco's sizing here) and is too narrow for
+   the badge beside the pencil, so the badge sits just under it instead. */
+.about-editable-photo.mascot-panel-deco{height:auto;}
+.about-editable-photo.mascot-panel-deco img{height:auto;}
+.about-editable-photo.mascot-panel-deco .about-photo-size{bottom:-20px; left:50%; transform:translateX(-50%);}
 .about-editable-photo-busy{width:12px; height:12px; border-radius:50%; border:2px solid var(--tan); border-top-color:var(--maroon); animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}

@@ -25,11 +25,17 @@ export function aboutIconComponent(key) {
 }
 
 // The About page's fully-editable text + icon content (everything besides
-// the fixed "About Us" header and section headings, and besides the named
-// photo slots in aboutPhotos.js) — defaults match what was previously
+// the "Meet Candy" / "What Makes Bagel Days Special" headings, and besides
+// the named photo slots in aboutPhotos.js) — defaults match what was previously
 // hardcoded in About.jsx, so the page renders identically until an admin
 // changes something in Homepage > About.
 export const DEFAULT_ABOUT_CONTENT = {
+  headings: {
+    heroTitle: "About Us",
+    heroTagline: "Freshly Baked, Every Morning.",
+    storyTitle: "Our Story",
+    storyTagline: "Freshly Crafted Every Morning.",
+  },
   // A single field per item (not separate lead/rest) — **wrapped like this**
   // renders bold, matching the old lead-in styling, but the whole thing is
   // one editable region in admin instead of two side-by-side pencils. See

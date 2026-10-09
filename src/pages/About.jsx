@@ -20,6 +20,7 @@ export default function About() {
   // Each list/array item is merged individually (by index) with its default,
   // so an admin edit to just one field (e.g. only the icon) doesn't lose the
   // rest of that item's still-default text.
+  const headings = { ...DEFAULT_ABOUT_CONTENT.headings, ...(overrides.headings || {}) };
   const storyList = DEFAULT_ABOUT_CONTENT.storyList.map((d, i) => ({ ...d, ...(overrides.storyList?.[i] || {}) }));
   const candy = { ...DEFAULT_ABOUT_CONTENT.candy, ...(overrides.candy || {}) };
   const specials = DEFAULT_ABOUT_CONTENT.specials.map((d, i) => ({ ...d, ...(overrides.specials?.[i] || {}) }));
@@ -29,5 +30,5 @@ export default function About() {
   // Supabase row arrives — see Home.jsx for the same pattern.
   if (pagesLoading) return null;
 
-  return <AboutPageBody storyList={storyList} candy={candy} candyPhotos={candyPhotos} specials={specials} photoUrl={photoUrl} />;
+  return <AboutPageBody headings={headings} storyList={storyList} candy={candy} candyPhotos={candyPhotos} specials={specials} photoUrl={photoUrl} />;
 }

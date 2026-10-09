@@ -22,6 +22,17 @@ async function uploadSiteImage(file) {
   return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
+// Same as uploadSiteImage but keeps transparency (PNG) — for the mascot
+// illustration in About's Meet Candy panel, a cut-out that sits straight on
+// the panel's cream background and would get a white box as a JPEG.
+async function uploadSiteCutout(file) {
+  const resized = await resizeImage(file, 600, { format: "image/png" });
+  const path = `${crypto.randomUUID()}.png`;
+  const { error } = await supabase.storage.from(BUCKET).upload(path, resized, { cacheControl: "3600", upsert: false });
+  if (error) throw error;
+  return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
+
 // An uploaded SVG goes to storage as-is instead of being rasterized to a
 // PNG — matching uploadCategoryIcon in MenuManager. No raster size can match
 // true vector rendering, which is what the hand-coded line icons elsewhere
@@ -258,7 +269,7 @@ function AboutSection({ content, t }) {
     setBusySlot(slot);
     setError("");
     try {
-      const url = await uploadSiteImage(file);
+      const url = slot === "candyDeco" ? await uploadSiteCutout(file) : await uploadSiteImage(file);
       await savePhotos({ ...photosRef.current, [slot]: url });
     } catch (err) {
       setError(err.message || t("photoUploadFailed"));
@@ -305,6 +316,7 @@ function AboutSection({ content, t }) {
     await savePhotos({ ...photosRef.current, candy: list.filter((_, i) => i !== index) });
   }
 
+  const headings = { ...DEFAULT_ABOUT_CONTENT.headings, ...(overrides.headings || {}) };
   const storyList = DEFAULT_ABOUT_CONTENT.storyList.map((d, i) => ({ ...d, ...(overrides.storyList?.[i] || {}) }));
   const candy = { ...DEFAULT_ABOUT_CONTENT.candy, ...(overrides.candy || {}) };
   const specials = DEFAULT_ABOUT_CONTENT.specials.map((d, i) => ({ ...d, ...(overrides.specials?.[i] || {}) }));
@@ -312,10 +324,12 @@ function AboutSection({ content, t }) {
   return (
     <div className="homepage-section about-editor">
       <p className="homepage-hint">{t("aboutPhotosIntro")}</p>
+      <p className="homepage-hint">{t("aboutImageSizeHint")}</p>
       {error && <p className="form-status err">{error}</p>}
 
       <div className="about-editor-preview">
         <AboutPageBody
+          headings={headings}
           storyList={storyList}
           candy={candy}
           candyPhotos={candyPhotoList(photos)}
@@ -323,6 +337,7 @@ function AboutSection({ content, t }) {
           photoUrl={(slot) => productImageUrl(photos[slot] || DEFAULT_ABOUT_PHOTOS[slot])}
           editable
           busySlot={busySlot}
+          onHeadingChange={(field, v) => saveContent({ ...overridesRef.current, headings: { ...(overridesRef.current.headings || {}), [field]: v } })}
           onStoryIconPick={(i, f) => handleIconPick("storyList", i, f)}
           onStoryTextChange={(i, field, v) => saveContent(patchArrayItem("storyList", i, field, v))}
           onCandyTextChange={(field, v) => saveContent({ ...overridesRef.current, candy: { ...(overridesRef.current.candy || {}), [field]: v } })}

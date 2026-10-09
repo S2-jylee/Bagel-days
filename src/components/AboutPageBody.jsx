@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { asset, productImageUrl } from "../lib/assetUrl";
+import { productImageUrl } from "../lib/assetUrl";
+import { ABOUT_PHOTO_SIZES } from "../lib/aboutPhotos";
 import { aboutIconComponent } from "../lib/aboutContent";
 import { IcPencil, IcPlus, IcTrash, IcChevronLeft, IcChevronRight } from "./Icons";
 
@@ -126,11 +127,16 @@ function EditableIcon({ value, iconUrl, onPick, editable, busy }) {
 // A photo with a pencil overlay (editable mode only) that opens a file
 // picker; the actual upload is done by the caller (onPick receives the
 // raw File, not a URL — the admin wrapper owns Supabase Storage access).
-function EditablePhoto({ src, alt, className, onPick, busy }) {
+// `slot` picks that photo's recommended upload size for the small badge in
+// the opposite corner. `className` goes on the bare <img> on the public
+// page, and on the wrapper instead in editable mode, so a class that
+// positions the image in its parent's layout keeps doing so either way.
+function EditablePhoto({ src, alt, className, slot, onPick, busy }) {
   if (!onPick) return <img src={src} alt={alt} className={className} />;
   return (
-    <span className="about-editable-photo">
-      <img src={src} alt={alt} className={className} />
+    <span className={`about-editable-photo${className ? ` ${className}` : ""}`}>
+      <img src={src} alt={alt} />
+      <span className="about-photo-size">{ABOUT_PHOTO_SIZES[slot]}px</span>
       <label className="about-editable-photo-pencil" aria-label="Change photo">
         {busy ? <span className="about-editable-photo-busy" /> : <IcPencil />}
         <input type="file" accept="image/*" hidden disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) onPick(f); }} />
@@ -213,6 +219,7 @@ function CandyPhotoManager({ photos, busy, onAdd, onRemove }) {
           <input type="file" accept="image/*" hidden disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) onAdd(f); }} />
         </label>
       )}
+      <span className="about-photo-size about-photo-size-inline">{ABOUT_PHOTO_SIZES.candy}px</span>
     </div>
   );
 }
@@ -224,6 +231,7 @@ function CandyPhotoManager({ photos, busy, onAdd, onRemove }) {
 // lookalike that could drift out of sync with it. Change handlers are only
 // required in editable mode.
 export default function AboutPageBody({
+  headings,
   storyList,
   candy,
   candyPhotos,
@@ -231,6 +239,7 @@ export default function AboutPageBody({
   photoUrl,
   editable = false,
   busySlot,
+  onHeadingChange,
   onStoryIconPick,
   onStoryTextChange,
   onCandyTextChange,
@@ -244,9 +253,9 @@ export default function AboutPageBody({
     <>
       <section className="hero about-hero">
         <div className="wrap about-hero-wrap">
-          <h1>About Us</h1>
+          <h1><EditableText value={headings.heroTitle} editable={editable} onChange={(v) => onHeadingChange("heroTitle", v)} /></h1>
           <div className="about-hero-divider"><span /></div>
-          <p className="script" style={{ fontSize: "1.2rem", marginTop: 14 }}>Freshly Baked, Every Morning.</p>
+          <p className="script" style={{ fontSize: "1.2rem", marginTop: 14 }}><EditableText value={headings.heroTagline} editable={editable} onChange={(v) => onHeadingChange("heroTagline", v)} /></p>
         </div>
       </section>
 
@@ -255,14 +264,15 @@ export default function AboutPageBody({
           <div className="our-story-photo">
             <EditablePhoto
               src={photoUrl("storyMain")}
+              slot="storyMain"
               alt="Hand-rolled bagel dough"
               onPick={onPhotoPick && ((f) => onPhotoPick("storyMain", f))}
               busy={busySlot === "storyMain"}
             />
           </div>
           <div className="our-story-text">
-            <h2>Our Story</h2>
-            <p className="script our-story-tagline">Freshly Crafted Every Morning.</p>
+            <h2><EditableText value={headings.storyTitle} editable={editable} onChange={(v) => onHeadingChange("storyTitle", v)} /></h2>
+            <p className="script our-story-tagline"><EditableText value={headings.storyTagline} editable={editable} onChange={(v) => onHeadingChange("storyTagline", v)} /></p>
             <ul className="story-list">
               {storyList.map((item, i) => (
                 <li key={i}>
@@ -281,8 +291,8 @@ export default function AboutPageBody({
             </ul>
           </div>
           <div className="img-duo">
-            <EditablePhoto src={photoUrl("storyTop")} alt="Bagels boiling" onPick={onPhotoPick && ((f) => onPhotoPick("storyTop", f))} busy={busySlot === "storyTop"} />
-            <EditablePhoto src={photoUrl("storyBottom")} alt="Bagels baking in the oven" onPick={onPhotoPick && ((f) => onPhotoPick("storyBottom", f))} busy={busySlot === "storyBottom"} />
+            <EditablePhoto src={photoUrl("storyTop")} slot="storyTop" alt="Bagels boiling" onPick={onPhotoPick && ((f) => onPhotoPick("storyTop", f))} busy={busySlot === "storyTop"} />
+            <EditablePhoto src={photoUrl("storyBottom")} slot="storyBottom" alt="Bagels baking in the oven" onPick={onPhotoPick && ((f) => onPhotoPick("storyBottom", f))} busy={busySlot === "storyBottom"} />
           </div>
         </div>
 
@@ -295,7 +305,7 @@ export default function AboutPageBody({
               <p style={{ marginTop: 10 }}><EditableText value={candy.p2} editable={editable} textarea onChange={(v) => onCandyTextChange("p2", v)} /></p>
               <p style={{ marginTop: 10 }} className="script"><EditableText value={candy.p3} editable={editable} textarea onChange={(v) => onCandyTextChange("p3", v)} /></p>
             </div>
-            <img className="mascot-panel-deco" src={asset("/assets/images/mascot-dog.png")} alt="" />
+            <EditablePhoto className="mascot-panel-deco" src={photoUrl("candyDeco")} slot="candyDeco" alt="" onPick={onPhotoPick && ((f) => onPhotoPick("candyDeco", f))} busy={busySlot === "candyDeco"} />
           </div>
           {editable && (
             <CandyPhotoManager
@@ -332,7 +342,7 @@ export default function AboutPageBody({
                   </div>
                 </div>
                 <div className="thumb">
-                  <EditablePhoto src={photoUrl(s.slot)} alt={s.num} onPick={onPhotoPick && ((f) => onPhotoPick(s.slot, f))} busy={busySlot === s.slot} />
+                  <EditablePhoto src={photoUrl(s.slot)} slot={s.slot} alt={s.num} onPick={onPhotoPick && ((f) => onPhotoPick(s.slot, f))} busy={busySlot === s.slot} />
                 </div>
               </div>
             ))}
