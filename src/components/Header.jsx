@@ -1,6 +1,5 @@
 import { NavLink, Link } from "react-router-dom";
 import { IcInsta, IcTikTok } from "./Icons";
-import { asset } from "../lib/assetUrl";
 import { ORDER_NOW_URL } from "../lib/orderNow";
 
 const IcFacebook = () => (
@@ -21,7 +20,6 @@ export default function Header({ onOpenMobileNav }) {
     <header className="site">
       <div className="nav">
         <Link to="/" className="logo">
-          <img src={asset("/assets/images/logo-mark.jpg")} alt="Bagel Days logo" />
           Bagel Days
         </Link>
         <nav className="links">
