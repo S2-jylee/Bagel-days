@@ -95,6 +95,11 @@ function ProductModal({ id, onClose, nested }) {
           )}
           <p className={p.setSections.length > 0 ? "product-modal-desc-bold" : undefined}>{p.desc}</p>
 
+          {/* Only this part scrolls — the photo, name/price/description
+              above and the Order Now button below stay put, so a Set with
+              lots of components doesn't push the photo off the top. */}
+          {(p.setSections.length > 0 || p.addons.length > 0) && (
+          <div className="product-modal-scroll">
           {p.setSections.length > 0 && (
             <div className="modal-set-sections">
               {p.setSections.map((section, i) => {
@@ -169,6 +174,8 @@ function ProductModal({ id, onClose, nested }) {
                 </div>
               ))}
             </div>
+          )}
+          </div>
           )}
 
           <a
