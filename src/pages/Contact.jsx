@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { IcGift, IcMailCheck, IcMail, IcInsta, IcTikTok, IcFacebook, IcPhoneCall, IcExternal } from "../components/Icons";
 import { asset, productImageUrl } from "../lib/assetUrl";
+import { closingNote } from "../lib/closingNote";
 import { usePageContent } from "../context/PageContentContext";
 import { useSiteSettings } from "../context/SiteSettingsContext";
 import HeroCarousel from "../components/HeroCarousel";
@@ -27,6 +28,7 @@ export default function Contact() {
   const cateringCardImg = content.contactCardImage
     ? productImageUrl(content.contactCardImage)
     : asset("/assets/images/catering-box.png");
+  const note = closingNote("contact", pages.contact);
   const { settings } = useSiteSettings();
   const socialLinks = [
     { ic: IcInsta, label: "Instagram", value: settings.instagramHandle, href: settings.instagramUrl },
@@ -136,10 +138,10 @@ export default function Contact() {
           </div>
 
           <div className="thank-note">
-            <img src={asset("/assets/images/candy-mascot.png")} alt="Candy the mascot" />
+            <img src={productImageUrl(note.image)} alt="" />
             <div>
-              <h3 className="script" style={{ fontSize: "1.2rem" }}>Thank you for supporting Bagel Days.</h3>
-              <p style={{ marginTop: 6 }}>From our family to yours, thank you for being part of our journey. We can't wait to welcome you soon!</p>
+              <h3 className="script" style={{ fontSize: "1.2rem" }}>{note.title}</h3>
+              <p style={{ marginTop: 6 }}>{note.text}</p>
             </div>
           </div>
         </div>

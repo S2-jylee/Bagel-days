@@ -927,6 +927,7 @@ p.lede{white-space:pre-line;}
 .check-list li svg{width:16px; height:16px; color:var(--maroon); flex-shrink:0; margin-top:3px;}
 .closing-note{margin-top:36px; text-align:center; background:var(--cream-alt); border-radius:var(--radius); padding:36px;}
 .closing-note .ic svg{width:28px; height:28px;}
+.closing-note-img{width:100%; height:100%; object-fit:contain; border-radius:50%;}
 .map-embed{width:100%; aspect-ratio:16/8; border:0; border-radius:var(--radius); margin-top:40px;}
 
 /* ---------- Contact ---------- */
@@ -1917,6 +1918,12 @@ footer ul li a:hover{color:#F0D9C9;}
    .contact-card-photo-center) centers in whatever leftover height Top
    Photos' taller content leaves below the label, not just after it. */
 .homepage-photo-row > .field:not(.full){flex:0 0 auto; display:flex; flex-direction:column;}
+.closing-note-photo{
+  position:relative; width:140px; height:140px; margin-bottom:8px; display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--line); border-radius:8px; background:var(--cream-alt); color:var(--maroon);
+}
+.closing-note-photo > img{width:100%; height:100%; object-fit:contain; display:block; border-radius:8px;}
+.closing-note-photo > svg{width:40px; height:40px;}
 .contact-card-photo-center{flex:1; display:flex; align-items:center; justify-content:center; margin-top:8px;}
 .homepage-photo-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:12px; margin-top:8px;}
 .homepage-photo-thumb{position:relative; border-radius:8px; overflow:hidden; border:1px solid var(--line); background:#fff;}

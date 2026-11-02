@@ -2,6 +2,8 @@ import { IcMapPin, IcClockOutline, IcMapPinned, IcCircleParking, IcCheck, IcHear
 import { usePageContent } from "../context/PageContentContext";
 import { useSiteSettings } from "../context/SiteSettingsContext";
 import { mapsDirectionsUrl, mapsViewUrl, hoursRows } from "../lib/siteSettings";
+import { closingNote } from "../lib/closingNote";
+import { productImageUrl } from "../lib/assetUrl";
 import HeroCarousel from "../components/HeroCarousel";
 import { useSeo } from "../lib/seo";
 
@@ -20,6 +22,7 @@ export default function Visit() {
 
   const { pages, loading: pagesLoading } = usePageContent();
   const content = pages.visit || DEFAULT_CONTENT;
+  const note = closingNote("visit", pages.visit);
   const { settings } = useSiteSettings();
 
   // Avoid flashing DEFAULT_CONTENT's bundled placeholder photo before the
@@ -95,10 +98,10 @@ export default function Visit() {
 
           <div className="closing-note">
             <div className="ic" style={{ width: 60, height: 60, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--maroon)", margin: "0 auto 14px" }}>
-              <IcHeartThin />
+              {note.image ? <img src={productImageUrl(note.image)} alt="" className="closing-note-img" /> : <IcHeartThin />}
             </div>
-            <h3 className="script" style={{ fontSize: "1.4rem" }}>We look forward to seeing you soon!</h3>
-            <p style={{ marginTop: 10 }}>Thank you for choosing Bagel Days. We can't wait to welcome you with freshly baked bagels and great coffee.</p>
+            <h3 className="script" style={{ fontSize: "1.4rem" }}>{note.title}</h3>
+            <p style={{ marginTop: 10 }}>{note.text}</p>
           </div>
         </div>
       </section>

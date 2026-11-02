@@ -6,9 +6,10 @@ import { productImageUrl } from "../../lib/assetUrl";
 import { resizeImage } from "../../lib/imageResize";
 import { useAdminLang } from "../../lib/adminI18n";
 import { logActivity } from "../../lib/activityLog";
-import { IcChevronLeft, IcChevronRight, IcTrash, IcPencil } from "../../components/Icons";
+import { IcChevronLeft, IcChevronRight, IcTrash, IcPencil, IcHeartThin } from "../../components/Icons";
 import { DEFAULT_ABOUT_PHOTOS, candyPhotoList } from "../../lib/aboutPhotos";
 import { DEFAULT_ABOUT_CONTENT } from "../../lib/aboutContent";
+import { CLOSING_NOTE_DEFAULTS, closingNote } from "../../lib/closingNote";
 import AboutPageBody from "../../components/AboutPageBody";
 
 const BUCKET = "site-images";
@@ -514,6 +515,106 @@ function ContactCardImageSection({ content, t }) {
   );
 }
 
+// The message block at the bottom of Contact / Visit Us. The image saves as
+// soon as it's picked, like every other photo here, and the text with this
+// section's own Save button. Both go through the same stored closingNote
+// (noteRef), so saving one never writes the other's unsaved draft.
+export function ClosingNoteSection({ pageId, content, headingKey, t }) {
+  const defaults = CLOSING_NOTE_DEFAULTS[pageId];
+  const initial = closingNote(pageId, content);
+  const [title, setTitle] = useState(initial.title);
+  const [text, setText] = useState(initial.text);
+  const [image, setImage] = useState(initial.image);
+  const noteRef = useRef(content.aboutContent?.closingNote || {});
+  const [busy, setBusy] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [savedFlash, setSavedFlash] = useState(false);
+  const [error, setError] = useState("");
+
+  async function saveNote(patch) {
+    const next = { ...noteRef.current, ...patch };
+    const { error: err } = await supabase
+      .from("page_content")
+      .update({ about_content: { ...(content.aboutContent || {}), closingNote: next }, updated_at: new Date().toISOString() })
+      .eq("page_id", pageId);
+    if (err) {
+      setError(err.message || t("saveFailed"));
+      return false;
+    }
+    noteRef.current = next;
+    logActivity({ action: "update", entity: "homepage_section", label: t(headingKey), path: t("homepageTab") });
+    return true;
+  }
+
+  async function handlePick(file) {
+    setBusy(true);
+    setError("");
+    try {
+      const url = await uploadSiteCutout(file);
+      if (await saveNote({ image: url })) setImage(url);
+    } catch (err) {
+      setError(err.message || t("photoUploadFailed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    setError("");
+    const ok = await saveNote({ title, text });
+    setSaving(false);
+    if (!ok) return;
+    setSavedFlash(true);
+    setTimeout(() => setSavedFlash(false), 2000);
+  }
+
+  return (
+    <div className="homepage-section">
+      <h4 className="homepage-subheading">{t(headingKey)}</h4>
+      <div className="field full">
+        <label>{t("closingNoteImageLabel")}</label>
+        <div className="closing-note-photo">
+          {image ? <img src={productImageUrl(image)} alt="" /> : <IcHeartThin />}
+          <span className="about-photo-size">{defaults.size}px</span>
+          <label className="about-editable-photo-pencil" aria-label={t("closingNoteImageLabel")}>
+            {busy ? <span className="about-editable-photo-busy" /> : <IcPencil />}
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              disabled={busy}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = "";
+                if (f) handlePick(f);
+              }}
+            />
+          </label>
+        </div>
+        <p className="homepage-hint">{t("closingNoteImageHint")}</p>
+      </div>
+      <div className="field full">
+        <label>{t("titleLabel")}</label>
+        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+      </div>
+      <div className="field full">
+        <label>{t("descriptionLabel")}</label>
+        <textarea rows={3} value={text} onChange={(e) => setText(e.target.value)} />
+      </div>
+
+      {error && <p className="form-status err">{error}</p>}
+
+      <div className="menu-manager-form-actions">
+        {savedFlash && <span className="form-status ok">{t("saved")}</span>}
+        <button type="button" className="btn btn-primary btn-sm" onClick={handleSave} disabled={saving || busy}>
+          {saving ? t("saving") : t("saveChanges")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 const SUB_TABS = [
   { id: "home", labelKey: "homeSectionTitle" },
   { id: "about", labelKey: "aboutSectionTitle" },
@@ -550,18 +651,24 @@ export default function HomepageManager() {
       {subTab === "about" && pages.about && <AboutSection key="about" content={pages.about} t={t} />}
       {subTab === "pickup" && pages.pickup && <PageSection key="pickup" pageId="pickup" sectionLabel={t("pickupSectionTitle")} content={pages.pickup} t={t} />}
       {subTab === "visit" && pages.visit && (
-        <PageSection key="visit" pageId="visit" sectionLabel={t("visitSectionTitle")} content={pages.visit} showTagline={false} footerNoteKey="visitBusinessInfoNote" t={t} />
+        <>
+          <PageSection key="visit" pageId="visit" sectionLabel={t("visitSectionTitle")} content={pages.visit} showTagline={false} footerNoteKey="visitBusinessInfoNote" t={t} />
+          <ClosingNoteSection key="visit-note" pageId="visit" content={pages.visit} headingKey="closingNoteVisitHeading" t={t} />
+        </>
       )}
       {subTab === "contact" && pages.contact && (
-        <PageSection
-          key="contact"
-          pageId="contact"
-          sectionLabel={t("contactSectionTitle")}
-          content={pages.contact}
-          footerNoteKey="contactBusinessInfoNote"
-          extraPhotoField={<ContactCardImageSection content={pages.contact} t={t} />}
-          t={t}
-        />
+        <>
+          <PageSection
+            key="contact"
+            pageId="contact"
+            sectionLabel={t("contactSectionTitle")}
+            content={pages.contact}
+            footerNoteKey="contactBusinessInfoNote"
+            extraPhotoField={<ContactCardImageSection content={pages.contact} t={t} />}
+            t={t}
+          />
+          <ClosingNoteSection key="contact-note" pageId="contact" content={pages.contact} headingKey="closingNoteContactHeading" t={t} />
+        </>
       )}
       {subTab === "footer" && <BusinessInfoSection key="footer" settings={settings} t={t} />}
     </div>

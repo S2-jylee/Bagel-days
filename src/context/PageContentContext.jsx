@@ -67,6 +67,8 @@ export function PageContentProvider({ children }) {
 // contactCardImage is only meaningful for page_id "contact" — the single
 // photo in the Catering & Bulk Orders card, separate from that page's own
 // hero carousel (images).
+// Contact and Visit Us also keep their bottom message block in aboutContent,
+// as closingNote (see src/lib/closingNote.js).
 export function usePageContent() {
   const ctx = useContext(PageContentContext);
   if (!ctx) throw new Error("usePageContent must be used within PageContentProvider");
