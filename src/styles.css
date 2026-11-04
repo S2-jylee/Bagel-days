@@ -650,13 +650,17 @@ p.lede{white-space:pre-line;}
    the photo too, and a fixed height keeps every divider the same length. */
 .special-item-text{
   display:flex; flex-direction:column; align-items:center; text-align:center;
-  min-height:150px; padding:0 14px; border-right:1px solid var(--line);
+  min-height:150px; padding:0 14px; position:relative;
   /* Grid items in a row share the tallest item’s height; letting the text
      block grow to fill it pins every .thumb to the row’s bottom edge, so the
      photos line up even when a description wraps to more lines. */
   flex:1 1 auto;
 }
-.special-grid > .special-item:last-child .special-item-text{border-right:none;}
+/* The divider sits in the middle of the 20px grid gap (right:-10px), not on
+   the item's own edge, so the space between it and the photos on either
+   side is equal. */
+.special-item-text::after{content:""; position:absolute; top:0; bottom:0; right:-10px; width:1px; background:var(--line);}
+.special-grid > .special-item:last-child .special-item-text::after{display:none;}
 /* .special-item-copy groups num/h4/p (previously flat inside
    .special-item-text) so the icon can become a separate column on mobile
    without also splitting num/h4/p apart from each other. Column layout
@@ -1062,7 +1066,8 @@ footer ul li a:hover{color:#F0D9C9;}
   /* Dividers only make sense in a single row (desktop's 5-across) — at
      2 columns the grid wraps, so a lone divider on the row's last item
      would just dangle against the outer edge with nothing beside it. */
-  .special-item-text{border-right:none; min-height:0;}
+  .special-item-text{min-height:0;}
+  .special-item-text::after{display:none;}
   /* Our Story on mobile: the single big photo is dropped (matches the
      mockup — list first, then the two duo photos side by side instead
      of stacked, no room for all three on a narrow screen). */
@@ -1173,7 +1178,7 @@ footer ul li a:hover{color:#F0D9C9;}
      own column instead of sitting above the num/title/description. */
   .special-grid{grid-template-columns:1fr; gap:18px;}
   .special-item{display:flex; flex-direction:row; align-items:flex-start; gap:12px;}
-  .special-item-text{flex-direction:row; align-items:center; text-align:left; padding:0; border-right:none; min-height:0; flex:1; gap:10px;}
+  .special-item-text{flex-direction:row; align-items:center; text-align:left; padding:0; min-height:0; flex:1; gap:10px;}
   .special-item-copy{align-items:flex-start; text-align:left;}
   .special-item-icon{margin-bottom:0; flex-shrink:0;}
   .special-item .thumb{width:90px; flex-shrink:0; margin-top:0;}
