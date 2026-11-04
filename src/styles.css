@@ -961,8 +961,17 @@ label{font-size:.78rem; font-weight:600; color:var(--ink); display:block; margin
 .git-value:hover{color:var(--maroon);}
 .git-ext{color:var(--maroon-light); flex-shrink:0; display:flex;}
 .git-ext svg{width:15px; height:15px;}
-.thank-note{margin-top:30px; background:var(--cream-alt); border-radius:var(--radius); padding:26px; display:flex; gap:18px; align-items:center;}
-.thank-note img{width:70px; height:70px; object-fit:cover;}
+.thank-note{margin-top:30px; background:var(--cream-alt); border-radius:var(--radius); padding:14px 20px; display:flex; gap:14px; align-items:center;}
+.thank-note h3{font-size:1.05rem !important;}
+.thank-note p{font-size:.85rem; margin-top:2px !important;}
+/* contain, not cover: an uploaded logo (often not square) shows whole
+   instead of having its sides cropped off; sized so small lettering in it
+   stays legible. */
+.thank-note img{width:80px; height:auto; max-height:80px; object-fit:contain; flex-shrink:0;}
+@media (max-width:600px){
+  .thank-note{flex-direction:column; text-align:center;}
+  .thank-note img{width:90px; max-height:90px;}
+}
 .form-status{margin-top:12px; font-size:.85rem; font-family:'Pretendard', sans-serif;}
 .form-status.ok{color:#3f7d4d;}
 .form-status.err{color:var(--maroon);}

@@ -9,7 +9,7 @@ export const CLOSING_NOTE_DEFAULTS = {
     title: "Thank you for supporting Bagel Days.",
     text: "From our family to yours, thank you for being part of our journey. We can't wait to welcome you soon!",
     image: "/assets/images/candy-mascot.png",
-    size: "280 × 280",
+    size: "300 × 300",
   },
   visit: {
     title: "We look forward to seeing you soon!",
