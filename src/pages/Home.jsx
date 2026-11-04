@@ -4,7 +4,8 @@ import FoodCard from "../components/FoodCard";
 import HeroCarousel from "../components/HeroCarousel";
 import { UberEatsButton, DoorDashButton } from "../components/DeliveryButtons";
 import { IcLeafyGreen, IcHandCoins, IcCoffeeCup, IcHeartHandshake, IcPin, IcClock, IcPhone, IcPaperBag, IcMotorbike } from "../components/Icons";
-import { asset } from "../lib/assetUrl";
+import { productImageUrl } from "../lib/assetUrl";
+import { DEFAULT_ABOUT_PHOTOS } from "../lib/aboutPhotos";
 import { useProducts } from "../context/ProductsContext";
 import { usePageContent } from "../context/PageContentContext";
 import { useSiteSettings } from "../context/SiteSettingsContext";
@@ -29,6 +30,9 @@ export default function Home() {
   const { pages, loading: pagesLoading } = usePageContent();
   const content = pages.home || DEFAULT_CONTENT;
   const { settings } = useSiteSettings();
+  // The mobile-only mascot badge in the About widget is the same character
+  // as About > Meet Candy's side illustration, so it follows that admin slot.
+  const mascotSrc = productImageUrl(pages.about?.aboutPhotos?.candyDeco || DEFAULT_ABOUT_PHOTOS.candyDeco);
 
   // Which items show here (and in what order) is set by staff in Admin →
   // Menu Items, not derived automatically — see MenuManager's star toggle.
@@ -91,7 +95,7 @@ export default function Home() {
 
           <div className="widget-card widget-about">
             <div className="widget-about-badge">
-              <img src={asset("/assets/images/mascot-dog.png")} alt="Bagel Days mascot" />
+              <img src={mascotSrc} alt="Bagel Days mascot" />
             </div>
             <div className="widget-about-text">
               <h3>About Bagel Days</h3>
