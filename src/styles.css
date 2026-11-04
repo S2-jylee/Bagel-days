@@ -640,7 +640,7 @@ p.lede{white-space:pre-line;}
 
 /* ---------- Special numbered list ---------- */
 .special-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:20px; margin-top:20px;}
-.special-item{text-align:left;}
+.special-item{text-align:left; display:flex; flex-direction:column;}
 /* Fixed min-height on the text block (icon+num+h4+p), not the item as a
    whole — reserves the same vertical space regardless of how many lines a
    given item's description wraps to, so every item's .thumb below starts
@@ -651,6 +651,10 @@ p.lede{white-space:pre-line;}
 .special-item-text{
   display:flex; flex-direction:column; align-items:center; text-align:center;
   min-height:150px; padding:0 14px; border-right:1px solid var(--line);
+  /* Grid items in a row share the tallest item’s height; letting the text
+     block grow to fill it pins every .thumb to the row’s bottom edge, so the
+     photos line up even when a description wraps to more lines. */
+  flex:1 1 auto;
 }
 .special-grid > .special-item:last-child .special-item-text{border-right:none;}
 /* .special-item-copy groups num/h4/p (previously flat inside
@@ -1168,7 +1172,7 @@ footer ul li a:hover{color:#F0D9C9;}
      (icon above copy) to row (icon beside copy) so the icon becomes its
      own column instead of sitting above the num/title/description. */
   .special-grid{grid-template-columns:1fr; gap:18px;}
-  .special-item{display:flex; align-items:flex-start; gap:12px;}
+  .special-item{display:flex; flex-direction:row; align-items:flex-start; gap:12px;}
   .special-item-text{flex-direction:row; align-items:center; text-align:left; padding:0; border-right:none; min-height:0; flex:1; gap:10px;}
   .special-item-copy{align-items:flex-start; text-align:left;}
   .special-item-icon{margin-bottom:0; flex-shrink:0;}
