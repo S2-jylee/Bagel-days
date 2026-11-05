@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useProducts, groupAddons } from "../context/ProductsContext";
 import { useCategories } from "../context/CategoriesContext";
@@ -13,6 +13,48 @@ const IcClose = () => (
 );
 
 const BADGE_LABELS = { signature: "Signature", best: "Best", new: "New" };
+
+// The modal's scroll region with its own always-visible scrollbar. Mobile
+// browsers draw overlay scrollbars that fade out a moment after scrolling
+// stops (and CSS can't keep them on in iOS Safari/Whale), so the native one
+// is hidden and this track + thumb mirror the scroll position instead —
+// shown only while the content actually overflows.
+function ModalScrollArea({ children }) {
+  const ref = useRef(null);
+  const [bar, setBar] = useState(null);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const update = () => {
+      const { scrollTop, scrollHeight, clientHeight } = el;
+      if (scrollHeight <= clientHeight + 1) return setBar(null);
+      setBar({ top: (scrollTop / scrollHeight) * 100, height: (clientHeight / scrollHeight) * 100 });
+    };
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    // Content height changes after mount too (chip photos loading), and the
+    // region itself resizes with the viewport.
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    for (const child of el.children) ro.observe(child);
+    return () => {
+      el.removeEventListener("scroll", update);
+      ro.disconnect();
+    };
+  }, []);
+
+  return (
+    <div className={`product-modal-scroll-wrap${bar ? " has-bar" : ""}`}>
+      <div className="product-modal-scroll" ref={ref}>{children}</div>
+      {bar && (
+        <div className="product-modal-scrollbar" aria-hidden="true">
+          <span style={{ top: `${bar.top}%`, height: `${bar.height}%` }} />
+        </div>
+      )}
+    </div>
+  );
+}
 
 // PC-only enhancement: a section's choices resolved to the real, active
 // products they represent (a "choose any X" wildcard expands to every
@@ -99,7 +141,7 @@ function ProductModal({ id, onClose, nested }) {
               above and the Order Now button below stay put, so a Set with
               lots of components doesn't push the photo off the top. */}
           {(p.setSections.length > 0 || p.addons.length > 0) && (
-          <div className="product-modal-scroll">
+          <ModalScrollArea>
           {p.setSections.length > 0 && (
             <div className="modal-set-sections">
               {p.setSections.map((section, i) => {
@@ -175,7 +217,7 @@ function ProductModal({ id, onClose, nested }) {
               ))}
             </div>
           )}
-          </div>
+          </ModalScrollArea>
           )}
 
           <a
